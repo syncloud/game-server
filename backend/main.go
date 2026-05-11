@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/syncloud/game-server/backend/db"
 	"github.com/syncloud/game-server/backend/installer"
+	"github.com/syncloud/game-server/backend/query"
 	"github.com/syncloud/game-server/backend/runner"
 	"github.com/syncloud/game-server/backend/server"
 )
@@ -181,8 +183,17 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Stor
 		return
 	}
 	if len(parts) == 2 && parts[1] != "" {
-		handleServerAction(w, r, store, run, id, parts[1])
-		return
+		switch parts[1] {
+		case "logs":
+			handleLogs(w, r, run, id)
+			return
+		case "query":
+			handleQuery(w, r, store, id)
+			return
+		default:
+			handleServerAction(w, r, store, run, id, parts[1])
+			return
+		}
 	}
 	switch r.Method {
 	case http.MethodGet:
@@ -264,6 +275,35 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, store *server.St
 	s, _ = store.Get(id)
 	s.Status = currentStatus(s, run)
 	writeJSON(w, http.StatusOK, s)
+}
+
+func handleLogs(w http.ResponseWriter, r *http.Request, run *runner.Runner, id int64) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", "GET")
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"lines": run.Logs(id)})
+}
+
+func handleQuery(w http.ResponseWriter, r *http.Request, store *server.Store, id int64) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", "GET")
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	s, err := store.Get(id)
+	if err != nil || s == nil {
+		writeError(w, http.StatusNotFound, "not found")
+		return
+	}
+	addr := fmt.Sprintf("127.0.0.1:%d", s.Port)
+	info, err := query.QueryInfo(addr, 2*time.Second)
+	if err != nil {
+		writeError(w, http.StatusBadGateway, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, info)
 }
 
 func currentStatus(s *server.Server, run *runner.Runner) string {

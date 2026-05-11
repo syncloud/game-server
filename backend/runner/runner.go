@@ -10,15 +10,19 @@ import (
 	"time"
 )
 
+const ringSize = 500
+
 type Runner struct {
 	mu     sync.Mutex
 	procs  map[int64]*exec.Cmd
+	logs   map[int64]*ring
 	logger *log.Logger
 }
 
 func New(logger *log.Logger) *Runner {
 	return &Runner{
 		procs:  map[int64]*exec.Cmd{},
+		logs:   map[int64]*ring{},
 		logger: logger,
 	}
 }
@@ -36,6 +40,16 @@ func (r *Runner) Running(id int64) bool {
 	return syscall.Kill(cmd.Process.Pid, 0) == nil
 }
 
+func (r *Runner) Logs(id int64) []string {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	rg, ok := r.logs[id]
+	if !ok {
+		return []string{}
+	}
+	return rg.snapshot()
+}
+
 func (r *Runner) Start(id int64, startCmd string, workDir string) error {
 	if startCmd == "" {
 		return fmt.Errorf("start command empty")
@@ -47,14 +61,19 @@ func (r *Runner) Start(id int64, startCmd string, workDir string) error {
 			return fmt.Errorf("already running")
 		}
 	}
+	rg, ok := r.logs[id]
+	if !ok {
+		rg = newRing(ringSize)
+		r.logs[id] = rg
+	}
 	cmd := exec.Command("sh", "-c", startCmd)
 	if workDir != "" {
 		if _, err := os.Stat(workDir); err == nil {
 			cmd.Dir = workDir
 		}
 	}
-	cmd.Stdout = newLogWriter(r.logger, fmt.Sprintf("server[%d] stdout", id))
-	cmd.Stderr = newLogWriter(r.logger, fmt.Sprintf("server[%d] stderr", id))
+	cmd.Stdout = newLogWriter(r.logger, fmt.Sprintf("server[%d] stdout", id), rg)
+	cmd.Stderr = newLogWriter(r.logger, fmt.Sprintf("server[%d] stderr", id), rg)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	if err := cmd.Start(); err != nil {
@@ -68,8 +87,10 @@ func (r *Runner) Start(id int64, startCmd string, workDir string) error {
 		err := cmd.Wait()
 		if err != nil {
 			r.logger.Printf("server[%d] exited: %v", id, err)
+			rg.add(fmt.Sprintf("[runner] exited: %v", err))
 		} else {
 			r.logger.Printf("server[%d] exited cleanly", id)
+			rg.add("[runner] exited cleanly")
 		}
 	}()
 	return nil
@@ -117,16 +138,55 @@ func (r *Runner) Restart(id int64, startCmd string, workDir string) error {
 	return r.Start(id, startCmd, workDir)
 }
 
+type ring struct {
+	mu   sync.Mutex
+	buf  []string
+	pos  int
+	full bool
+	size int
+}
+
+func newRing(size int) *ring {
+	return &ring{buf: make([]string, size), size: size}
+}
+
+func (r *ring) add(s string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.buf[r.pos] = s
+	r.pos = (r.pos + 1) % r.size
+	if r.pos == 0 {
+		r.full = true
+	}
+}
+
+func (r *ring) snapshot() []string {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if !r.full {
+		out := make([]string, r.pos)
+		copy(out, r.buf[:r.pos])
+		return out
+	}
+	out := make([]string, r.size)
+	copy(out, r.buf[r.pos:])
+	copy(out[r.size-r.pos:], r.buf[:r.pos])
+	return out
+}
+
 type logWriter struct {
 	logger *log.Logger
 	prefix string
+	ring   *ring
 }
 
-func newLogWriter(l *log.Logger, p string) *logWriter {
-	return &logWriter{logger: l, prefix: p}
+func newLogWriter(l *log.Logger, p string, r *ring) *logWriter {
+	return &logWriter{logger: l, prefix: p, ring: r}
 }
 
 func (w *logWriter) Write(p []byte) (int, error) {
-	w.logger.Printf("%s: %s", w.prefix, string(p))
+	line := string(p)
+	w.logger.Printf("%s: %s", w.prefix, line)
+	w.ring.add(line)
 	return len(p), nil
 }

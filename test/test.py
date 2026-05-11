@@ -116,6 +116,34 @@ def test_create_unknown_game_rejected(app_domain):
     assert r.status_code == 400, r.text
 
 
+def test_logs_endpoint(app_domain):
+    create = requests.post(
+        'https://{0}/api/v1/servers'.format(app_domain),
+        json={
+            'name': 'log-stub',
+            'gameId': 'teeworlds',
+            'port': 8304,
+            'startCmd': 'echo hello-from-runner; sleep 5',
+        },
+        verify=False)
+    assert create.status_code == 201, create.text
+    sid = create.json()['id']
+    start = requests.post(
+        'https://{0}/api/v1/servers/{1}/start'.format(app_domain, sid),
+        verify=False)
+    assert start.status_code == 200, start.text
+    import time
+    time.sleep(2)
+    logs = requests.get(
+        'https://{0}/api/v1/servers/{1}/logs'.format(app_domain, sid),
+        verify=False)
+    assert logs.status_code == 200, logs.text
+    lines = logs.json().get('lines', [])
+    assert any('hello-from-runner' in l for l in lines), 'log buffer should capture stdout: ' + str(lines)
+    requests.post('https://{0}/api/v1/servers/{1}/stop'.format(app_domain, sid), verify=False)
+    requests.delete('https://{0}/api/v1/servers/{1}'.format(app_domain, sid), verify=False)
+
+
 def test_lifecycle(app_domain):
     create = requests.post(
         'https://{0}/api/v1/servers'.format(app_domain),
