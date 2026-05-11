@@ -5,7 +5,7 @@ local node = '20';
 local platform = '26.04.7';
 local python = '3.12-slim-bookworm';
 local deployer = 'https://github.com/syncloud/store/releases/download/4/syncloud-release';
-local distros = ['bookworm', 'buster'];
+local distros = ['bookworm'];
 local distro_default = 'bookworm';
 local arch = 'amd64';
 
