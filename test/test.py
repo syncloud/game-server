@@ -116,6 +116,42 @@ def test_create_unknown_game_rejected(app_domain):
     assert r.status_code == 400, r.text
 
 
+def test_lifecycle(app_domain):
+    create = requests.post(
+        'https://{0}/api/v1/servers'.format(app_domain),
+        json={
+            'name': 'stub',
+            'gameId': 'teeworlds',
+            'port': 8303,
+            'startCmd': 'sleep 30',
+        },
+        verify=False)
+    assert create.status_code == 201, create.text
+    sid = create.json()['id']
+
+    start = requests.post(
+        'https://{0}/api/v1/servers/{1}/start'.format(app_domain, sid),
+        verify=False)
+    assert start.status_code == 200, start.text
+    assert start.json()['status'] == 'running'
+
+    again = requests.post(
+        'https://{0}/api/v1/servers/{1}/start'.format(app_domain, sid),
+        verify=False)
+    assert again.status_code == 409, again.text
+
+    stop = requests.post(
+        'https://{0}/api/v1/servers/{1}/stop'.format(app_domain, sid),
+        verify=False)
+    assert stop.status_code == 200, stop.text
+    assert stop.json()['status'] == 'stopped'
+
+    cleanup = requests.delete(
+        'https://{0}/api/v1/servers/{1}'.format(app_domain, sid),
+        verify=False)
+    assert cleanup.status_code == 204, cleanup.text
+
+
 def test_storage_change_event(device):
     device.run_ssh('snap run game-server.storage-change > {0}/storage-change.log'.format(TMP_DIR))
 

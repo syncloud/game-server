@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/syncloud/game-server/backend/db"
+	"github.com/syncloud/game-server/backend/runner"
 	"github.com/syncloud/game-server/backend/server"
 )
 
@@ -69,6 +70,7 @@ func main() {
 	if err != nil {
 		logger.Fatalf("db: %v", err)
 	}
+	run := runner.New(logger)
 
 	_ = os.Remove(socketPath)
 	listener, err := net.Listen("unix", socketPath)
@@ -90,7 +92,7 @@ func main() {
 		handleServers(w, r, store)
 	})
 	mux.HandleFunc("/api/v1/servers/", func(w http.ResponseWriter, r *http.Request) {
-		handleServerByID(w, r, store)
+		handleServerByID(w, r, store, run)
 	})
 
 	logger.Printf("listening on %s", socketPath)
@@ -116,9 +118,10 @@ func openStore(logger *log.Logger) (*server.Store, error) {
 }
 
 type createRequest struct {
-	Name   string `json:"name"`
-	GameID string `json:"gameId"`
-	Port   int    `json:"port"`
+	Name     string `json:"name"`
+	GameID   string `json:"gameId"`
+	Port     int    `json:"port"`
+	StartCmd string `json:"startCmd"`
 }
 
 func handleServers(w http.ResponseWriter, r *http.Request, store *server.Store) {
@@ -149,7 +152,12 @@ func handleServers(w http.ResponseWriter, r *http.Request, store *server.Store) 
 		if req.Port == 0 {
 			req.Port = game.DefaultPort
 		}
-		s, err := store.Create(server.Server{Name: req.Name, GameID: req.GameID, Port: req.Port})
+		s, err := store.Create(server.Server{
+			Name:     req.Name,
+			GameID:   req.GameID,
+			Port:     req.Port,
+			StartCmd: req.StartCmd,
+		})
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -161,12 +169,16 @@ func handleServers(w http.ResponseWriter, r *http.Request, store *server.Store) 
 	}
 }
 
-func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Store) {
+func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Store, run *runner.Runner) {
 	rest := strings.TrimPrefix(r.URL.Path, "/api/v1/servers/")
 	parts := strings.SplitN(rest, "/", 2)
 	id, err := strconv.ParseInt(parts[0], 10, 64)
 	if err != nil {
 		writeError(w, http.StatusBadRequest, "invalid id")
+		return
+	}
+	if len(parts) == 2 && parts[1] != "" {
+		handleServerAction(w, r, store, run, id, parts[1])
 		return
 	}
 	switch r.Method {
@@ -180,8 +192,10 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Stor
 			writeError(w, http.StatusNotFound, "not found")
 			return
 		}
+		s.Status = currentStatus(s, run)
 		writeJSON(w, http.StatusOK, s)
 	case http.MethodDelete:
+		_ = run.Stop(id)
 		if err := store.Delete(id); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				writeError(w, http.StatusNotFound, "not found")
@@ -195,4 +209,54 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Stor
 		w.Header().Set("Allow", "GET, DELETE")
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 	}
+}
+
+func handleServerAction(w http.ResponseWriter, r *http.Request, store *server.Store, run *runner.Runner, id int64, action string) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", "POST")
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	s, err := store.Get(id)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if s == nil {
+		writeError(w, http.StatusNotFound, "not found")
+		return
+	}
+	switch action {
+	case "start":
+		if err := run.Start(id, s.StartCmd, s.InstallDir); err != nil {
+			writeError(w, http.StatusConflict, err.Error())
+			return
+		}
+		_ = store.UpdateStatus(id, "running")
+	case "stop":
+		if err := run.Stop(id); err != nil {
+			writeError(w, http.StatusConflict, err.Error())
+			return
+		}
+		_ = store.UpdateStatus(id, "stopped")
+	case "restart":
+		if err := run.Restart(id, s.StartCmd, s.InstallDir); err != nil {
+			writeError(w, http.StatusConflict, err.Error())
+			return
+		}
+		_ = store.UpdateStatus(id, "running")
+	default:
+		writeError(w, http.StatusNotFound, "unknown action")
+		return
+	}
+	s, _ = store.Get(id)
+	s.Status = currentStatus(s, run)
+	writeJSON(w, http.StatusOK, s)
+}
+
+func currentStatus(s *server.Server, run *runner.Runner) string {
+	if run.Running(s.ID) {
+		return "running"
+	}
+	return "stopped"
 }
