@@ -1,4 +1,5 @@
 import os
+import time
 from os.path import join
 from subprocess import check_output
 
@@ -12,6 +13,16 @@ from syncloudlib.integration.installer import local_install
 TMP_DIR = '/tmp/syncloud'
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+
+@pytest.fixture(scope="session")
+def auth(device_user, device_password):
+    return (device_user, device_password)
+
+
+@pytest.fixture(scope="session")
+def api(app_domain):
+    return 'https://{0}/api/v1'.format(app_domain)
 
 
 @pytest.fixture(scope="session")
@@ -57,14 +68,14 @@ def test_index(app_domain):
     wait_for_rest(requests.session(), "https://{0}".format(app_domain), 200, 10)
 
 
-def test_health(app_domain):
-    response = requests.get('https://{0}/api/v1/health'.format(app_domain), verify=False)
+def test_health(api, auth):
+    response = requests.get(api + '/health', auth=auth, verify=False)
     assert response.status_code == 200, response.text
     assert response.json().get('status') == 'ok', response.text
 
 
-def test_games_catalog(app_domain):
-    response = requests.get('https://{0}/api/v1/games'.format(app_domain), verify=False)
+def test_games_catalog(api, auth):
+    response = requests.get(api + '/games', auth=auth, verify=False)
     assert response.status_code == 200, response.text
     games = response.json()
     ids = {g['id'] for g in games}
@@ -72,15 +83,16 @@ def test_games_catalog(app_domain):
     assert 'cs2' in ids, 'cs2 anonymous-friendly steam server must be in catalog'
 
 
-def test_servers_empty(app_domain):
-    response = requests.get('https://{0}/api/v1/servers'.format(app_domain), verify=False)
+def test_servers_empty(api, auth):
+    response = requests.get(api + '/servers', auth=auth, verify=False)
     assert response.status_code == 200, response.text
     assert response.json() == [], 'no servers installed at start'
 
 
-def test_create_server(app_domain):
+def test_create_server(api, auth):
     response = requests.post(
-        'https://{0}/api/v1/servers'.format(app_domain),
+        api + '/servers',
+        auth=auth,
         json={'name': 'test-tw', 'gameId': 'teeworlds', 'port': 8303},
         verify=False)
     assert response.status_code == 201, response.text
@@ -91,34 +103,36 @@ def test_create_server(app_domain):
     assert body['status'] == 'stopped'
 
 
-def test_list_after_create(app_domain):
-    response = requests.get('https://{0}/api/v1/servers'.format(app_domain), verify=False)
+def test_list_after_create(api, auth):
+    response = requests.get(api + '/servers', auth=auth, verify=False)
     assert response.status_code == 200
     servers = response.json()
     assert len(servers) == 1
     assert servers[0]['name'] == 'test-tw'
 
 
-def test_delete_server(app_domain):
-    list_resp = requests.get('https://{0}/api/v1/servers'.format(app_domain), verify=False)
+def test_delete_server(api, auth):
+    list_resp = requests.get(api + '/servers', auth=auth, verify=False)
     sid = list_resp.json()[0]['id']
-    d = requests.delete('https://{0}/api/v1/servers/{1}'.format(app_domain, sid), verify=False)
+    d = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
     assert d.status_code == 204, d.text
-    after = requests.get('https://{0}/api/v1/servers'.format(app_domain), verify=False).json()
+    after = requests.get(api + '/servers', auth=auth, verify=False).json()
     assert after == []
 
 
-def test_create_unknown_game_rejected(app_domain):
+def test_create_unknown_game_rejected(api, auth):
     r = requests.post(
-        'https://{0}/api/v1/servers'.format(app_domain),
+        api + '/servers',
+        auth=auth,
         json={'name': 'bad', 'gameId': 'not-a-game', 'port': 1234},
         verify=False)
     assert r.status_code == 400, r.text
 
 
-def test_logs_endpoint(app_domain):
+def test_logs_endpoint(api, auth):
     create = requests.post(
-        'https://{0}/api/v1/servers'.format(app_domain),
+        api + '/servers',
+        auth=auth,
         json={
             'name': 'log-stub',
             'gameId': 'teeworlds',
@@ -128,25 +142,21 @@ def test_logs_endpoint(app_domain):
         verify=False)
     assert create.status_code == 201, create.text
     sid = create.json()['id']
-    start = requests.post(
-        'https://{0}/api/v1/servers/{1}/start'.format(app_domain, sid),
-        verify=False)
+    start = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
     assert start.status_code == 200, start.text
-    import time
     time.sleep(2)
-    logs = requests.get(
-        'https://{0}/api/v1/servers/{1}/logs'.format(app_domain, sid),
-        verify=False)
+    logs = requests.get(api + '/servers/{0}/logs'.format(sid), auth=auth, verify=False)
     assert logs.status_code == 200, logs.text
     lines = logs.json().get('lines', [])
     assert any('hello-from-runner' in l for l in lines), 'log buffer should capture stdout: ' + str(lines)
-    requests.post('https://{0}/api/v1/servers/{1}/stop'.format(app_domain, sid), verify=False)
-    requests.delete('https://{0}/api/v1/servers/{1}'.format(app_domain, sid), verify=False)
+    requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
+    requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
 
 
-def test_lifecycle(app_domain):
+def test_lifecycle(api, auth):
     create = requests.post(
-        'https://{0}/api/v1/servers'.format(app_domain),
+        api + '/servers',
+        auth=auth,
         json={
             'name': 'stub',
             'gameId': 'teeworlds',
@@ -157,26 +167,18 @@ def test_lifecycle(app_domain):
     assert create.status_code == 201, create.text
     sid = create.json()['id']
 
-    start = requests.post(
-        'https://{0}/api/v1/servers/{1}/start'.format(app_domain, sid),
-        verify=False)
+    start = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
     assert start.status_code == 200, start.text
     assert start.json()['status'] == 'running'
 
-    again = requests.post(
-        'https://{0}/api/v1/servers/{1}/start'.format(app_domain, sid),
-        verify=False)
+    again = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
     assert again.status_code == 409, again.text
 
-    stop = requests.post(
-        'https://{0}/api/v1/servers/{1}/stop'.format(app_domain, sid),
-        verify=False)
+    stop = requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
     assert stop.status_code == 200, stop.text
     assert stop.json()['status'] == 'stopped'
 
-    cleanup = requests.delete(
-        'https://{0}/api/v1/servers/{1}'.format(app_domain, sid),
-        verify=False)
+    cleanup = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
     assert cleanup.status_code == 204, cleanup.text
 
 
