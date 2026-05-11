@@ -135,6 +135,10 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
+	if err := i.registerOIDC(); err != nil {
+		i.logger.Warn("oidc register failed (continuing with forward-auth)", zap.Error(err))
+	}
+
 	variables := Variables{
 		AuthUrl:         authUrl,
 		AuthLocalSocket: i.platformClient.GetAuthLocalSocket(),
@@ -149,6 +153,14 @@ func (i *Installer) UpdateConfigs() error {
 	}
 
 	return i.FixPermissions()
+}
+
+func (i *Installer) registerOIDC() error {
+	password, err := i.platformClient.RegisterOIDCClient(App, "/auth/callback", true, "client_secret_basic")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path.Join(DataDir, "oidc.secret"), []byte(password), 0640)
 }
 
 func (i *Installer) FixPermissions() error {
