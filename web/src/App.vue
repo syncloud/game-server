@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import GameCard from './components/GameCard.vue'
 import ServerRow from './components/ServerRow.vue'
+import InstallDialog from './components/InstallDialog.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 
 const tab = ref('catalog')
@@ -10,6 +11,7 @@ const servers = ref([])
 const loading = ref(true)
 const error = ref(null)
 const query = ref('')
+const installing = ref(null)
 
 async function loadAll () {
   loading.value = true
@@ -26,6 +28,23 @@ async function loadAll () {
   } finally {
     loading.value = false
   }
+}
+
+async function createServer (payload) {
+  const r = await fetch('/api/v1/servers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  if (!r.ok) throw new Error((await r.json()).error || 'create failed')
+  installing.value = null
+  tab.value = 'servers'
+  await loadAll()
+}
+
+async function deleteServer (id) {
+  await fetch(`/api/v1/servers/${id}`, { method: 'DELETE' })
+  await loadAll()
 }
 
 const filteredGames = computed(() => {
@@ -61,7 +80,7 @@ onMounted(loadAll)
             :class="{ active: tab === 'servers' }"
             data-testid="tab-servers"
             @click="tab = 'servers'"
-          >My Servers</button>
+          >My Servers <span v-if="servers.length" class="count">{{ servers.length }}</span></button>
         </nav>
         <ThemeToggle />
       </div>
@@ -85,7 +104,12 @@ onMounted(loadAll)
           Try a different search.
         </div>
         <div v-else class="grid" data-testid="game-grid">
-          <GameCard v-for="g in filteredGames" :key="g.id" :game="g" />
+          <GameCard
+            v-for="g in filteredGames"
+            :key="g.id"
+            :game="g"
+            @install="installing = g"
+          />
         </div>
       </section>
 
@@ -95,10 +119,35 @@ onMounted(loadAll)
           <div class="empty-title">No servers yet</div>
           Install a game from the Catalog to get started.
         </div>
-        <div v-else>
-          <ServerRow v-for="s in servers" :key="s.id" :server="s" />
+        <div v-else class="grid">
+          <ServerRow
+            v-for="s in servers"
+            :key="s.id"
+            :server="s"
+            @delete="deleteServer(s.id)"
+          />
         </div>
       </section>
     </main>
+
+    <InstallDialog
+      v-if="installing"
+      :game="installing"
+      @close="installing = null"
+      @submit="createServer"
+    />
   </div>
 </template>
+
+<style scoped>
+.count {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 7px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+</style>

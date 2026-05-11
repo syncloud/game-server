@@ -1,14 +1,22 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
+
+	"github.com/syncloud/game-server/backend/db"
+	"github.com/syncloud/game-server/backend/server"
 )
 
 const socketPath = "/var/snap/game-server/current/backend.sock"
+const dbPath = "/var/snap/game-server/current/database.db"
 
 type Game struct {
 	ID          string   `json:"id"`
@@ -35,24 +43,32 @@ var catalog = []Game{
 	{ID: "terraria", Name: "Terraria (TShock)", Source: "egg", EggURL: "https://raw.githubusercontent.com/parkervcp/eggs/master/game_eggs/terraria/tshock/egg-t-shock.json", Summary: "2D sandbox with TShock server.", DefaultPort: 7777, Protocols: []string{"tcp"}},
 }
 
-type Server struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	GameID string `json:"gameId"`
-	Status string `json:"status"`
-	Port   int    `json:"port"`
-}
-
-var servers = []Server{}
-
 func writeJSON(w http.ResponseWriter, code int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	_ = json.NewEncoder(w).Encode(v)
 }
 
+func writeError(w http.ResponseWriter, code int, msg string) {
+	writeJSON(w, code, map[string]string{"error": msg})
+}
+
+func gameByID(id string) *Game {
+	for i := range catalog {
+		if catalog[i].ID == id {
+			return &catalog[i]
+		}
+	}
+	return nil
+}
+
 func main() {
 	logger := log.New(os.Stdout, "backend: ", log.LstdFlags)
+
+	store, err := openStore(logger)
+	if err != nil {
+		logger.Fatalf("db: %v", err)
+	}
 
 	_ = os.Remove(socketPath)
 	listener, err := net.Listen("unix", socketPath)
@@ -71,11 +87,112 @@ func main() {
 		writeJSON(w, http.StatusOK, catalog)
 	})
 	mux.HandleFunc("/api/v1/servers", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, http.StatusOK, servers)
+		handleServers(w, r, store)
+	})
+	mux.HandleFunc("/api/v1/servers/", func(w http.ResponseWriter, r *http.Request) {
+		handleServerByID(w, r, store)
 	})
 
 	logger.Printf("listening on %s", socketPath)
 	if err := http.Serve(listener, mux); err != nil {
 		logger.Fatalf("serve: %v", err)
+	}
+}
+
+func openStore(logger *log.Logger) (*server.Store, error) {
+	d, err := db.Open(dbPath)
+	if err != nil {
+		if _, statErr := os.Stat("/var/snap/game-server/current"); statErr != nil {
+			logger.Printf("data dir missing, falling back to in-memory db: %v", statErr)
+			d, err = db.Open(":memory:")
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, err
+		}
+	}
+	return server.NewStore(d.DB), nil
+}
+
+type createRequest struct {
+	Name   string `json:"name"`
+	GameID string `json:"gameId"`
+	Port   int    `json:"port"`
+}
+
+func handleServers(w http.ResponseWriter, r *http.Request, store *server.Store) {
+	switch r.Method {
+	case http.MethodGet:
+		list, err := store.List()
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		writeJSON(w, http.StatusOK, list)
+	case http.MethodPost:
+		var req createRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			writeError(w, http.StatusBadRequest, "invalid body")
+			return
+		}
+		req.Name = strings.TrimSpace(req.Name)
+		if req.Name == "" {
+			writeError(w, http.StatusBadRequest, "name required")
+			return
+		}
+		game := gameByID(req.GameID)
+		if game == nil {
+			writeError(w, http.StatusBadRequest, "unknown gameId")
+			return
+		}
+		if req.Port == 0 {
+			req.Port = game.DefaultPort
+		}
+		s, err := store.Create(server.Server{Name: req.Name, GameID: req.GameID, Port: req.Port})
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		writeJSON(w, http.StatusCreated, s)
+	default:
+		w.Header().Set("Allow", "GET, POST")
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+	}
+}
+
+func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Store) {
+	rest := strings.TrimPrefix(r.URL.Path, "/api/v1/servers/")
+	parts := strings.SplitN(rest, "/", 2)
+	id, err := strconv.ParseInt(parts[0], 10, 64)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid id")
+		return
+	}
+	switch r.Method {
+	case http.MethodGet:
+		s, err := store.Get(id)
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		if s == nil {
+			writeError(w, http.StatusNotFound, "not found")
+			return
+		}
+		writeJSON(w, http.StatusOK, s)
+	case http.MethodDelete:
+		if err := store.Delete(id); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				writeError(w, http.StatusNotFound, "not found")
+				return
+			}
+			writeError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	default:
+		w.Header().Set("Allow", "GET, DELETE")
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 	}
 }

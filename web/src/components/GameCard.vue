@@ -1,5 +1,6 @@
 <script setup>
 defineProps({ game: { type: Object, required: true } })
+defineEmits(['install'])
 </script>
 
 <template>
@@ -14,7 +15,11 @@ defineProps({ game: { type: Object, required: true } })
     <p class="card-summary">{{ game.summary }}</p>
     <div class="card-foot">
       <span class="port">{{ game.protocols.join('/').toUpperCase() }} {{ game.defaultPort }}</span>
-      <button class="btn" data-testid="install-btn" disabled>Install</button>
+      <button
+        class="btn"
+        data-testid="install-btn"
+        @click="$emit('install', game)"
+      >Install</button>
     </div>
   </article>
 </template>

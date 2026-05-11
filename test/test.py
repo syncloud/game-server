@@ -75,7 +75,45 @@ def test_games_catalog(app_domain):
 def test_servers_empty(app_domain):
     response = requests.get('https://{0}/api/v1/servers'.format(app_domain), verify=False)
     assert response.status_code == 200, response.text
-    assert response.json() == [], 'no servers installed yet at phase 0'
+    assert response.json() == [], 'no servers installed at start'
+
+
+def test_create_server(app_domain):
+    response = requests.post(
+        'https://{0}/api/v1/servers'.format(app_domain),
+        json={'name': 'test-tw', 'gameId': 'teeworlds', 'port': 8303},
+        verify=False)
+    assert response.status_code == 201, response.text
+    body = response.json()
+    assert body['id'] > 0
+    assert body['name'] == 'test-tw'
+    assert body['gameId'] == 'teeworlds'
+    assert body['status'] == 'stopped'
+
+
+def test_list_after_create(app_domain):
+    response = requests.get('https://{0}/api/v1/servers'.format(app_domain), verify=False)
+    assert response.status_code == 200
+    servers = response.json()
+    assert len(servers) == 1
+    assert servers[0]['name'] == 'test-tw'
+
+
+def test_delete_server(app_domain):
+    list_resp = requests.get('https://{0}/api/v1/servers'.format(app_domain), verify=False)
+    sid = list_resp.json()[0]['id']
+    d = requests.delete('https://{0}/api/v1/servers/{1}'.format(app_domain, sid), verify=False)
+    assert d.status_code == 204, d.text
+    after = requests.get('https://{0}/api/v1/servers'.format(app_domain), verify=False).json()
+    assert after == []
+
+
+def test_create_unknown_game_rejected(app_domain):
+    r = requests.post(
+        'https://{0}/api/v1/servers'.format(app_domain),
+        json={'name': 'bad', 'gameId': 'not-a-game', 'port': 1234},
+        verify=False)
+    assert r.status_code == 400, r.text
 
 
 def test_storage_change_event(device):
