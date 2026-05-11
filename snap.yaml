@@ -1,0 +1,39 @@
+name: game-server
+summary: Game Server
+description: Dedicated game server panel for Syncloud
+grade: stable
+
+apps:
+  backend:
+    user: game-server
+    command: bin/service.backend.sh
+    daemon: simple
+    restart-condition: always
+    start-timeout: 600s
+    restart-delay: 10s
+
+  nginx:
+    user: game-server
+    command: bin/service.nginx.sh
+    daemon: simple
+    restart-condition: always
+    start-timeout: 600s
+    restart-delay: 10s
+
+  cli:
+    command: bin/cli
+
+  storage-change:
+    command: bin/cli storage-change
+
+  access-change:
+    command: bin/cli access-change
+
+  backup-pre-stop:
+    command: bin/cli backup-pre-stop
+
+  restore-pre-start:
+    command: bin/cli restore-pre-start
+
+  restore-post-start:
+    command: bin/cli restore-post-start

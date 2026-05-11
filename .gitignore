@@ -1,0 +1,7 @@
+build/
+artifact/
+package.name
+node_modules/
+web/dist/
+*.snap
+.idea/
