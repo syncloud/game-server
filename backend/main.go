@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -10,8 +11,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/syncloud/game-server/backend/db"
+	"github.com/syncloud/game-server/backend/installer"
 	"github.com/syncloud/game-server/backend/runner"
 	"github.com/syncloud/game-server/backend/server"
 )
@@ -227,6 +230,15 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, store *server.St
 		return
 	}
 	switch action {
+	case "install":
+		game := gameByID(s.GameID)
+		if game == nil {
+			writeError(w, http.StatusBadRequest, "unknown gameId on server")
+			return
+		}
+		_ = store.UpdateStatus(id, "installing")
+		go runInstall(store, id, *game)
+		s.Status = "installing"
 	case "start":
 		if err := run.Start(id, s.StartCmd, s.InstallDir); err != nil {
 			writeError(w, http.StatusConflict, err.Error())
@@ -255,8 +267,34 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, store *server.St
 }
 
 func currentStatus(s *server.Server, run *runner.Runner) string {
+	if s.Status == "installing" || s.Status == "install-error" {
+		return s.Status
+	}
 	if run.Running(s.ID) {
 		return "running"
 	}
 	return "stopped"
+}
+
+func runInstall(store *server.Store, id int64, g Game) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	defer cancel()
+	s, err := store.Get(id)
+	if err != nil || s == nil {
+		return
+	}
+	result, err := installer.Install(ctx, installer.Game{
+		ID:          g.ID,
+		Name:        g.Name,
+		Source:      g.Source,
+		SteamAppID:  g.SteamAppID,
+		EggURL:      g.EggURL,
+		DefaultPort: g.DefaultPort,
+	}, s.Name, "", "")
+	if err != nil {
+		_ = store.UpdateStatus(id, "install-error")
+		return
+	}
+	_ = store.UpdateInstall(id, result.InstallDir, result.StartCmd)
+	_ = store.UpdateStatus(id, "stopped")
 }

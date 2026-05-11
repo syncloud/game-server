@@ -76,6 +76,11 @@ func (s *Store) UpdateStatus(id int64, status string) error {
 	return err
 }
 
+func (s *Store) UpdateInstall(id int64, installDir, startCmd string) error {
+	_, err := s.db.Exec(`UPDATE servers SET install_dir = ?, start_cmd = ? WHERE id = ?`, installDir, startCmd, id)
+	return err
+}
+
 func (s *Store) Delete(id int64) error {
 	_, err := s.db.Exec(`DELETE FROM servers WHERE id = ?`, id)
 	return err

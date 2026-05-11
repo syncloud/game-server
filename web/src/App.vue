@@ -125,6 +125,7 @@ onMounted(loadAll)
             :key="s.id"
             :server="s"
             @delete="deleteServer(s.id)"
+            @refresh="loadAll"
           />
         </div>
       </section>

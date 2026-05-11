@@ -54,6 +54,13 @@ local arch = 'amd64';
       ],
     },
     {
+      name: 'steamcmd',
+      image: 'debian:bookworm-slim',
+      commands: [
+        './steamcmd/build.sh',
+      ],
+    },
+    {
       name: 'cli',
       image: 'golang:' + go,
       commands: [
