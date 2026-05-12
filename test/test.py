@@ -223,6 +223,33 @@ def test_steamcmd_diagnostics(device):
         out = device.run_ssh(cmd, throw=False)
         print(out if out else '(no output)')
 
+    show('disk space on /var/snap (statvfs would see this)',
+         'df -h /var/snap/game-server/current/.steam-runtime || df -h /var/snap')
+    show('writable filesystems',
+         'mount | head -10')
+    # use a tempfile script to avoid double-escaping into ssh
+    diag = (
+        'set +e\n'
+        'mkdir -p /var/snap/game-server/current/.steam-home/Steam/logs\n'
+        'apt list --installed 2>/dev/null | grep -i strace || apt-get install -y strace 2>&1 | tail -3\n'
+        'cd /var/snap/game-server/current/.steam-runtime\n'
+        'echo PWD=$(pwd)\n'
+        'echo files=$(ls | tr "\\n" " ")\n'
+        'echo === ulimit ===\n'
+        'ulimit -n\n'
+        'echo === strace -e openat,connect,statfs,statvfs steamcmd +exit ===\n'
+        'strace -f -e trace=openat,connect,statfs,statvfs,access -ttt -s 200 -o /tmp/strace.log '
+        '  /snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -60\n'
+        'echo === strace log tail ===\n'
+        'tail -80 /tmp/strace.log\n'
+        'echo === Steam logs after run ===\n'
+        'ls -la /var/snap/game-server/current/.steam-home/Steam/logs/ 2>&1\n'
+        'cat /var/snap/game-server/current/.steam-home/Steam/logs/*.txt 2>&1 || true\n'
+    )
+    device.run_ssh('cat > /tmp/diag.sh <<\'DIAGEOF\'\n' + diag + 'DIAGEOF\n', throw=False)
+    show('comprehensive diag',
+         'bash /tmp/diag.sh')
+
     show('ldd on the 32-bit steamcmd binary (look for "not found")',
          'ldd /snap/game-server/current/steamcmd/linux32/steamcmd 2>&1 || true')
 
