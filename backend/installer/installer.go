@@ -17,8 +17,34 @@ import (
 const (
 	SteamCMDPath   = "/snap/game-server/current/bin/steamcmd.sh"
 	SteamLib32     = "/snap/game-server/current/steamcmd/lib32"
+	SteamLib64     = "/snap/game-server/current/steamcmd/lib64"
 	ServersBaseDir = "/var/snap/game-server/current/servers"
 )
+
+// wrapAmd64 builds a startCmd that invokes a 64-bit binary via our bundled
+// ld-linux-x86-64.so.2 + lib64, so games don't depend on host glibc/
+// libstdc++/libGL/etc.
+func wrapAmd64(binary string, extraPaths string, args string) string {
+	libs := SteamLib64
+	if extraPaths != "" {
+		libs = libs + ":" + extraPaths
+	}
+	return fmt.Sprintf(
+		"LD_LIBRARY_PATH=%s %s/ld-linux-x86-64.so.2 --library-path %s %s %s",
+		libs, SteamLib64, libs, binary, args)
+}
+
+// wrapI386 builds a startCmd that invokes a 32-bit binary via our bundled
+// ld-linux.so.2 + lib32. For HLDS and friends.
+func wrapI386(binary string, extraPaths string, args string) string {
+	libs := SteamLib32
+	if extraPaths != "" {
+		libs = libs + ":" + extraPaths
+	}
+	return fmt.Sprintf(
+		"LD_LIBRARY_PATH=%s %s/ld-linux.so.2 --library-path %s %s %s",
+		libs, SteamLib32, libs, binary, args)
+}
 
 type Game struct {
 	ID          string
@@ -112,23 +138,22 @@ func installSteam(ctx context.Context, g Game, installDir, user, pass string) (*
 func steamStartCmd(g Game, dir string) string {
 	switch g.ID {
 	case "cs2":
-		return fmt.Sprintf("%s/game/bin/linuxsteamrt64/cs2 -dedicated +map de_dust2", dir)
+		bin := dir + "/game/bin/linuxsteamrt64/cs2"
+		return wrapAmd64(bin, dir+"/game/bin/linuxsteamrt64", fmt.Sprintf("-dedicated +map de_dust2 +port %d", g.DefaultPort))
 	case "tf2":
-		return fmt.Sprintf("%s/srcds_run -game tf -port %d", dir, g.DefaultPort)
+		// SrcDS is 32-bit (TF2 dedicated)
+		return wrapI386(dir+"/srcds_linux", dir+":"+dir+"/bin", fmt.Sprintf("-game tf +map ctf_2fort +port %d", g.DefaultPort))
 	case "gmod":
-		return fmt.Sprintf("%s/srcds_run -game garrysmod -port %d", dir, g.DefaultPort)
+		return wrapI386(dir+"/srcds_linux", dir+":"+dir+"/bin", fmt.Sprintf("-game garrysmod +port %d", g.DefaultPort))
 	case "valheim":
-		return fmt.Sprintf("%s/valheim_server.x86_64 -port %d -world \"Dedicated\" -password \"changeme\"", dir, g.DefaultPort)
+		// Valheim is amd64
+		return wrapAmd64(dir+"/valheim_server.x86_64", dir, fmt.Sprintf("-port %d -world Dedicated -password changeme", g.DefaultPort))
 	case "zomboid":
-		return fmt.Sprintf("%s/start-server.sh", dir)
+		// Zomboid wraps its own JVM; let the start-server.sh handle libs
+		return fmt.Sprintf("cd %s && ./start-server.sh -port %d", dir, g.DefaultPort)
 	case "hlds-cs":
-		// HLDS uses the same bundled 32-bit loader as steamcmd
-		return fmt.Sprintf(
-			"LD_LIBRARY_PATH=%s:%s:%s/cstrike %s/ld-linux.so.2 --library-path %s:%s:%s/cstrike %s/hlds_linux -game cstrike +map de_dust2 +port %d",
-			SteamLib32, dir, dir,
-			SteamLib32,
-			SteamLib32, dir, dir,
-			dir, g.DefaultPort)
+		// HLDS is 32-bit, mod dir needs to be in library search for libstdc++/libsteam_api
+		return wrapI386(dir+"/hlds_linux", dir+":"+dir+"/cstrike", fmt.Sprintf("-game cstrike +map de_dust2 +port %d", g.DefaultPort))
 	default:
 		return fmt.Sprintf("echo 'no default startCmd for %s; configure manually'", g.ID)
 	}
