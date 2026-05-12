@@ -10,9 +10,14 @@ LD="${LIBS}/ld-linux.so.2"
 RUNTIME=/var/snap/game-server/current/.steam-runtime
 if [ ! -x "${RUNTIME}/linux32/steamcmd" ]; then
     mkdir -p "${RUNTIME}"
-    cp -r "${SCDIR}/linux32" "${RUNTIME}/" 2>/dev/null || true
-    [ -d "${SCDIR}/package" ] && cp -r "${SCDIR}/package" "${RUNTIME}/" 2>/dev/null || true
-    [ -f "${SCDIR}/steamcmd.sh" ] && cp "${SCDIR}/steamcmd.sh" "${RUNTIME}/" 2>/dev/null || true
+    # Copy everything from the bundled steamcmd dir except lib32 (which stays
+    # in /snap — it doesn't mutate). Picks up linux32/, public/, steamcmd.sh,
+    # and any future tarball additions automatically.
+    for f in "${SCDIR}"/*; do
+        name=$(basename "$f")
+        [ "$name" = "lib32" ] && continue
+        cp -r "$f" "${RUNTIME}/"
+    done
 fi
 
 export HOME="${HOME_OVERRIDE:-/var/snap/game-server/current/.steam-home}"
