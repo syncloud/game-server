@@ -53,10 +53,13 @@ type EggVariable struct {
 	DefaultValue string `json:"default_value"`
 }
 
-func Install(ctx context.Context, g Game, name, steamUser, steamPass string) (*Result, error) {
+func Install(ctx context.Context, g Game, name string, port int, steamUser, steamPass string) (*Result, error) {
 	installDir := filepath.Join(ServersBaseDir, name)
 	if err := os.MkdirAll(installDir, 0755); err != nil {
 		return nil, fmt.Errorf("mkdir: %w", err)
+	}
+	if port > 0 {
+		g.DefaultPort = port
 	}
 	switch g.Source {
 	case "steam":

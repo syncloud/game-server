@@ -50,7 +50,7 @@ func installTeeworldsNative(ctx context.Context, g Game, installDir string) (*Re
 		return nil, fmt.Errorf("chmod: %w", err)
 	}
 
-	startCmd := fmt.Sprintf("cd %s && %s -p %d", filepath.Dir(srvPath), srvPath, g.DefaultPort)
+	startCmd := fmt.Sprintf("cd %s && %s \"sv_port %d\"", filepath.Dir(srvPath), srvPath, g.DefaultPort)
 	return &Result{InstallDir: installDir, StartCmd: startCmd}, nil
 }
 

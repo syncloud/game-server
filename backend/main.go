@@ -332,7 +332,7 @@ func runInstall(logger *log.Logger, store *server.Store, id int64, g Game) {
 		SteamAppID:  g.SteamAppID,
 		EggURL:      g.EggURL,
 		DefaultPort: g.DefaultPort,
-	}, s.Name, "", "")
+	}, s.Name, s.Port, "", "")
 	if err != nil {
 		logger.Printf("install[%d] FAILED: %v", id, err)
 		_ = store.UpdateLastError(id, err.Error())
