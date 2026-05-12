@@ -249,7 +249,7 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, store *server.St
 			return
 		}
 		_ = store.UpdateStatus(id, "installing")
-		go runInstall(store, id, *game)
+		go runInstall(log.Default(), store, id, *game)
 		s.Status = "installing"
 	case "start":
 		if err := run.Start(id, s.StartCmd, s.InstallDir); err != nil {
@@ -317,13 +317,14 @@ func currentStatus(s *server.Server, run *runner.Runner) string {
 	return "stopped"
 }
 
-func runInstall(store *server.Store, id int64, g Game) {
+func runInstall(logger *log.Logger, store *server.Store, id int64, g Game) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 	s, err := store.Get(id)
 	if err != nil || s == nil {
 		return
 	}
+	logger.Printf("install[%d] starting: game=%s source=%s appid=%d egg=%s", id, g.ID, g.Source, g.SteamAppID, g.EggURL)
 	result, err := installer.Install(ctx, installer.Game{
 		ID:          g.ID,
 		Name:        g.Name,
@@ -333,9 +334,12 @@ func runInstall(store *server.Store, id int64, g Game) {
 		DefaultPort: g.DefaultPort,
 	}, s.Name, "", "")
 	if err != nil {
+		logger.Printf("install[%d] FAILED: %v", id, err)
+		_ = store.UpdateLastError(id, err.Error())
 		_ = store.UpdateStatus(id, "install-error")
 		return
 	}
+	logger.Printf("install[%d] OK: dir=%s start=%q", id, result.InstallDir, result.StartCmd)
 	_ = store.UpdateInstall(id, result.InstallDir, result.StartCmd)
 	_ = store.UpdateStatus(id, "stopped")
 }

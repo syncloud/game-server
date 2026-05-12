@@ -7,7 +7,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-const schema = `
+const createSchema = `
 CREATE TABLE IF NOT EXISTS servers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL UNIQUE,
@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS servers (
   start_cmd TEXT NOT NULL DEFAULT '',
   steam_user TEXT NOT NULL DEFAULT '',
   steam_pass TEXT NOT NULL DEFAULT '',
+  last_error TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 `
@@ -31,8 +32,10 @@ func Open(path string) (*DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open: %w", err)
 	}
-	if _, err := conn.Exec(schema); err != nil {
+	if _, err := conn.Exec(createSchema); err != nil {
 		return nil, fmt.Errorf("schema: %w", err)
 	}
+	// idempotent migration for snaps upgraded from a schema without last_error
+	_, _ = conn.Exec(`ALTER TABLE servers ADD COLUMN last_error TEXT`)
 	return &DB{conn}, nil
 }

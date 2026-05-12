@@ -14,6 +14,7 @@ type Server struct {
 	Status     string `json:"status"`
 	InstallDir string `json:"installDir"`
 	StartCmd   string `json:"startCmd"`
+	LastError  string `json:"lastError,omitempty"`
 }
 
 type Store struct {
@@ -25,7 +26,7 @@ func NewStore(db *sql.DB) *Store {
 }
 
 func (s *Store) List() ([]Server, error) {
-	rows, err := s.db.Query(`SELECT id, name, game_id, port, status, install_dir, start_cmd FROM servers ORDER BY id`)
+	rows, err := s.db.Query(`SELECT id, name, game_id, port, status, install_dir, start_cmd, COALESCE(last_error, '') FROM servers ORDER BY id`)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
 	}
@@ -33,7 +34,7 @@ func (s *Store) List() ([]Server, error) {
 	var out []Server
 	for rows.Next() {
 		var x Server
-		if err := rows.Scan(&x.ID, &x.Name, &x.GameID, &x.Port, &x.Status, &x.InstallDir, &x.StartCmd); err != nil {
+		if err := rows.Scan(&x.ID, &x.Name, &x.GameID, &x.Port, &x.Status, &x.InstallDir, &x.StartCmd, &x.LastError); err != nil {
 			return nil, err
 		}
 		out = append(out, x)
@@ -45,9 +46,9 @@ func (s *Store) List() ([]Server, error) {
 }
 
 func (s *Store) Get(id int64) (*Server, error) {
-	row := s.db.QueryRow(`SELECT id, name, game_id, port, status, install_dir, start_cmd FROM servers WHERE id = ?`, id)
+	row := s.db.QueryRow(`SELECT id, name, game_id, port, status, install_dir, start_cmd, COALESCE(last_error, '') FROM servers WHERE id = ?`, id)
 	var x Server
-	if err := row.Scan(&x.ID, &x.Name, &x.GameID, &x.Port, &x.Status, &x.InstallDir, &x.StartCmd); err != nil {
+	if err := row.Scan(&x.ID, &x.Name, &x.GameID, &x.Port, &x.Status, &x.InstallDir, &x.StartCmd, &x.LastError); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
@@ -77,7 +78,12 @@ func (s *Store) UpdateStatus(id int64, status string) error {
 }
 
 func (s *Store) UpdateInstall(id int64, installDir, startCmd string) error {
-	_, err := s.db.Exec(`UPDATE servers SET install_dir = ?, start_cmd = ? WHERE id = ?`, installDir, startCmd, id)
+	_, err := s.db.Exec(`UPDATE servers SET install_dir = ?, start_cmd = ?, last_error = NULL WHERE id = ?`, installDir, startCmd, id)
+	return err
+}
+
+func (s *Store) UpdateLastError(id int64, msg string) error {
+	_, err := s.db.Exec(`UPDATE servers SET last_error = ? WHERE id = ?`, msg, id)
 	return err
 }
 
