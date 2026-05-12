@@ -15,7 +15,8 @@ import (
 )
 
 const (
-	SteamCMDPath   = "/snap/game-server/current/steamcmd/steamcmd.sh"
+	SteamCMDPath   = "/snap/game-server/current/bin/steamcmd.sh"
+	SteamLib32     = "/snap/game-server/current/steamcmd/lib32"
 	ServersBaseDir = "/var/snap/game-server/current/servers"
 )
 
@@ -109,6 +110,14 @@ func steamStartCmd(g Game, dir string) string {
 		return fmt.Sprintf("%s/valheim_server.x86_64 -port %d -world \"Dedicated\" -password \"changeme\"", dir, g.DefaultPort)
 	case "zomboid":
 		return fmt.Sprintf("%s/start-server.sh", dir)
+	case "hlds-cs":
+		// HLDS uses the same bundled 32-bit loader as steamcmd
+		return fmt.Sprintf(
+			"LD_LIBRARY_PATH=%s:%s:%s/cstrike %s/ld-linux.so.2 --library-path %s:%s:%s/cstrike %s/hlds_linux -game cstrike +map de_dust2 +port %d",
+			SteamLib32, dir, dir,
+			SteamLib32,
+			SteamLib32, dir, dir,
+			dir, g.DefaultPort)
 	default:
 		return fmt.Sprintf("echo 'no default startCmd for %s; configure manually'", g.ID)
 	}

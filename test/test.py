@@ -153,6 +153,18 @@ def test_logs_endpoint(api, auth):
     requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
 
 
+def _wait_a2s(api, auth, sid, timeout):
+    deadline = time.time() + timeout
+    last = None
+    while time.time() < deadline:
+        r = requests.get(api + '/servers/{0}/query'.format(sid), auth=auth, verify=False)
+        last = (r.status_code, r.text[:200])
+        if r.status_code == 200:
+            return r.json()
+        time.sleep(3)
+    raise AssertionError('timeout waiting for A2S response, last={0}'.format(last))
+
+
 def _wait_status(api, auth, sid, target, timeout):
     deadline = time.time() + timeout
     last = None
@@ -194,6 +206,29 @@ def test_teeworlds_real_install_and_play(api, auth, device):
 
     cleanup = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
     assert cleanup.status_code == 204, cleanup.text
+
+
+def test_hlds_cs_real_install_and_query(api, auth, device):
+    create = requests.post(
+        api + '/servers',
+        auth=auth,
+        json={'name': 'hlds-real', 'gameId': 'hlds-cs', 'port': 27115},
+        verify=False)
+    assert create.status_code == 201, create.text
+    sid = create.json()['id']
+
+    install = requests.post(api + '/servers/{0}/install'.format(sid), auth=auth, verify=False)
+    assert install.status_code == 200, install.text
+    _wait_status(api, auth, sid, 'stopped', timeout=900)
+
+    start = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
+    assert start.status_code == 200, start.text
+
+    info = _wait_a2s(api, auth, sid, timeout=60)
+    assert 'Counter-Strike' in info.get('Game', '') or 'cstrike' in info.get('Folder', ''), info
+
+    requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
+    requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
 
 
 def test_lifecycle(api, auth):
