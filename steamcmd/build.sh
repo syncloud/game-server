@@ -4,7 +4,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd ${DIR}
 
 apt update
-apt -y install wget ca-certificates
+apt -y install wget ca-certificates patchelf
 
 OUT=${DIR}/../build/snap/steamcmd
 mkdir -p ${OUT}
@@ -53,6 +53,17 @@ for src in /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu; do
         find "$src" -maxdepth 1 \( -type f -o -type l \) -name '*.so*' -exec cp -P {} ${OUT}/lib64/ \;
     fi
 done
+
+# Patch the steamcmd binary's ELF interpreter to point at our bundled 32-bit
+# ld-linux. Otherwise `exec ld-linux --library-path X binary` makes
+# /proc/self/exe report the ld-linux path; steamcmd derives STEAMROOT from
+# /proc/self/exe and chdirs to /snap (read-only squashfs), then all writes
+# fail with EROFS — surfaced as the misleading "Steam needs to be online".
+echo "before patchelf:"
+patchelf --print-interpreter ${OUT}/linux32/steamcmd
+patchelf --set-interpreter /var/snap/game-server/current/.steam-runtime/linux32/ld-linux.so.2 ${OUT}/linux32/steamcmd
+echo "after patchelf:"
+patchelf --print-interpreter ${OUT}/linux32/steamcmd
 
 cd ${DIR}
 ls -la ${OUT}

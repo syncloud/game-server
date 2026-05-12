@@ -20,12 +20,16 @@ if [ ! -x "${RUNTIME}/linux32/steamcmd" ]; then
         esac
         cp -r "$f" "${RUNTIME}/"
     done
+    # The patched binary's ELF interpreter is
+    # ${RUNTIME}/linux32/ld-linux.so.2 — needs to actually exist there
+    # (it's also bundled in /snap/.../lib32/). Symlink it in.
+    ln -sf "${LIBS}/ld-linux.so.2" "${RUNTIME}/linux32/ld-linux.so.2"
     # If we happen to be running as root (install hook, manual SSH diag, etc.)
     # ensure the runtime + game-server's HOME end up owned by game-server,
     # otherwise the backend service (which runs as game-server) can't write
     # back into them and steamcmd dies with permission errors / exit 1.
     if [ "$(id -u)" = "0" ]; then
-        chown -R game-server:game-server "${RUNTIME}"
+        chown -RH game-server:game-server "${RUNTIME}"
         chown -R game-server:game-server "${HOME_OVERRIDE:-/var/snap/game-server/current/.steam-home}" 2>/dev/null || true
     fi
 fi
@@ -42,4 +46,12 @@ cd "${RUNTIME}"
 # only for libs Steam doesn't ship (libc, libssl, libcurl, nss_*, ...).
 export LD_LIBRARY_PATH="${RUNTIME}/linux32:${LIBS}:${LD_LIBRARY_PATH:-}"
 export SSL_CERT_FILE="${SSL_CERT_FILE:-/etc/ssl/certs/ca-certificates.crt}"
-exec "${LD}" --library-path "${RUNTIME}/linux32:${LIBS}" "${RUNTIME}/linux32/steamcmd" "$@"
+
+# Exec the binary DIRECTLY (no explicit ld-linux invocation). The binary's
+# ELF interpreter was patchelf'd at build time to point at
+# ${RUNTIME}/linux32/ld-linux.so.2 (symlinked above). This way
+# /proc/self/exe correctly reports the steamcmd binary path (under writable
+# RUNTIME), so when steamcmd derives STEAMROOT from /proc/self/exe and
+# chdirs there, the cwd is writable — fixes the EROFS that masquerades as
+# "Steam needs to be online".
+exec "${RUNTIME}/linux32/steamcmd" "$@"
