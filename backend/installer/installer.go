@@ -86,9 +86,16 @@ func installSteam(ctx context.Context, g Game, installDir, user, pass string) (*
 		"+@sSteamCmdForcePlatformType", "linux",
 		"+force_install_dir", installDir,
 		"+login", login,
+	}
+	// HLDS appid 90 needs an explicit mod to populate cstrike/dod/valve/etc.;
+	// without it +app_update 90 only fetches the base server stub.
+	if g.ID == "hlds-cs" {
+		args = append(args, "+app_set_config", "90", "mod", "cstrike")
+	}
+	args = append(args,
 		"+app_update", strconv.Itoa(g.SteamAppID), "validate",
 		"+quit",
-	}
+	)
 	cmd := exec.CommandContext(ctx, SteamCMDPath, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
