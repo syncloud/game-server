@@ -213,12 +213,63 @@ def test_teeworlds_real_install_and_play(api, auth, device):
     assert cleanup.status_code == 204, cleanup.text
 
 
+def test_steamcmd_diagnostics(device):
+    """Capture exactly what steamcmd needs and what's missing. Always runs;
+    output goes to pytest stdout and is visible in the CI log. Not an
+    assertion — diagnostic only."""
+
+    def show(title, cmd):
+        print('\n===== {} =====\nCMD: {}'.format(title, cmd))
+        out = device.run_ssh(cmd, throw=False)
+        print(out if out else '(no output)')
+
+    show('ldd on the 32-bit steamcmd binary (look for "not found")',
+         'ldd /snap/game-server/current/steamcmd/linux32/steamcmd 2>&1 || true')
+
+    show('ldd via our bundled loader',
+         'LD_LIBRARY_PATH=/snap/game-server/current/steamcmd/lib32 '
+         '/snap/game-server/current/steamcmd/lib32/ld-linux.so.2 --verify '
+         '/snap/game-server/current/steamcmd/linux32/steamcmd 2>&1 || true')
+
+    show('lib32 file listing',
+         'ls /snap/game-server/current/steamcmd/lib32 | sort')
+
+    show('lib32 contains key SSL/curl/nss libs?',
+         'ls /snap/game-server/current/steamcmd/lib32 | grep -E '
+         '"libssl|libcurl|libnghttp2|libidn2|libnss|libgssapi|libkrb5|'
+         'libsasl|libssh|librtmp|libpsl|libcom_err|libkeyutils|libbrotli" '
+         '| sort')
+
+    show('host can resolve Steam CDN',
+         'getent hosts steamcdn-a.akamaihd.net 2>&1; '
+         'getent hosts client-update.akamaihd.net 2>&1')
+
+    show('host TLS works to Steam',
+         'curl -sIv --max-time 10 https://steamcdn-a.akamaihd.net/client/ 2>&1 '
+         '| head -40 || true')
+
+    show('runtime dir state after a bare steamcmd +exit',
+         'sudo -u game-server -E HOME=/var/snap/game-server/current/.steam-home '
+         '/snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -40 || true')
+
+    show('Steam logs after that attempt',
+         'cat /var/snap/game-server/current/.steam-home/Steam/logs/stderr.txt 2>&1 || true; '
+         'echo ---bootstrap---; '
+         'cat /var/snap/game-server/current/.steam-home/Steam/logs/bootstrap_log.txt 2>&1 || true')
+
+    show('LD_DEBUG=libs on a +exit (first 80 lines)',
+         'sudo -u game-server -E HOME=/var/snap/game-server/current/.steam-home '
+         'LD_DEBUG=libs LD_DEBUG_OUTPUT=/tmp/ld-debug '
+         '/snap/game-server/current/bin/steamcmd.sh +exit 2>&1 >/dev/null || true; '
+         'cat /tmp/ld-debug.* 2>/dev/null | head -200 || echo "(no ld-debug output)"')
+
+
 @pytest.mark.xfail(
     reason='steamcmd bootstrap fails inside snap (Steam needs to be online '
            'to update, log files empty). The 32-bit lib bundle and writable '
            'runtime dir aren\'t enough; suspect missing nss-resolver, '
-           'libcurl SSL plugin lookup, or DNS quirk. Needs deeper diagnosis '
-           'and likely the amd64 lib bundle change to land first.',
+           'libcurl SSL plugin lookup, or DNS quirk. Diagnostic captured in '
+           'test_steamcmd_diagnostics — read pytest output to root-cause.',
     strict=False, run=True)
 def test_hlds_cs_real_install_and_query(api, auth, device):
     create = requests.post(
