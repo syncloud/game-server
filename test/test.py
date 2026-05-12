@@ -223,51 +223,38 @@ def test_steamcmd_diagnostics(device):
         out = device.run_ssh(cmd, throw=False)
         print(out if out else '(no output)')
 
-    # write a script via heredoc to avoid double-escaping into ssh
-    diag = (
-        'set +e\n'
-        '\n'
-        'echo === df on snap data + /tmp ===\n'
-        'df -h /var/snap /tmp /\n'
-        '\n'
-        'echo === stat -f /var/snap (overlayfs values can be weird) ===\n'
-        'stat -f /var/snap/game-server/current\n'
-        '\n'
-        'echo === stat -f /tmp ===\n'
-        'stat -f /tmp\n'
-        '\n'
-        'apt-get install -y strace 2>&1 | tail -3\n'
-        '\n'
-        'echo === run our wrapper once to seed the runtime dir ===\n'
-        '/snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -20\n'
-        '\n'
-        'echo === ls .steam-runtime ===\n'
-        'ls -la /var/snap/game-server/current/.steam-runtime/\n'
-        'echo === Steam/logs after that run ===\n'
-        'ls -la /var/snap/game-server/current/.steam-home/Steam/logs/ 2>&1\n'
-        '\n'
-        'echo === EXPERIMENT 1: same steamcmd, run from /tmp (tmpfs) instead of overlay ===\n'
-        'rm -rf /tmp/sctest && mkdir /tmp/sctest\n'
-        'cp -r /snap/game-server/current/steamcmd/linux32 /tmp/sctest/\n'
-        'HOME=/tmp/sctest cd /tmp/sctest && \\\n'
-        '  LD_LIBRARY_PATH=/snap/game-server/current/steamcmd/lib32 \\\n'
-        '  /snap/game-server/current/steamcmd/lib32/ld-linux.so.2 \\\n'
-        '    --library-path /tmp/sctest/linux32:/snap/game-server/current/steamcmd/lib32 \\\n'
-        '    /tmp/sctest/linux32/steamcmd +exit 2>&1 | head -20\n'
-        '\n'
-        'echo === EXPERIMENT 2: strace what bare steamcmd does (correct syscall names) ===\n'
-        'cd /var/snap/game-server/current/.steam-runtime\n'
-        'strace -f -e trace=openat,connect,statfs,fstatfs,access,write '
-        '  -ttt -s 200 -o /tmp/strace.log '
-        '  /snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -20\n'
-        'echo === strace last 100 lines ===\n'
-        'tail -100 /tmp/strace.log\n'
-        '\n'
-        'echo === Steam logs final state ===\n'
-        'find /var/snap/game-server/current/.steam-home -type f 2>&1 | head -20\n'
-        'cat /var/snap/game-server/current/.steam-home/Steam/logs/*.txt 2>&1 | head -30 || true\n'
-    )
-    device.run_ssh('cat > /tmp/diag.sh <<\'DIAGEOF\'\n' + diag + 'DIAGEOF\n', throw=False)
+    # heredoc body — use simple bash, no parens in echo args
+    diag = '''#!/bin/bash
+set +e
+echo SECTION df
+df -h /var/snap /tmp / 2>&1
+echo SECTION statf-varsnap
+stat -f /var/snap/game-server/current 2>&1
+echo SECTION statf-tmp
+stat -f /tmp 2>&1
+echo SECTION apt-strace
+apt-get install -y strace 2>&1 | tail -3
+echo SECTION seed-runtime
+/snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -20
+echo SECTION ls-runtime
+ls -la /var/snap/game-server/current/.steam-runtime/ 2>&1
+echo SECTION steamlogs-after-seed
+ls -la /var/snap/game-server/current/.steam-home/Steam/logs/ 2>&1
+cat /var/snap/game-server/current/.steam-home/Steam/logs/stderr.txt 2>&1 | head -20
+echo SECTION exp1-run-from-tmp
+rm -rf /tmp/sctest
+mkdir -p /tmp/sctest
+cp -r /snap/game-server/current/steamcmd/linux32 /tmp/sctest/
+cd /tmp/sctest
+HOME=/tmp/sctest LD_LIBRARY_PATH=/snap/game-server/current/steamcmd/lib32 /snap/game-server/current/steamcmd/lib32/ld-linux.so.2 --library-path /tmp/sctest/linux32:/snap/game-server/current/steamcmd/lib32 /tmp/sctest/linux32/steamcmd +exit 2>&1 | head -20
+echo SECTION strace-bare
+cd /var/snap/game-server/current/.steam-runtime
+strace -f -e trace=openat,connect,statfs,fstatfs,access,write -ttt -s 200 -o /tmp/strace.log /snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -20
+echo SECTION strace-tail
+tail -150 /tmp/strace.log 2>&1
+echo SECTION done
+'''
+    device.run_ssh("cat > /tmp/diag.sh <<'DIAGEOF'\n" + diag + "DIAGEOF\n", throw=False)
     show('comprehensive diag', 'bash /tmp/diag.sh')
 
     show('ldd on the 32-bit steamcmd binary (look for "not found")',
