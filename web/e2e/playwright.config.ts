@@ -13,6 +13,10 @@ export default defineConfig({
   use: {
     baseURL,
     ignoreHTTPSErrors: true,
+    httpCredentials: {
+      username: process.env.PLAYWRIGHT_USER || 'syncloud',
+      password: process.env.PLAYWRIGHT_PASSWORD || 'syncloud'
+    },
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure'
