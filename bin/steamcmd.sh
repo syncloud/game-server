@@ -26,9 +26,10 @@ if [ ! -x "${RUNTIME}/linux32/steamcmd" ]; then
         cp -r "$f" "${RUNTIME}/"
     done
     # steamcmd's ELF interpreter was patched at build time to point at
-    # ${RUNTIME}/linux32/ld-linux.so.2 — create that as a symlink to the
-    # actual ld-linux that lives in our /snap-bundled lib32.
-    ln -sf "${LIBS}/ld-linux.so.2" "${RUNTIME}/linux32/ld-linux.so.2"
+    # ${RUNTIME}/linux32/ld-linux.so.2. Earlier we symlinked, but the
+    # kernel seems unable to traverse the /var/snap/<app>/current symlink
+    # during PT_INTERP load — copy the loader as a regular file instead.
+    cp "${LIBS}/ld-linux.so.2" "${RUNTIME}/linux32/ld-linux.so.2"
     # If we happen to be running as root (install hook, manual SSH diag, etc.)
     # ensure the runtime + game-server's HOME end up owned by game-server,
     # otherwise the backend service (which runs as game-server) can't write
