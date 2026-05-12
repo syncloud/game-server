@@ -92,6 +92,7 @@ func installSteam(ctx context.Context, g Game, installDir, user, pass string) (*
 	cmd := exec.CommandContext(ctx, SteamCMDPath, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	cmd.Dir = installDir
 	if err := cmd.Run(); err != nil {
 		return nil, fmt.Errorf("steamcmd: %w", err)
 	}
