@@ -60,9 +60,16 @@ done
 # there. If we wrap with `exec ld-linux --library-path X binary`,
 # /proc/self/exe reports the ld-linux path; otherwise it's the binary
 # path. We want the binary path so STEAMROOT is the writable RUNTIME copy.
+# Patch interpreter to a path UNDER $SNAP_DATA so the wrapper can create
+# the symlink (and chown it to game-server). Earlier attempts to point at
+# /snap/.../lib32/ld-linux.so.2 directly failed with kernel ENOENT on exec
+# even though the file was present — likely a snap mount-namespace quirk
+# where the symlink chain /snap/<app>/current -> x1 doesn't resolve for
+# the kernel during PT_INTERP load. The RUNTIME path is a direct dir
+# under /var/snap (no double symlink) and works.
 echo "before patchelf:"
 patchelf --print-interpreter ${OUT}/linux32/steamcmd
-patchelf --set-interpreter /snap/game-server/current/steamcmd/lib32/ld-linux.so.2 ${OUT}/linux32/steamcmd
+patchelf --set-interpreter /var/snap/game-server/current/.steam-runtime/linux32/ld-linux.so.2 ${OUT}/linux32/steamcmd
 echo "after patchelf:"
 patchelf --print-interpreter ${OUT}/linux32/steamcmd
 

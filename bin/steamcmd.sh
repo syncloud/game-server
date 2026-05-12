@@ -25,12 +25,16 @@ if [ ! -x "${RUNTIME}/linux32/steamcmd" ]; then
         esac
         cp -r "$f" "${RUNTIME}/"
     done
+    # steamcmd's ELF interpreter was patched at build time to point at
+    # ${RUNTIME}/linux32/ld-linux.so.2 — create that as a symlink to the
+    # actual ld-linux that lives in our /snap-bundled lib32.
+    ln -sf "${LIBS}/ld-linux.so.2" "${RUNTIME}/linux32/ld-linux.so.2"
     # If we happen to be running as root (install hook, manual SSH diag, etc.)
     # ensure the runtime + game-server's HOME end up owned by game-server,
     # otherwise the backend service (which runs as game-server) can't write
     # back into them and steamcmd dies with permission errors / exit 1.
     if [ "$(id -u)" = "0" ]; then
-        chown -R game-server:game-server "${RUNTIME}"
+        chown -RH game-server:game-server "${RUNTIME}"
         chown -R game-server:game-server "${HOME_OVERRIDE:-/var/snap/game-server/current/.steam-home}" 2>/dev/null || true
     fi
 fi
