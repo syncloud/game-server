@@ -10,9 +10,9 @@ LD="${LIBS}/ld-linux.so.2"
 RUNTIME=/var/snap/game-server/current/.steam-runtime
 if [ ! -x "${RUNTIME}/linux32/steamcmd" ]; then
     mkdir -p "${RUNTIME}"
-    # Copy everything from the bundled steamcmd dir except lib32 (which stays
-    # in /snap — it doesn't mutate). Picks up linux32/, public/, steamcmd.sh,
-    # and any future tarball additions automatically.
+    # Copy everything from the bundled steamcmd dir except lib32/lib64 (which
+    # stay in /snap — they don't mutate). Picks up linux32/, public/,
+    # steamcmd.sh and any future tarball additions automatically.
     for f in "${SCDIR}"/*; do
         name=$(basename "$f")
         case "$name" in
@@ -20,6 +20,14 @@ if [ ! -x "${RUNTIME}/linux32/steamcmd" ]; then
         esac
         cp -r "$f" "${RUNTIME}/"
     done
+    # If we happen to be running as root (install hook, manual SSH diag, etc.)
+    # ensure the runtime + game-server's HOME end up owned by game-server,
+    # otherwise the backend service (which runs as game-server) can't write
+    # back into them and steamcmd dies with permission errors / exit 1.
+    if [ "$(id -u)" = "0" ]; then
+        chown -R game-server:game-server "${RUNTIME}"
+        chown -R game-server:game-server "${HOME_OVERRIDE:-/var/snap/game-server/current/.steam-home}" 2>/dev/null || true
+    fi
 fi
 
 export HOME="${HOME_OVERRIDE:-/var/snap/game-server/current/.steam-home}"

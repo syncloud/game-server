@@ -234,8 +234,8 @@ echo SECTION statf-tmp
 stat -f /tmp 2>&1
 echo SECTION apt-strace
 apt-get install -y strace 2>&1 | tail -3
-echo SECTION seed-runtime
-/snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -20
+echo SECTION seed-runtime-as-game-server
+sudo -u game-server -i /snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -20
 echo SECTION ls-runtime
 ls -la /var/snap/game-server/current/.steam-runtime/ 2>&1
 echo SECTION steamlogs-after-seed
