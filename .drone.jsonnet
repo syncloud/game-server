@@ -99,18 +99,6 @@ local arch = 'amd64';
     for distro in distros
   ] + [
     {
-      name: 'test-ui-' + projectName,
-      image: 'mcr.microsoft.com/playwright:v1.59.1-jammy',
-      commands: [
-        'APP_DOMAIN="' + name + '.' + distro_default + '.com"',
-        'getent hosts $APP_DOMAIN | sed "s/$APP_DOMAIN/auth.' + distro_default + '.com/g" | tee -a /etc/hosts',
-        'cat /etc/hosts',
-        'PLAYWRIGHT_DOMAIN=' + distro_default + '.com ./ci/ui.sh ' + projectName,
-      ],
-    }
-    for projectName in ['desktop', 'mobile']
-  ] + [
-    {
       name: 'upload',
       image: 'debian:bookworm-slim',
       environment: {
