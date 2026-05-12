@@ -2,7 +2,10 @@ module github.com/syncloud/game-server/backend
 
 go 1.23
 
-require modernc.org/sqlite v1.34.1
+require (
+	github.com/ulikunitz/xz v0.5.12
+	modernc.org/sqlite v1.34.1
+)
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect

@@ -115,6 +115,9 @@ func steamStartCmd(g Game, dir string) string {
 }
 
 func installEgg(ctx context.Context, g Game, installDir string) (*Result, error) {
+	if g.ID == "teeworlds" {
+		return installTeeworldsNative(ctx, g, installDir)
+	}
 	if g.EggURL == "" {
 		return nil, fmt.Errorf("egg url empty")
 	}

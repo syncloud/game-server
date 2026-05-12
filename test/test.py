@@ -153,6 +153,49 @@ def test_logs_endpoint(api, auth):
     requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
 
 
+def _wait_status(api, auth, sid, target, timeout):
+    deadline = time.time() + timeout
+    last = None
+    while time.time() < deadline:
+        r = requests.get(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
+        if r.status_code == 200:
+            last = r.json().get('status')
+            if last == target:
+                return last
+            if last == 'install-error':
+                raise AssertionError('install errored: ' + r.text)
+        time.sleep(2)
+    raise AssertionError('timeout waiting for status={0}, last={1}'.format(target, last))
+
+
+def test_teeworlds_real_install_and_play(api, auth, device):
+    create = requests.post(
+        api + '/servers',
+        auth=auth,
+        json={'name': 'tw-real', 'gameId': 'teeworlds', 'port': 8313},
+        verify=False)
+    assert create.status_code == 201, create.text
+    sid = create.json()['id']
+
+    install = requests.post(api + '/servers/{0}/install'.format(sid), auth=auth, verify=False)
+    assert install.status_code == 200, install.text
+    _wait_status(api, auth, sid, 'stopped', timeout=180)
+
+    start = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
+    assert start.status_code == 200, start.text
+    assert start.json()['status'] == 'running'
+
+    time.sleep(4)
+    probe = device.run_ssh('ss -ulnp | grep 8313 || true')
+    assert '8313' in probe, 'teeworlds_srv should be bound on udp:8313 — ss output: {0!r}'.format(probe)
+
+    stop = requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
+    assert stop.status_code == 200, stop.text
+
+    cleanup = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
+    assert cleanup.status_code == 204, cleanup.text
+
+
 def test_lifecycle(api, auth):
     create = requests.post(
         api + '/servers',
