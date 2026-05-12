@@ -4,7 +4,6 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,24 +15,19 @@ import (
 	"github.com/ulikunitz/xz"
 )
 
-const githubLatestURL = "https://api.github.com/repos/teeworlds/teeworlds/releases/latest"
-
-type githubAsset struct {
-	Name string `json:"name"`
-	URL  string `json:"browser_download_url"`
-}
-
-type githubRelease struct {
-	Assets []githubAsset `json:"assets"`
-}
+// Pinned. Bump when a new linux_x86_64 release ships. We hit the asset URL
+// directly instead of api.github.com/.../releases/latest because the API
+// imposes 60 unauthenticated requests/hour per IP and CI hits that ceiling
+// fast across rebuilds. The asset URL serves from a different bucket with
+// no auth quota.
+const (
+	teeworldsVersion  = "0.7.5"
+	teeworldsAssetURL = "https://github.com/teeworlds/teeworlds/releases/download/" + teeworldsVersion + "/teeworlds-" + teeworldsVersion + "-linux_x86_64.tar.gz"
+)
 
 func installTeeworldsNative(ctx context.Context, g Game, installDir string) (*Result, error) {
-	asset, err := pickTeeworldsAsset(ctx)
-	if err != nil {
-		return nil, err
-	}
-	tarballPath := filepath.Join(installDir, asset.Name)
-	if err := download(ctx, asset.URL, tarballPath); err != nil {
+	tarballPath := filepath.Join(installDir, filepath.Base(teeworldsAssetURL))
+	if err := download(ctx, teeworldsAssetURL, tarballPath); err != nil {
 		return nil, fmt.Errorf("download: %w", err)
 	}
 	defer os.Remove(tarballPath)
@@ -52,29 +46,6 @@ func installTeeworldsNative(ctx context.Context, g Game, installDir string) (*Re
 
 	startCmd := fmt.Sprintf("cd %s && %s \"sv_port %d\"", filepath.Dir(srvPath), srvPath, g.DefaultPort)
 	return &Result{InstallDir: installDir, StartCmd: startCmd}, nil
-}
-
-func pickTeeworldsAsset(ctx context.Context) (*githubAsset, error) {
-	req, _ := http.NewRequestWithContext(ctx, "GET", githubLatestURL, nil)
-	client := &http.Client{Timeout: 30 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("github http %d", resp.StatusCode)
-	}
-	var rel githubRelease
-	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
-		return nil, err
-	}
-	for _, a := range rel.Assets {
-		if strings.Contains(a.Name, "linux_x86_64") {
-			return &a, nil
-		}
-	}
-	return nil, fmt.Errorf("no linux_x86_64 asset in latest release")
 }
 
 func download(ctx context.Context, url, dst string) error {
