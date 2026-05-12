@@ -54,14 +54,15 @@ for src in /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu; do
     fi
 done
 
-# Patch the steamcmd binary's ELF interpreter to point at our bundled 32-bit
-# ld-linux. Otherwise `exec ld-linux --library-path X binary` makes
-# /proc/self/exe report the ld-linux path; steamcmd derives STEAMROOT from
-# /proc/self/exe and chdirs to /snap (read-only squashfs), then all writes
-# fail with EROFS — surfaced as the misleading "Steam needs to be online".
+# Patch steamcmd's ELF interpreter to point at our bundled i386 ld-linux
+# in /snap (the path is stable once the snap is installed). Why this
+# matters: steamcmd derives STEAMROOT from /proc/self/exe and chdirs
+# there. If we wrap with `exec ld-linux --library-path X binary`,
+# /proc/self/exe reports the ld-linux path; otherwise it's the binary
+# path. We want the binary path so STEAMROOT is the writable RUNTIME copy.
 echo "before patchelf:"
 patchelf --print-interpreter ${OUT}/linux32/steamcmd
-patchelf --set-interpreter /var/snap/game-server/current/.steam-runtime/linux32/ld-linux.so.2 ${OUT}/linux32/steamcmd
+patchelf --set-interpreter /snap/game-server/current/steamcmd/lib32/ld-linux.so.2 ${OUT}/linux32/steamcmd
 echo "after patchelf:"
 patchelf --print-interpreter ${OUT}/linux32/steamcmd
 

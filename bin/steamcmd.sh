@@ -12,7 +12,10 @@ if [ ! -x "${RUNTIME}/linux32/steamcmd" ]; then
     mkdir -p "${RUNTIME}"
     # Copy everything from the bundled steamcmd dir except lib32/lib64 (which
     # stay in /snap — they don't mutate). Picks up linux32/, public/,
-    # steamcmd.sh and any future tarball additions automatically.
+    # steamcmd.sh and any future tarball additions automatically. The
+    # steamcmd binary was patchelf'd at build time to use
+    # /snap/.../steamcmd/lib32/ld-linux.so.2 as its ELF interpreter, so it
+    # works post-copy without any runtime fixup.
     for f in "${SCDIR}"/*; do
         name=$(basename "$f")
         case "$name" in
@@ -20,16 +23,12 @@ if [ ! -x "${RUNTIME}/linux32/steamcmd" ]; then
         esac
         cp -r "$f" "${RUNTIME}/"
     done
-    # The patched binary's ELF interpreter is
-    # ${RUNTIME}/linux32/ld-linux.so.2 — needs to actually exist there
-    # (it's also bundled in /snap/.../lib32/). Symlink it in.
-    ln -sf "${LIBS}/ld-linux.so.2" "${RUNTIME}/linux32/ld-linux.so.2"
     # If we happen to be running as root (install hook, manual SSH diag, etc.)
     # ensure the runtime + game-server's HOME end up owned by game-server,
     # otherwise the backend service (which runs as game-server) can't write
     # back into them and steamcmd dies with permission errors / exit 1.
     if [ "$(id -u)" = "0" ]; then
-        chown -RH game-server:game-server "${RUNTIME}"
+        chown -R game-server:game-server "${RUNTIME}"
         chown -R game-server:game-server "${HOME_OVERRIDE:-/var/snap/game-server/current/.steam-home}" 2>/dev/null || true
     fi
 fi
