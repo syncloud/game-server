@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash
+set -e
+trap 'echo "[steamcmd.sh] failed at line $LINENO with exit $?" >&2' ERR
 
 # /snap/ is squashfs (read-only); steamcmd self-updates `package/` and writes
 # state next to its binary, so we copy the bundle to a writable runtime dir
@@ -46,11 +48,19 @@ cd "${RUNTIME}"
 export LD_LIBRARY_PATH="${RUNTIME}/linux32:${LIBS}:${LD_LIBRARY_PATH:-}"
 export SSL_CERT_FILE="${SSL_CERT_FILE:-/etc/ssl/certs/ca-certificates.crt}"
 
+# Sanity-check the patched interpreter actually exists. If it doesn't, the
+# kernel will refuse the exec with a useless 'no such file' that the wrapper
+# would otherwise swallow.
+echo "[steamcmd.sh] binary: ${RUNTIME}/linux32/steamcmd" >&2
+echo "[steamcmd.sh] interpreter: $(LD_LIBRARY_PATH= /usr/bin/file ${RUNTIME}/linux32/steamcmd 2>&1 || true)" >&2
+echo "[steamcmd.sh] expected interpreter file at ${LIBS}/ld-linux.so.2:" >&2
+ls -la "${LIBS}/ld-linux.so.2" >&2 || true
+
 # Exec the binary DIRECTLY (no explicit ld-linux invocation). The binary's
 # ELF interpreter was patchelf'd at build time to point at
-# ${RUNTIME}/linux32/ld-linux.so.2 (symlinked above). This way
-# /proc/self/exe correctly reports the steamcmd binary path (under writable
-# RUNTIME), so when steamcmd derives STEAMROOT from /proc/self/exe and
-# chdirs there, the cwd is writable — fixes the EROFS that masquerades as
-# "Steam needs to be online".
+# /snap/.../steamcmd/lib32/ld-linux.so.2 — that path exists once the snap
+# is installed. This way /proc/self/exe correctly reports the steamcmd
+# binary path (under writable RUNTIME), so when steamcmd derives STEAMROOT
+# from /proc/self/exe and chdirs there, cwd is writable — fixes the EROFS
+# that masquerades as 'Steam needs to be online'.
 exec "${RUNTIME}/linux32/steamcmd" "$@"
