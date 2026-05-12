@@ -223,32 +223,52 @@ def test_steamcmd_diagnostics(device):
         out = device.run_ssh(cmd, throw=False)
         print(out if out else '(no output)')
 
-    show('disk space on /var/snap (statvfs would see this)',
-         'df -h /var/snap/game-server/current/.steam-runtime || df -h /var/snap')
-    show('writable filesystems',
-         'mount | head -10')
-    # use a tempfile script to avoid double-escaping into ssh
+    # write a script via heredoc to avoid double-escaping into ssh
     diag = (
         'set +e\n'
-        'mkdir -p /var/snap/game-server/current/.steam-home/Steam/logs\n'
-        'apt list --installed 2>/dev/null | grep -i strace || apt-get install -y strace 2>&1 | tail -3\n'
-        'cd /var/snap/game-server/current/.steam-runtime\n'
-        'echo PWD=$(pwd)\n'
-        'echo files=$(ls | tr "\\n" " ")\n'
-        'echo === ulimit ===\n'
-        'ulimit -n\n'
-        'echo === strace -e openat,connect,statfs,statvfs steamcmd +exit ===\n'
-        'strace -f -e trace=openat,connect,statfs,statvfs,access -ttt -s 200 -o /tmp/strace.log '
-        '  /snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -60\n'
-        'echo === strace log tail ===\n'
-        'tail -80 /tmp/strace.log\n'
-        'echo === Steam logs after run ===\n'
+        '\n'
+        'echo === df on snap data + /tmp ===\n'
+        'df -h /var/snap /tmp /\n'
+        '\n'
+        'echo === stat -f /var/snap (overlayfs values can be weird) ===\n'
+        'stat -f /var/snap/game-server/current\n'
+        '\n'
+        'echo === stat -f /tmp ===\n'
+        'stat -f /tmp\n'
+        '\n'
+        'apt-get install -y strace 2>&1 | tail -3\n'
+        '\n'
+        'echo === run our wrapper once to seed the runtime dir ===\n'
+        '/snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -20\n'
+        '\n'
+        'echo === ls .steam-runtime ===\n'
+        'ls -la /var/snap/game-server/current/.steam-runtime/\n'
+        'echo === Steam/logs after that run ===\n'
         'ls -la /var/snap/game-server/current/.steam-home/Steam/logs/ 2>&1\n'
-        'cat /var/snap/game-server/current/.steam-home/Steam/logs/*.txt 2>&1 || true\n'
+        '\n'
+        'echo === EXPERIMENT 1: same steamcmd, run from /tmp (tmpfs) instead of overlay ===\n'
+        'rm -rf /tmp/sctest && mkdir /tmp/sctest\n'
+        'cp -r /snap/game-server/current/steamcmd/linux32 /tmp/sctest/\n'
+        'HOME=/tmp/sctest cd /tmp/sctest && \\\n'
+        '  LD_LIBRARY_PATH=/snap/game-server/current/steamcmd/lib32 \\\n'
+        '  /snap/game-server/current/steamcmd/lib32/ld-linux.so.2 \\\n'
+        '    --library-path /tmp/sctest/linux32:/snap/game-server/current/steamcmd/lib32 \\\n'
+        '    /tmp/sctest/linux32/steamcmd +exit 2>&1 | head -20\n'
+        '\n'
+        'echo === EXPERIMENT 2: strace what bare steamcmd does (correct syscall names) ===\n'
+        'cd /var/snap/game-server/current/.steam-runtime\n'
+        'strace -f -e trace=openat,connect,statfs,fstatfs,access,write '
+        '  -ttt -s 200 -o /tmp/strace.log '
+        '  /snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -20\n'
+        'echo === strace last 100 lines ===\n'
+        'tail -100 /tmp/strace.log\n'
+        '\n'
+        'echo === Steam logs final state ===\n'
+        'find /var/snap/game-server/current/.steam-home -type f 2>&1 | head -20\n'
+        'cat /var/snap/game-server/current/.steam-home/Steam/logs/*.txt 2>&1 | head -30 || true\n'
     )
     device.run_ssh('cat > /tmp/diag.sh <<\'DIAGEOF\'\n' + diag + 'DIAGEOF\n', throw=False)
-    show('comprehensive diag',
-         'bash /tmp/diag.sh')
+    show('comprehensive diag', 'bash /tmp/diag.sh')
 
     show('ldd on the 32-bit steamcmd binary (look for "not found")',
          'ldd /snap/game-server/current/steamcmd/linux32/steamcmd 2>&1 || true')
