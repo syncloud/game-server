@@ -2,6 +2,7 @@ package installer
 
 import (
 	"archive/tar"
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -37,7 +38,7 @@ func installTeeworldsNative(ctx context.Context, g Game, installDir string) (*Re
 	}
 	defer os.Remove(tarballPath)
 
-	if err := extractTarXz(tarballPath, installDir); err != nil {
+	if err := extractTar(tarballPath, installDir); err != nil {
 		return nil, fmt.Errorf("extract: %w", err)
 	}
 
@@ -96,17 +97,31 @@ func download(ctx context.Context, url, dst string) error {
 	return err
 }
 
-func extractTarXz(tarballPath, dst string) error {
+func extractTar(tarballPath, dst string) error {
 	f, err := os.Open(tarballPath)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	xzr, err := xz.NewReader(f)
-	if err != nil {
-		return fmt.Errorf("xz: %w", err)
+	var r io.Reader
+	switch {
+	case strings.HasSuffix(tarballPath, ".tar.xz") || strings.HasSuffix(tarballPath, ".txz"):
+		xzr, err := xz.NewReader(f)
+		if err != nil {
+			return fmt.Errorf("xz: %w", err)
+		}
+		r = xzr
+	case strings.HasSuffix(tarballPath, ".tar.gz") || strings.HasSuffix(tarballPath, ".tgz"):
+		gzr, err := gzip.NewReader(f)
+		if err != nil {
+			return fmt.Errorf("gzip: %w", err)
+		}
+		defer gzr.Close()
+		r = gzr
+	default:
+		return fmt.Errorf("unknown archive extension: %s", filepath.Base(tarballPath))
 	}
-	tr := tar.NewReader(xzr)
+	tr := tar.NewReader(r)
 	for {
 		hdr, err := tr.Next()
 		if err == io.EOF {
