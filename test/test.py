@@ -264,13 +264,6 @@ def test_steamcmd_diagnostics(device):
          'cat /tmp/ld-debug.* 2>/dev/null | head -200 || echo "(no ld-debug output)"')
 
 
-@pytest.mark.xfail(
-    reason='steamcmd bootstrap fails inside snap (Steam needs to be online '
-           'to update, log files empty). The 32-bit lib bundle and writable '
-           'runtime dir aren\'t enough; suspect missing nss-resolver, '
-           'libcurl SSL plugin lookup, or DNS quirk. Diagnostic captured in '
-           'test_steamcmd_diagnostics — read pytest output to root-cause.',
-    strict=False, run=True)
 def test_hlds_cs_real_install_and_query(api, auth, device):
     create = requests.post(
         api + '/servers',

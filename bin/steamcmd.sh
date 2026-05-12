@@ -15,7 +15,9 @@ if [ ! -x "${RUNTIME}/linux32/steamcmd" ]; then
     # and any future tarball additions automatically.
     for f in "${SCDIR}"/*; do
         name=$(basename "$f")
-        [ "$name" = "lib32" ] && continue
+        case "$name" in
+            lib32|lib64) continue ;;
+        esac
         cp -r "$f" "${RUNTIME}/"
     done
 fi
