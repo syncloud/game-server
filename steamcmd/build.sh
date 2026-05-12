@@ -22,9 +22,13 @@ apt -y install \
     libc6:i386 libstdc++6:i386 libgcc-s1:i386 \
     zlib1g:i386 libcurl4:i386 libssl3:i386 \
     libtinfo6:i386 libncurses6:i386 \
-    libsdl2-2.0-0:i386 libgl1:i386
+    libsdl2-2.0-0:i386 libgl1:i386 \
+    curl:i386
 
 mkdir -p ${OUT}/lib32
+# Also bundle the i386 curl binary so we can independently verify 32-bit
+# HTTPS works from inside the snap (diagnostic only).
+cp /usr/bin/curl ${OUT}/lib32/curl.i386 || cp /usr/bin/curl.i386 ${OUT}/lib32/curl.i386 || true
 [ -f /lib/ld-linux.so.2 ] && cp /lib/ld-linux.so.2 ${OUT}/lib32/
 for src in /lib/i386-linux-gnu /usr/lib/i386-linux-gnu; do
     if [ -d "$src" ]; then

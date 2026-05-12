@@ -234,8 +234,12 @@ echo SECTION statf-tmp
 stat -f /tmp 2>&1
 echo SECTION apt-strace
 apt-get install -y strace 2>&1 | tail -3
+echo SECTION 32bit-curl-test
+ls -la /snap/game-server/current/steamcmd/lib32/curl.i386 2>&1
+echo --- 32-bit curl HEAD to Steam CDN ---
+LD_LIBRARY_PATH=/snap/game-server/current/steamcmd/lib32 /snap/game-server/current/steamcmd/lib32/ld-linux.so.2 --library-path /snap/game-server/current/steamcmd/lib32 /snap/game-server/current/steamcmd/lib32/curl.i386 -sIv --max-time 10 https://steamcdn-a.akamaihd.net/client/ 2>&1 | head -40
 echo SECTION seed-runtime-as-game-server
-sudo -u game-server -i /snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -20
+sudo -u game-server -H bash -c "/snap/game-server/current/bin/steamcmd.sh +exit" 2>&1 | head -20
 echo SECTION ls-runtime
 ls -la /var/snap/game-server/current/.steam-runtime/ 2>&1
 echo SECTION steamlogs-after-seed
