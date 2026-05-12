@@ -35,13 +35,14 @@ done
 
 # i386 dynamic linker
 find /tmp/i386/extract -name 'ld-linux.so.2' -exec cp -v {} ${OUT}/lib32/ \;
-# everything from /lib/i386-linux-gnu and /usr/lib/i386-linux-gnu
-if [ -d /tmp/i386/extract/lib/i386-linux-gnu ]; then
-    cp -P /tmp/i386/extract/lib/i386-linux-gnu/* ${OUT}/lib32/
-fi
-if [ -d /tmp/i386/extract/usr/lib/i386-linux-gnu ]; then
-    cp -P /tmp/i386/extract/usr/lib/i386-linux-gnu/* ${OUT}/lib32/
-fi
+# every shared object from /lib/i386-linux-gnu and /usr/lib/i386-linux-gnu
+# (skip subdirs like gconv/ — we don't need locale converters for steamcmd)
+for src in /tmp/i386/extract/lib/i386-linux-gnu /tmp/i386/extract/usr/lib/i386-linux-gnu; do
+    if [ -d "$src" ]; then
+        find "$src" -maxdepth 1 -type f -name '*.so*' -exec cp -P {} ${OUT}/lib32/ \;
+        find "$src" -maxdepth 1 -type l -name '*.so*' -exec cp -P {} ${OUT}/lib32/ \;
+    fi
+done
 
 cd ${DIR}
 ls -la ${OUT}
