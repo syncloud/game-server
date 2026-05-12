@@ -27,6 +27,11 @@ mkdir -p "${HOME}"
 
 cd "${RUNTIME}"
 
-export LD_LIBRARY_PATH="${LIBS}:${LD_LIBRARY_PATH:-}"
+# Library order matters: steamcmd ships its OWN linux32/libstdc++.so.6
+# (2013-era 32-bit libstdc++ it was built against). The official
+# steamcmd.sh prepends linux32/ to LD_LIBRARY_PATH so Steam's libstdc++
+# wins over system libs. Mirror that — fall back to our bookworm lib32
+# only for libs Steam doesn't ship (libc, libssl, libcurl, nss_*, ...).
+export LD_LIBRARY_PATH="${RUNTIME}/linux32:${LIBS}:${LD_LIBRARY_PATH:-}"
 export SSL_CERT_FILE="${SSL_CERT_FILE:-/etc/ssl/certs/ca-certificates.crt}"
-exec "${LD}" --library-path "${LIBS}" "${RUNTIME}/linux32/steamcmd" "$@"
+exec "${LD}" --library-path "${RUNTIME}/linux32:${LIBS}" "${RUNTIME}/linux32/steamcmd" "$@"
