@@ -39,6 +39,11 @@ def module_setup(request, device, app_dir, artifact_dir):
         device.run_ssh('ls -la /var/snap/game-server/current/ > {0}/var.snap.current.ls.log'.format(TMP_DIR), throw=False)
         device.run_ssh('ls -la /var/snap/game-server/common > {0}/var.snap.common.ls.log'.format(TMP_DIR), throw=False)
         device.run_ssh('cat /etc/hosts > {0}/hosts.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /snap/game-server/current/steamcmd > {0}/steamcmd.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls /snap/game-server/current/steamcmd/lib32 | head -50 > {0}/steamcmd.lib32.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('cat /var/snap/game-server/current/.steam-home/Steam/logs/stderr.txt > {0}/steam.stderr.log 2>/dev/null'.format(TMP_DIR), throw=False)
+        device.run_ssh('cat /var/snap/game-server/current/.steam-home/Steam/logs/bootstrap_log.txt > {0}/steam.bootstrap.log 2>/dev/null'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /var/snap/game-server/current/.steam-home/Steam/logs/ > {0}/steam.logs.ls 2>/dev/null'.format(TMP_DIR), throw=False)
 
         app_log_dir = join(artifact_dir, 'log')
         os.mkdir(app_log_dir)
