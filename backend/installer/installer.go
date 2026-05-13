@@ -90,7 +90,7 @@ func Install(ctx context.Context, g Game, name string, port int, steamUser, stea
 	switch g.Source {
 	case "steam":
 		return installSteam(ctx, g, installDir, steamUser, steamPass)
-	case "egg":
+	case "egg", "pelican", "parkervcp":
 		return installEgg(ctx, g, installDir)
 	default:
 		return nil, fmt.Errorf("unknown source %q", g.Source)
