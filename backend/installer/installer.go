@@ -115,13 +115,16 @@ func installSteam(ctx context.Context, g Game, installDir, user, pass string) (*
 	}
 	// HLDS appid 90 needs an explicit mod to populate cstrike/dod/valve/etc.;
 	// without it +app_update 90 only fetches the base server stub.
+	// It also needs the 'steam_legacy' beta branch — Valve retired the
+	// default branch for legacy GoldSrc; without -beta steam_legacy you
+	// get K_EAppUpdateError 0x10E "platform doesn't match".
 	if g.ID == "hlds-cs" {
 		args = append(args, "+app_set_config", "90", "mod", "cstrike")
+		args = append(args, "+app_update", "90", "-beta", "steam_legacy", "validate")
+	} else {
+		args = append(args, "+app_update", strconv.Itoa(g.SteamAppID), "validate")
 	}
-	args = append(args,
-		"+app_update", strconv.Itoa(g.SteamAppID), "validate",
-		"+quit",
-	)
+	args = append(args, "+quit")
 	cmd := exec.CommandContext(ctx, SteamCMDPath, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
