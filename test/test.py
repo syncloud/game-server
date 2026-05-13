@@ -86,6 +86,20 @@ def test_games_catalog(api, auth):
     ids = {g['id'] for g in games}
     assert 'teeworlds' in ids, 'teeworlds (smallest pelican egg, our CI fixture) must be in catalog'
     assert 'cs2' in ids, 'cs2 anonymous-friendly steam server must be in catalog'
+    assert 'hlds-cs' in ids, 'hlds-cs (CI Steam fixture) must be in catalog'
+    # every game should have a tier
+    for g in games:
+        assert g.get('tier') in ('supported', 'compatible', 'experimental'), \
+            'game {} has no tier: {}'.format(g.get('id'), g)
+
+
+def test_catalog_sources(api, auth):
+    response = requests.get(api + '/catalog/sources', auth=auth, verify=False)
+    assert response.status_code == 200, response.text
+    sources = response.json()
+    # parkervcp/eggs + pelican-eggs/games pinned versions are present
+    assert 'parkervcp/eggs' in sources
+    assert 'pelican-eggs/games' in sources
 
 
 def test_servers_empty(api, auth):

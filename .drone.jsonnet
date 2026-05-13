@@ -47,6 +47,13 @@ local arch = 'amd64';
       ],
     },
     {
+      name: 'catalog',
+      image: 'golang:' + go,
+      commands: [
+        './catalog/build.sh',
+      ],
+    },
+    {
       name: 'backend',
       image: 'golang:' + go,
       commands: [

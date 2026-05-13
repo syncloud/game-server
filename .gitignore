@@ -5,3 +5,6 @@ node_modules/
 web/dist/
 *.snap
 .idea/
+catalog/work/
+# backend/catalog/catalog.json is committed as a stub so 'go build' works
+# locally without running catalog/build.sh; CI regenerates it.
