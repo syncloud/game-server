@@ -25,10 +25,13 @@ test('tier filter pills', async ({ page }, info) => {
   await expect(page.getByTestId('tier-supported')).toBeVisible()
   await expect(page.getByTestId('tier-compatible')).toBeVisible()
   await expect(page.getByTestId('tier-experimental')).toBeVisible()
-  // pick supported → teeworlds + hlds-cs should show, experimental ones shouldn't
+  // pick supported — hlds-cs is hand-curated as supported.
   await page.getByTestId('tier-supported').click()
-  await expect(page.getByTestId('game-teeworlds')).toBeVisible()
+  await expect(page.getByTestId('game-hlds-cs')).toBeVisible()
   await shoot(page, info, 'tier-supported')
+  // pick compatible — teeworlds (from the egg catalog) lands here.
+  await page.getByTestId('tier-compatible').click()
+  await expect(page.getByTestId('game-teeworlds')).toBeVisible()
 })
 
 test('servers tab empty by default', async ({ page }, info) => {
