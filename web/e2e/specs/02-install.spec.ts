@@ -2,19 +2,21 @@ import { test, expect } from '@playwright/test'
 import { shoot } from '../helpers/screenshot'
 
 test('install dialog opens, creates a server, lands on server detail', async ({ page }, info) => {
+  // Unique name per attempt — retries+UNIQUE constraint would otherwise
+  // poison the retry when the first attempt half-succeeds.
+  const name = `e2e-tw-${Date.now()}`
+
   await page.goto('/#/catalog')
   await page.getByTestId('game-teeworlds').getByTestId('install-btn').click()
   await expect(page.getByTestId('install-dialog')).toBeVisible()
-  await page.getByTestId('dialog-name').fill('e2e-tw')
+  await page.getByTestId('dialog-name').fill(name)
   // Some egg variants don't have a SERVER_PORT variable so the catalog
   // defaultPort comes through as 0 — fill explicitly to enable submit.
   await page.getByTestId('dialog-port').fill('8313')
   await page.getByTestId('dialog-submit').click()
-  // Phase 13 routes to server detail page after create. Wait for URL
-  // change first so a timeout here clearly says "navigation didn't happen"
-  // rather than "element not found".
-  await page.waitForURL(/#\/servers\/\d+$/, { timeout: 20_000 })
-  await expect(page.getByTestId('detail-name')).toHaveText('e2e-tw')
+  // Hash-router doesn't fire 'load' on navigation; assert the detail
+  // element directly instead of waitForURL.
+  await expect(page.getByTestId('detail-name')).toHaveText(name)
   await expect(page.getByTestId('detail-status')).toBeVisible()
   await shoot(page, info, 'server-detail')
 
@@ -24,6 +26,8 @@ test('install dialog opens, creates a server, lands on server detail', async ({ 
   await page.getByTestId('subtab-query').click()
   await expect(page.getByTestId('detail-query')).toBeVisible()
 
+  // confirm() prompt — auto-accept
+  page.once('dialog', d => d.accept())
   await page.getByTestId('action-delete').click()
-  await page.waitForURL(/#\/servers$/)
+  await expect(page.getByTestId('servers-empty')).toBeVisible()
 })
