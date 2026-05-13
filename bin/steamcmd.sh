@@ -74,6 +74,18 @@ echo "[steamcmd.sh] running interpreter --version:" >&2
 echo "[steamcmd.sh] running /snap-bundled interpreter --version (control):" >&2
 "${LIBS}/ld-linux.so.2" --version >&2 || echo "[steamcmd.sh] /snap interp exit: $?" >&2
 
+# Dump the binary's PT_INTERP section directly. Read bytes 0x40..0x100,
+# which is where .interp typically sits on 32-bit ELFs. od shows
+# printable + escaped — we'll see exactly what string the kernel reads.
+echo "[steamcmd.sh] raw bytes 0x80..0x120 of binary (looking for .interp):" >&2
+dd if="${RUNTIME}/linux32/steamcmd" bs=1 skip=128 count=160 status=none 2>&1 | od -c -An | head -10 >&2
+
+# Try to exec the binary via our explicit ld-linux invocation. If THIS
+# works, we'll know the binary itself is fine and PT_INTERP-load is the
+# specific failing path.
+echo "[steamcmd.sh] try via explicit ld-linux:" >&2
+"${INTERP_TARGET}" "${RUNTIME}/linux32/steamcmd" +exit 2>&1 | head -5 >&2 || echo "[steamcmd.sh] explicit-ld exit: $?" >&2
+
 # Exec the binary DIRECTLY (no explicit ld-linux invocation). The binary's
 # ELF interpreter was patchelf'd at build time to point at
 # /snap/.../steamcmd/lib32/ld-linux.so.2 — that path exists once the snap
