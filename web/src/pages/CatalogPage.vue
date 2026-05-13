@@ -50,9 +50,14 @@ const counts = computed(() => {
 })
 
 async function createServer (payload) {
-  const created = await api.createServer(payload)
-  installing.value = null
-  router.push({ name: 'server-detail', params: { id: created.id } })
+  try {
+    const created = await api.createServer(payload)
+    installing.value = null
+    await router.push(`/servers/${created.id}`)
+  } catch (e) {
+    error.value = e.message
+    throw e
+  }
 }
 
 onMounted(load)
