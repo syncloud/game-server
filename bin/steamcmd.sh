@@ -52,10 +52,13 @@ export SSL_CERT_FILE="${SSL_CERT_FILE:-/etc/ssl/certs/ca-certificates.crt}"
 # Sanity-check the patched interpreter actually exists. If it doesn't, the
 # kernel will refuse the exec with a useless 'no such file' that the wrapper
 # would otherwise swallow.
-echo "[steamcmd.sh] binary: ${RUNTIME}/linux32/steamcmd" >&2
-echo "[steamcmd.sh] interpreter: $(LD_LIBRARY_PATH= /usr/bin/file ${RUNTIME}/linux32/steamcmd 2>&1 || true)" >&2
-echo "[steamcmd.sh] expected interpreter file at ${LIBS}/ld-linux.so.2:" >&2
-ls -la "${LIBS}/ld-linux.so.2" >&2 || true
+INTERP_TARGET="${RUNTIME}/linux32/ld-linux.so.2"
+echo "[steamcmd.sh] binary: ${RUNTIME}/linux32/steamcmd $(stat -c '%U:%G %a' ${RUNTIME}/linux32/steamcmd 2>/dev/null || echo MISSING)" >&2
+echo "[steamcmd.sh] interpreter target: ${INTERP_TARGET} $(stat -c '%U:%G %a %s bytes' ${INTERP_TARGET} 2>/dev/null || echo MISSING)" >&2
+echo "[steamcmd.sh] runtime/linux32 listing:" >&2
+ls -la "${RUNTIME}/linux32/" >&2 || true
+echo "[steamcmd.sh] /proc/self/exe of THIS shell = $(readlink /proc/self/exe)" >&2
+echo "[steamcmd.sh] mount namespace inode: $(readlink /proc/self/ns/mnt)" >&2
 
 # Exec the binary DIRECTLY (no explicit ld-linux invocation). The binary's
 # ELF interpreter was patchelf'd at build time to point at
