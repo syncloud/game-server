@@ -152,8 +152,12 @@ func steamStartCmd(g Game, dir string) string {
 		// Zomboid wraps its own JVM; let the start-server.sh handle libs
 		return fmt.Sprintf("cd %s && ./start-server.sh -port %d", dir, g.DefaultPort)
 	case "hlds-cs":
-		// HLDS is 32-bit, mod dir needs to be in library search for libstdc++/libsteam_api
-		return wrapI386(dir+"/hlds_linux", dir+":"+dir+"/cstrike", fmt.Sprintf("-game cstrike +map de_dust2 +port %d", g.DefaultPort))
+		// HLDS is 32-bit; mod dir needs to be in library search for libstdc++/libsteam_api.
+		// -insecure: skip the VAC connection that fails inside the snap (Steam
+		// auth isn't reachable, HLDS dies with 'Unable to initialize Steam' otherwise).
+		// +sv_lan 1: same — disable master server registration on first launch.
+		return wrapI386(dir+"/hlds_linux", dir+":"+dir+"/cstrike",
+			fmt.Sprintf("-game cstrike -insecure +sv_lan 1 +map de_dust2 +port %d +maxplayers 8", g.DefaultPort))
 	default:
 		return fmt.Sprintf("echo 'no default startCmd for %s; configure manually'", g.ID)
 	}
