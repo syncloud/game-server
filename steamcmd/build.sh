@@ -4,7 +4,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd ${DIR}
 
 apt update
-apt -y install wget ca-certificates patchelf
+apt -y install wget ca-certificates
 
 OUT=${DIR}/../build/snap/steamcmd
 mkdir -p ${OUT}
@@ -60,18 +60,12 @@ done
 # there. If we wrap with `exec ld-linux --library-path X binary`,
 # /proc/self/exe reports the ld-linux path; otherwise it's the binary
 # path. We want the binary path so STEAMROOT is the writable RUNTIME copy.
-# Patch interpreter to a path UNDER $SNAP_DATA so the wrapper can create
-# the symlink (and chown it to game-server). Earlier attempts to point at
-# /snap/.../lib32/ld-linux.so.2 directly failed with kernel ENOENT on exec
-# even though the file was present — likely a snap mount-namespace quirk
-# where the symlink chain /snap/<app>/current -> x1 doesn't resolve for
-# the kernel during PT_INTERP load. The RUNTIME path is a direct dir
-# under /var/snap (no double symlink) and works.
-echo "before patchelf:"
-patchelf --print-interpreter ${OUT}/linux32/steamcmd
-patchelf --set-interpreter /var/snap/game-server/current/.steam-runtime/linux32/ld-linux.so.2 ${OUT}/linux32/steamcmd
-echo "after patchelf:"
-patchelf --print-interpreter ${OUT}/linux32/steamcmd
+# NOTE: we tried patching the binary's PT_INTERP at build time so the
+# kernel would load our bundled ld-linux directly — that fails with
+# kernel ENOENT on PT_INTERP load in the snap mount namespace, even
+# though the file is verifiably present. Sidestep by invoking ld-linux
+# explicitly in bin/steamcmd.sh instead. Leave the binary's interpreter
+# at its default.
 
 cd ${DIR}
 ls -la ${OUT}
