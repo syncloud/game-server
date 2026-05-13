@@ -10,7 +10,10 @@ test('install dialog opens, creates a server, lands on server detail', async ({ 
   // defaultPort comes through as 0 — fill explicitly to enable submit.
   await page.getByTestId('dialog-port').fill('8313')
   await page.getByTestId('dialog-submit').click()
-  // Phase 13 routes to server detail page after create
+  // Phase 13 routes to server detail page after create. Wait for URL
+  // change first so a timeout here clearly says "navigation didn't happen"
+  // rather than "element not found".
+  await page.waitForURL(/#\/servers\/\d+$/, { timeout: 20_000 })
   await expect(page.getByTestId('detail-name')).toHaveText('e2e-tw')
   await expect(page.getByTestId('detail-status')).toBeVisible()
   await shoot(page, info, 'server-detail')
