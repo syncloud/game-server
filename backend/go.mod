@@ -1,4 +1,4 @@
-module github.com/syncloud/game-server/backend
+module github.com/syncloud/games/backend
 
 go 1.23
 

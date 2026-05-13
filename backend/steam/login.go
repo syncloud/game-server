@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	SteamCMDPath = "/snap/game-server/current/bin/steamcmd.sh"
-	UsernameFile = "/var/snap/game-server/current/steam-username"
+	SteamCMDPath = "/snap/games/current/bin/steamcmd.sh"
+	UsernameFile = "/var/snap/games/current/steam-username"
 )
 
 var (

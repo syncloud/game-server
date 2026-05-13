@@ -1,23 +1,23 @@
 # CI
 
-http://ci.syncloud.org:8080/syncloud/game-server (via 192.168.1.101:8080).
+http://ci.syncloud.org:8080/syncloud/games (via 192.168.1.101:8080).
 
 Check builds via API:
 ```
-curl -s "http://192.168.1.101:8080/api/repos/syncloud/game-server/builds?limit=5"
+curl -s "http://192.168.1.101:8080/api/repos/syncloud/games/builds?limit=5"
 ```
 
 Check which step failed:
 ```
-curl -s "http://192.168.1.101:8080/api/repos/syncloud/game-server/builds/{n}" | python3 -c "import json,sys; d=json.load(sys.stdin); [print(s['name'], s['status']) for st in d['stages'] for s in st['steps']]"
+curl -s "http://192.168.1.101:8080/api/repos/syncloud/games/builds/{n}" | python3 -c "import json,sys; d=json.load(sys.stdin); [print(s['name'], s['status']) for st in d['stages'] for s in st['steps']]"
 ```
 
 Tail a specific step (stage_number/step_number, both 1-indexed):
 ```
-curl -s "http://192.168.1.101:8080/api/repos/syncloud/game-server/builds/{n}/logs/1/{step}" | python3 -c "import json,sys; [print(l.get('out','').rstrip()) for l in json.load(sys.stdin)]"
+curl -s "http://192.168.1.101:8080/api/repos/syncloud/games/builds/{n}/logs/1/{step}" | python3 -c "import json,sys; [print(l.get('out','').rstrip()) for l in json.load(sys.stdin)]"
 ```
 
-Artifacts at `http://ci.syncloud.org:8081/files/game-server/{build}-amd64/`.
+Artifacts at `http://ci.syncloud.org:8081/files/games/{build}-amd64/`.
 
 # Status
 
@@ -53,7 +53,7 @@ In progress / open:
 # Architecture
 
 - `cli/` — Go cobra: install / configure / pre-refresh / post-refresh / cli (storage-change, access-change, backup-pre-stop, restore-pre-start, restore-post-start)
-- `backend/` — Go HTTP server on `unix:/var/snap/game-server/current/backend.sock`
+- `backend/` — Go HTTP server on `unix:/var/snap/games/current/backend.sock`
   - `db/` — SQLite open + schema
   - `server/` — Store with CRUD on servers
   - `runner/` — exec.Cmd-based process management with ring-buffer log capture
@@ -79,7 +79,7 @@ Use **teeworlds** for any test that needs a real install — smallest server in 
 # Storage layout (on device)
 
 ```
-/snap/game-server/current/                # read-only squashfs
+/snap/games/current/                # read-only squashfs
   steamcmd/                               # bundled steamcmd_linux.tar.gz contents
     linux32/steamcmd                      # i386 bootstrap binary
     steamcmd.sh, steam.sh                 # original wrapper (unused)
@@ -99,7 +99,7 @@ Use **teeworlds** for any test that needs a real install — smallest server in 
     steamcmd.sh                           # wrapper that invokes linux32/steamcmd
                                           #   via lib32/ld-linux.so.2 + lib32
 
-/var/snap/game-server/current/            # writable, $SNAP_DATA
+/var/snap/games/current/            # writable, $SNAP_DATA
   database.db                             # SQLite catalog of installed servers
   backend.sock                            # nginx -> backend
   servers/<name>/                         # per-server install (game files)
@@ -110,7 +110,7 @@ Use **teeworlds** for any test that needs a real install — smallest server in 
   .steam-runtime/                         # steamcmd's writable copy
                                           # (linux32 + public + package + steamcmd.sh)
 
-/var/snap/game-server/common/             # shared across revisions, $SNAP_COMMON
+/var/snap/games/common/             # shared across revisions, $SNAP_COMMON
   web.socket                              # platform -> nginx (PLATFORM CONTRACT)
   installed                               # marker file
 ```

@@ -14,19 +14,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/syncloud/game-server/backend/catalog"
-	"github.com/syncloud/game-server/backend/db"
-	"github.com/syncloud/game-server/backend/installer"
-	"github.com/syncloud/game-server/backend/query"
-	"github.com/syncloud/game-server/backend/runner"
-	"github.com/syncloud/game-server/backend/server"
-	"github.com/syncloud/game-server/backend/steam"
+	"github.com/syncloud/games/backend/catalog"
+	"github.com/syncloud/games/backend/db"
+	"github.com/syncloud/games/backend/installer"
+	"github.com/syncloud/games/backend/query"
+	"github.com/syncloud/games/backend/runner"
+	"github.com/syncloud/games/backend/server"
+	"github.com/syncloud/games/backend/steam"
 )
 
 type Game = catalog.Game
 
-const socketPath = "/var/snap/game-server/current/backend.sock"
-const dbPath = "/var/snap/game-server/current/database.db"
+const socketPath = "/var/snap/games/current/backend.sock"
+const dbPath = "/var/snap/games/current/database.db"
 
 
 func writeJSON(w http.ResponseWriter, code int, v any) {
@@ -100,7 +100,7 @@ func main() {
 func openStore(logger *log.Logger) (*server.Store, error) {
 	d, err := db.Open(dbPath)
 	if err != nil {
-		if _, statErr := os.Stat("/var/snap/game-server/current"); statErr != nil {
+		if _, statErr := os.Stat("/var/snap/games/current"); statErr != nil {
 			logger.Printf("data dir missing, falling back to in-memory db: %v", statErr)
 			d, err = db.Open(":memory:")
 			if err != nil {

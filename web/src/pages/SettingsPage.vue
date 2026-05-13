@@ -106,7 +106,7 @@ onMounted(load)
   <section class="detail-card" data-testid="settings-about">
     <h2>About</h2>
     <p class="muted">
-      <a href="https://github.com/syncloud/game-server" target="_blank">syncloud/game-server</a>
+      <a href="https://github.com/syncloud/games" target="_blank">syncloud/games</a>
       — Syncloud panel for SteamCMD and Pelican-egg game servers. WIP, see issue
       <a href="https://github.com/syncloud/platform/issues/35" target="_blank">platform#35</a>.
     </p>

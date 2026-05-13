@@ -4,10 +4,10 @@ set -e
 # /snap/ is squashfs (read-only); steamcmd self-updates `package/` and writes
 # state next to its binary, so we copy the bundle to a writable runtime dir
 # under $SNAP_DATA on first run. The lib32/ stays in /snap (doesn't change).
-SCDIR=/snap/game-server/current/steamcmd
+SCDIR=/snap/games/current/steamcmd
 LIBS="${SCDIR}/lib32"
 
-RUNTIME=/var/snap/game-server/current/.steam-runtime
+RUNTIME=/var/snap/games/current/.steam-runtime
 if [ ! -x "${RUNTIME}/linux32/steamcmd" ]; then
     mkdir -p "${RUNTIME}"
     # Copy everything from the bundled steamcmd dir except lib32/lib64.
@@ -19,8 +19,8 @@ if [ ! -x "${RUNTIME}/linux32/steamcmd" ]; then
         cp -r "$f" "${RUNTIME}/"
     done
     if [ "$(id -u)" = "0" ]; then
-        chown -R game-server:game-server "${RUNTIME}"
-        chown -R game-server:game-server "${HOME_OVERRIDE:-/var/snap/game-server/current/.steam-home}" 2>/dev/null || true
+        chown -R games:games "${RUNTIME}"
+        chown -R games:games "${HOME_OVERRIDE:-/var/snap/games/current/.steam-home}" 2>/dev/null || true
     fi
 fi
 
@@ -32,7 +32,7 @@ fi
 # cascade. With ld-linux running from $RUNTIME, STEAMROOT is writable.
 cp -f "${LIBS}/ld-linux.so.2" "${RUNTIME}/linux32/ld-linux.so.2"
 
-export HOME="${HOME_OVERRIDE:-/var/snap/game-server/current/.steam-home}"
+export HOME="${HOME_OVERRIDE:-/var/snap/games/current/.steam-home}"
 mkdir -p "${HOME}"
 
 cd "${RUNTIME}"

@@ -2,7 +2,7 @@
 
 retry=0
 retries=100
-APP=game-server
+APP=games
 NEXT=/snap/$APP/current/version
 CURRENT=/var/snap/$APP/current/version
 while ! diff $NEXT $CURRENT; do

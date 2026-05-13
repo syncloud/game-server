@@ -15,11 +15,15 @@ import (
 )
 
 const (
-	SteamCMDPath   = "/snap/game-server/current/bin/steamcmd.sh"
-	SteamLib32     = "/snap/game-server/current/steamcmd/lib32"
-	SteamLib64     = "/snap/game-server/current/steamcmd/lib64"
-	JREBinDir      = "/snap/game-server/current/jre/bin"
-	ServersBaseDir = "/var/snap/game-server/current/servers"
+	SteamCMDPath = "/snap/games/current/bin/steamcmd.sh"
+	SteamLib32   = "/snap/games/current/steamcmd/lib32"
+	SteamLib64   = "/snap/games/current/steamcmd/lib64"
+	JREBinDir    = "/snap/games/current/jre/bin"
+	// Game installs live on /data/<app>/ (external storage if available)
+	// so backups stay small and snap refresh rollback doesn't wipe the
+	// downloaded game files. /var/snap/games/current is for small state
+	// only (DB, configs, sentry).
+	ServersBaseDir = "/data/games/servers"
 )
 
 // wrapAmd64 builds a startCmd that invokes a 64-bit binary via our bundled

@@ -1,4 +1,4 @@
-local name = 'game-server';
+local name = 'games';
 local go = '1.23';
 local nginx = '1.24.0';
 local node = '20';

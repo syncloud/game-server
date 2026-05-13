@@ -28,22 +28,22 @@ def api(app_domain):
 @pytest.fixture(scope="session")
 def module_setup(request, device, app_dir, artifact_dir):
     def module_teardown():
-        device.run_ssh('ls -la /var/snap/game-server/current/config > {0}/config.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /var/snap/games/current/config > {0}/config.ls.log'.format(TMP_DIR), throw=False)
         device.run_ssh('top -bn 1 -w 500 -c > {0}/top.log'.format(TMP_DIR), throw=False)
         device.run_ssh('ps auxfw > {0}/ps.log'.format(TMP_DIR), throw=False)
         device.run_ssh('netstat -nlp > {0}/netstat.log'.format(TMP_DIR), throw=False)
         device.run_ssh('journalctl | tail -2000 > {0}/journalctl.log'.format(TMP_DIR), throw=False)
         device.run_ssh('ls -la /snap > {0}/snap.ls.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('ls -la /snap/game-server > {0}/snap.ls.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('ls -la /var/snap/game-server > {0}/var.snap.ls.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('ls -la /var/snap/game-server/current/ > {0}/var.snap.current.ls.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('ls -la /var/snap/game-server/common > {0}/var.snap.common.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /snap/games > {0}/snap.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /var/snap/games > {0}/var.snap.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /var/snap/games/current/ > {0}/var.snap.current.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /var/snap/games/common > {0}/var.snap.common.ls.log'.format(TMP_DIR), throw=False)
         device.run_ssh('cat /etc/hosts > {0}/hosts.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('ls -la /snap/game-server/current/steamcmd > {0}/steamcmd.ls.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('ls /snap/game-server/current/steamcmd/lib32 | head -50 > {0}/steamcmd.lib32.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('cat /var/snap/game-server/current/.steam-home/Steam/logs/stderr.txt > {0}/steam.stderr.log 2>/dev/null'.format(TMP_DIR), throw=False)
-        device.run_ssh('cat /var/snap/game-server/current/.steam-home/Steam/logs/bootstrap_log.txt > {0}/steam.bootstrap.log 2>/dev/null'.format(TMP_DIR), throw=False)
-        device.run_ssh('ls -la /var/snap/game-server/current/.steam-home/Steam/logs/ > {0}/steam.logs.ls 2>/dev/null'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /snap/games/current/steamcmd > {0}/steamcmd.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls /snap/games/current/steamcmd/lib32 | head -50 > {0}/steamcmd.lib32.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('cat /var/snap/games/current/.steam-home/Steam/logs/stderr.txt > {0}/steam.stderr.log 2>/dev/null'.format(TMP_DIR), throw=False)
+        device.run_ssh('cat /var/snap/games/current/.steam-home/Steam/logs/bootstrap_log.txt > {0}/steam.bootstrap.log 2>/dev/null'.format(TMP_DIR), throw=False)
+        device.run_ssh('ls -la /var/snap/games/current/.steam-home/Steam/logs/ > {0}/steam.logs.ls 2>/dev/null'.format(TMP_DIR), throw=False)
 
         app_log_dir = join(artifact_dir, 'log')
         os.mkdir(app_log_dir)
@@ -243,31 +243,31 @@ set +e
 echo SECTION df
 df -h /var/snap /tmp / 2>&1
 echo SECTION statf-varsnap
-stat -f /var/snap/game-server/current 2>&1
+stat -f /var/snap/games/current 2>&1
 echo SECTION statf-tmp
 stat -f /tmp 2>&1
 echo SECTION apt-strace
 apt-get install -y strace 2>&1 | tail -3
 echo SECTION 32bit-curl-test
-ls -la /snap/game-server/current/steamcmd/lib32/curl.i386 2>&1
+ls -la /snap/games/current/steamcmd/lib32/curl.i386 2>&1
 echo --- 32-bit curl HEAD to Steam CDN ---
-LD_LIBRARY_PATH=/snap/game-server/current/steamcmd/lib32 /snap/game-server/current/steamcmd/lib32/ld-linux.so.2 --library-path /snap/game-server/current/steamcmd/lib32 /snap/game-server/current/steamcmd/lib32/curl.i386 -sIv --max-time 10 https://steamcdn-a.akamaihd.net/client/ 2>&1 | head -40
-echo SECTION seed-runtime-as-game-server
-sudo -u game-server -H bash -c "/snap/game-server/current/bin/steamcmd.sh +exit" 2>&1 | head -20
+LD_LIBRARY_PATH=/snap/games/current/steamcmd/lib32 /snap/games/current/steamcmd/lib32/ld-linux.so.2 --library-path /snap/games/current/steamcmd/lib32 /snap/games/current/steamcmd/lib32/curl.i386 -sIv --max-time 10 https://steamcdn-a.akamaihd.net/client/ 2>&1 | head -40
+echo SECTION seed-runtime-as-games
+sudo -u games -H bash -c "/snap/games/current/bin/steamcmd.sh +exit" 2>&1 | head -20
 echo SECTION ls-runtime
-ls -la /var/snap/game-server/current/.steam-runtime/ 2>&1
+ls -la /var/snap/games/current/.steam-runtime/ 2>&1
 echo SECTION steamlogs-after-seed
-ls -la /var/snap/game-server/current/.steam-home/Steam/logs/ 2>&1
-cat /var/snap/game-server/current/.steam-home/Steam/logs/stderr.txt 2>&1 | head -20
+ls -la /var/snap/games/current/.steam-home/Steam/logs/ 2>&1
+cat /var/snap/games/current/.steam-home/Steam/logs/stderr.txt 2>&1 | head -20
 echo SECTION exp1-run-from-tmp
 rm -rf /tmp/sctest
 mkdir -p /tmp/sctest
-cp -r /snap/game-server/current/steamcmd/linux32 /tmp/sctest/
+cp -r /snap/games/current/steamcmd/linux32 /tmp/sctest/
 cd /tmp/sctest
-HOME=/tmp/sctest LD_LIBRARY_PATH=/snap/game-server/current/steamcmd/lib32 /snap/game-server/current/steamcmd/lib32/ld-linux.so.2 --library-path /tmp/sctest/linux32:/snap/game-server/current/steamcmd/lib32 /tmp/sctest/linux32/steamcmd +exit 2>&1 | head -20
+HOME=/tmp/sctest LD_LIBRARY_PATH=/snap/games/current/steamcmd/lib32 /snap/games/current/steamcmd/lib32/ld-linux.so.2 --library-path /tmp/sctest/linux32:/snap/games/current/steamcmd/lib32 /tmp/sctest/linux32/steamcmd +exit 2>&1 | head -20
 echo SECTION strace-bare
-cd /var/snap/game-server/current/.steam-runtime
-strace -f -e trace=openat,connect,statfs,fstatfs,access,write -ttt -s 200 -o /tmp/strace.log /snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -20
+cd /var/snap/games/current/.steam-runtime
+strace -f -e trace=openat,connect,statfs,fstatfs,access,write -ttt -s 200 -o /tmp/strace.log /snap/games/current/bin/steamcmd.sh +exit 2>&1 | head -20
 echo SECTION strace-tail
 tail -150 /tmp/strace.log 2>&1
 echo SECTION done
@@ -276,18 +276,18 @@ echo SECTION done
     show('comprehensive diag', 'bash /tmp/diag.sh')
 
     show('ldd on the 32-bit steamcmd binary (look for "not found")',
-         'ldd /snap/game-server/current/steamcmd/linux32/steamcmd 2>&1 || true')
+         'ldd /snap/games/current/steamcmd/linux32/steamcmd 2>&1 || true')
 
     show('ldd via our bundled loader',
-         'LD_LIBRARY_PATH=/snap/game-server/current/steamcmd/lib32 '
-         '/snap/game-server/current/steamcmd/lib32/ld-linux.so.2 --verify '
-         '/snap/game-server/current/steamcmd/linux32/steamcmd 2>&1 || true')
+         'LD_LIBRARY_PATH=/snap/games/current/steamcmd/lib32 '
+         '/snap/games/current/steamcmd/lib32/ld-linux.so.2 --verify '
+         '/snap/games/current/steamcmd/linux32/steamcmd 2>&1 || true')
 
     show('lib32 file listing',
-         'ls /snap/game-server/current/steamcmd/lib32 | sort')
+         'ls /snap/games/current/steamcmd/lib32 | sort')
 
     show('lib32 contains key SSL/curl/nss libs?',
-         'ls /snap/game-server/current/steamcmd/lib32 | grep -E '
+         'ls /snap/games/current/steamcmd/lib32 | grep -E '
          '"libssl|libcurl|libnghttp2|libidn2|libnss|libgssapi|libkrb5|'
          'libsasl|libssh|librtmp|libpsl|libcom_err|libkeyutils|libbrotli" '
          '| sort')
@@ -301,18 +301,18 @@ echo SECTION done
          '| head -40 || true')
 
     show('runtime dir state after a bare steamcmd +exit',
-         'sudo -u game-server -E HOME=/var/snap/game-server/current/.steam-home '
-         '/snap/game-server/current/bin/steamcmd.sh +exit 2>&1 | head -40 || true')
+         'sudo -u games -E HOME=/var/snap/games/current/.steam-home '
+         '/snap/games/current/bin/steamcmd.sh +exit 2>&1 | head -40 || true')
 
     show('Steam logs after that attempt',
-         'cat /var/snap/game-server/current/.steam-home/Steam/logs/stderr.txt 2>&1 || true; '
+         'cat /var/snap/games/current/.steam-home/Steam/logs/stderr.txt 2>&1 || true; '
          'echo ---bootstrap---; '
-         'cat /var/snap/game-server/current/.steam-home/Steam/logs/bootstrap_log.txt 2>&1 || true')
+         'cat /var/snap/games/current/.steam-home/Steam/logs/bootstrap_log.txt 2>&1 || true')
 
     show('LD_DEBUG=libs on a +exit (first 80 lines)',
-         'sudo -u game-server -E HOME=/var/snap/game-server/current/.steam-home '
+         'sudo -u games -E HOME=/var/snap/games/current/.steam-home '
          'LD_DEBUG=libs LD_DEBUG_OUTPUT=/tmp/ld-debug '
-         '/snap/game-server/current/bin/steamcmd.sh +exit 2>&1 >/dev/null || true; '
+         '/snap/games/current/bin/steamcmd.sh +exit 2>&1 >/dev/null || true; '
          'cat /tmp/ld-debug.* 2>/dev/null | head -200 || echo "(no ld-debug output)"')
 
 
@@ -344,7 +344,7 @@ def test_hlds_cs_real_install(api, auth, device):
 
     # Verify a real Steam asset landed on disk — proves SteamCMD did the
     # full anonymous-login + app_update flow inside the snap.
-    out = device.run_ssh('ls /var/snap/game-server/current/servers/hlds-real/hlds_linux 2>&1')
+    out = device.run_ssh('ls /data/games/servers/hlds-real/hlds_linux 2>&1')
     assert 'hlds_linux' in out and 'No such file' not in out, \
         'hlds_linux missing post-install: ' + out
 
@@ -411,11 +411,11 @@ def test_lifecycle(api, auth):
 
 
 def test_storage_change_event(device):
-    device.run_ssh('snap run game-server.storage-change > {0}/storage-change.log'.format(TMP_DIR))
+    device.run_ssh('snap run games.storage-change > {0}/storage-change.log'.format(TMP_DIR))
 
 
 def test_access_change_event(device):
-    device.run_ssh('snap run game-server.access-change > {0}/access-change.log'.format(TMP_DIR))
+    device.run_ssh('snap run games.access-change > {0}/access-change.log'.format(TMP_DIR))
 
 
 def test_remove(device, app):

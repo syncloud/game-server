@@ -1,4 +1,4 @@
-# game-server
+# games
 
 Syncloud app: dedicated game server panel.
 
@@ -13,7 +13,7 @@ See commits on `wip` for the phased build-out (server CRUD → process managemen
 ## Architecture
 
 - `cli/` — Go install/configure/access-change/storage-change/backup hooks (cobra).
-- `backend/` — Go HTTP backend on `unix:/var/snap/game-server/current/backend.sock`.
+- `backend/` — Go HTTP backend on `unix:/var/snap/games/current/backend.sock`.
 - `web/` — Vue 3 + Vite SPA, store-styled (`../store/web` look). Plain CSS, no Element Plus.
 - `config/` — nginx + authelia templates rendered at configure time.
 - `nginx/` — vendored static nginx.

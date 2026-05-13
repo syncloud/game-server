@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	App       = "game-server"
-	AppDir    = "/snap/game-server/current"
-	DataDir   = "/var/snap/game-server/current"
-	CommonDir = "/var/snap/game-server/common"
+	App       = "games"
+	AppDir    = "/snap/games/current"
+	DataDir   = "/var/snap/games/current"
+	CommonDir = "/var/snap/games/common"
 )
 
 type Variables struct {
@@ -102,9 +102,10 @@ func (i *Installer) StorageChange() error {
 	if err != nil {
 		return err
 	}
+	// Game install dirs go under storage (/data/games/servers/) so they
+	// survive snap refresh rollback and aren't included in platform backups.
 	if err := i.createMissingDirs(
-		path.Join(DataDir, "storage"),
-		path.Join(DataDir, "servers"),
+		path.Join(storageDir, "servers"),
 	); err != nil {
 		return err
 	}

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 
-const KEY = 'syncloud-game-server-theme'
+const KEY = 'syncloud-games-theme'
 const theme = ref('light')
 
 function apply (t) {

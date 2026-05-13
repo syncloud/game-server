@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const domain = process.env.PLAYWRIGHT_DOMAIN || 'bookworm.com'
-const baseURL = `https://game-server.${domain}`
+const baseURL = `https://games.${domain}`
 const storageState = '.auth/state.json'
 
 export default defineConfig({

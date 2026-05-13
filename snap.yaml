@@ -1,11 +1,11 @@
-name: game-server
+name: games
 summary: Game Server
 description: Dedicated game server panel for Syncloud
 grade: stable
 
 apps:
   backend:
-    user: game-server
+    user: games
     command: bin/service.backend.sh
     daemon: simple
     restart-condition: always
@@ -13,7 +13,7 @@ apps:
     restart-delay: 10s
 
   nginx:
-    user: game-server
+    user: games
     command: bin/service.nginx.sh
     daemon: simple
     restart-condition: always
