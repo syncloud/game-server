@@ -18,14 +18,14 @@ mkdir -p ${WORK}
 cd ${WORK}
 
 echo "fetching parkervcp/eggs @ ${PARKERVCP_SHA}"
+mkdir -p parkervcp
 wget -q "https://github.com/parkervcp/eggs/archive/${PARKERVCP_SHA}.tar.gz" -O parkervcp.tar.gz
-tar xzf parkervcp.tar.gz
-mv eggs-${PARKERVCP_SHA} parkervcp
+tar -xzf parkervcp.tar.gz -C parkervcp --strip-components=1
 
 echo "fetching pelican-eggs/games @ ${PELICAN_GAMES_SHA}"
+mkdir -p pelican
 wget -q "https://github.com/pelican-eggs/games/archive/${PELICAN_GAMES_SHA}.tar.gz" -O pelican.tar.gz
-tar xzf pelican.tar.gz
-mv games-${PELICAN_GAMES_SHA} pelican
+tar -xzf pelican.tar.gz -C pelican --strip-components=1
 
 cd ${DIR}/convert
 CGO_ENABLED=0 go build -buildvcs=false -o ${WORK}/convert .
