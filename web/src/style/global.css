@@ -112,15 +112,29 @@ button { font: inherit; cursor: pointer; }
   padding: 6px 14px;
   border-radius: 6px;
   font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
   transition: all 0.15s ease;
 }
 
-.tab:hover { color: var(--text); }
+.tab:hover { color: var(--text); text-decoration: none; }
 .tab.active {
   background: var(--bg-elevated);
   color: var(--text);
   box-shadow: var(--shadow);
 }
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--text);
+  text-decoration: none;
+}
+.brand:hover { text-decoration: none; }
 
 .theme-toggle {
   border: 1px solid var(--border);

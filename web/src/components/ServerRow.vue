@@ -1,15 +1,10 @@
 <script setup>
 const props = defineProps({ server: { type: Object, required: true } })
-const emit = defineEmits(['delete', 'refresh'])
-
-async function action (name) {
-  await fetch(`/api/v1/servers/${props.server.id}/${name}`, { method: 'POST' })
-  emit('refresh')
-}
+const emit = defineEmits(['open', 'start', 'stop', 'install', 'delete'])
 </script>
 
 <template>
-  <div class="card" :data-testid="`server-${server.id}`">
+  <div class="card" :data-testid="`server-${server.id}`" @click="emit('open')">
     <div class="card-head">
       <div class="card-icon">{{ server.name.charAt(0) }}</div>
       <div>
@@ -19,24 +14,24 @@ async function action (name) {
     </div>
     <div class="card-foot">
       <span class="port">{{ server.gameId.toUpperCase() }} · PORT {{ server.port }}</span>
-      <div class="actions">
+      <div class="actions" @click.stop>
         <button
           v-if="!server.installDir"
           class="btn"
           data-testid="server-install"
-          @click="action('install')"
+          @click="emit('install')"
         >Install</button>
         <button
           v-else-if="server.status === 'running'"
           class="btn ghost"
           data-testid="server-stop"
-          @click="action('stop')"
+          @click="emit('stop')"
         >Stop</button>
         <button
           v-else
           class="btn"
           data-testid="server-start"
-          @click="action('start')"
+          @click="emit('start')"
         >Start</button>
         <button class="btn ghost" data-testid="server-delete" @click="emit('delete')">Delete</button>
       </div>
@@ -45,18 +40,11 @@ async function action (name) {
 </template>
 
 <style scoped>
+.card { cursor: pointer; }
 .badge.status-running { background: rgba(22, 163, 74, 0.14); color: var(--success); }
 .badge.status-stopped { background: rgba(100, 116, 139, 0.18); color: var(--text-muted); }
 .badge.status-installing { background: rgba(217, 119, 6, 0.14); color: var(--warning); }
-.badge.status-error,
-.badge.status-install-error { background: rgba(220, 38, 38, 0.14); color: var(--danger); }
-
-.actions { display: flex; gap: 6px; }
-</style>
-
-<style scoped>
-.badge.status-running { background: rgba(22, 163, 74, 0.14); color: var(--success); }
-.badge.status-stopped { background: rgba(100, 116, 139, 0.18); color: var(--text-muted); }
-.badge.status-installing { background: rgba(217, 119, 6, 0.14); color: var(--warning); }
+.badge.status-install-error,
 .badge.status-error { background: rgba(220, 38, 38, 0.14); color: var(--danger); }
+.actions { display: flex; gap: 6px; }
 </style>
