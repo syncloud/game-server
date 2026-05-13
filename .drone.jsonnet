@@ -54,6 +54,13 @@ local arch = 'amd64';
       ],
     },
     {
+      name: 'jre',
+      image: 'debian:bookworm-slim',
+      commands: [
+        './jre/build.sh',
+      ],
+    },
+    {
       name: 'backend',
       image: 'golang:' + go,
       commands: [

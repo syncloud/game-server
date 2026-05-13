@@ -18,6 +18,7 @@ const (
 	SteamCMDPath   = "/snap/game-server/current/bin/steamcmd.sh"
 	SteamLib32     = "/snap/game-server/current/steamcmd/lib32"
 	SteamLib64     = "/snap/game-server/current/steamcmd/lib64"
+	JREBinDir      = "/snap/game-server/current/jre/bin"
 	ServersBaseDir = "/var/snap/game-server/current/servers"
 )
 
@@ -182,6 +183,7 @@ func installEgg(ctx context.Context, g Game, installDir string) (*Result, error)
 		return nil, fmt.Errorf("write install: %w", err)
 	}
 	env := append(os.Environ(), eggEnv(egg, g, installDir)...)
+	env = append(env, "PATH="+JREBinDir+":"+os.Getenv("PATH"))
 	cmd := exec.CommandContext(ctx, scriptPath)
 	cmd.Dir = installDir
 	cmd.Env = env
@@ -248,5 +250,8 @@ func renderStartup(egg *Egg, g Game, installDir string) string {
 	if startup == "" {
 		return fmt.Sprintf("echo 'no startup defined for %s'", g.ID)
 	}
-	return fmt.Sprintf("cd %s && %s", installDir, startup)
+	// Bundled JRE on PATH so eggs that invoke `java` (Minecraft, Terraria
+	// TShock, etc.) resolve to our /snap/.../jre/bin/java without needing
+	// a host JDK install.
+	return fmt.Sprintf("cd %s && export PATH=%s:$PATH && %s", installDir, JREBinDir, startup)
 }
