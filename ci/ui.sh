@@ -4,8 +4,9 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 cd ${DIR}/web/e2e
 
 npm ci
-npx playwright install chromium
+# Default user/password mirror the syncloud-lib integration test fixture
+# (created by the platform during activate_custom).
 PLAYWRIGHT_DOMAIN=${PLAYWRIGHT_DOMAIN:-bookworm.com} \
-PLAYWRIGHT_USER=${PLAYWRIGHT_USER:-syncloud} \
-PLAYWRIGHT_PASSWORD=${PLAYWRIGHT_PASSWORD:-syncloud} \
+PLAYWRIGHT_USER=${PLAYWRIGHT_USER:-user} \
+PLAYWRIGHT_PASSWORD=${PLAYWRIGHT_PASSWORD:-Password1} \
 npx playwright test --project="${1:-desktop}"

@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 
 const domain = process.env.PLAYWRIGHT_DOMAIN || 'bookworm.com'
 const baseURL = `https://game-server.${domain}`
+const storageState = '.auth/state.json'
 
 export default defineConfig({
   testDir: './specs',
@@ -10,19 +11,17 @@ export default defineConfig({
   workers: 1,
   retries: process.env.CI ? 1 : 0,
   reporter: [['html', { open: 'never' }]],
+  globalSetup: './global-setup.ts',
   use: {
     baseURL,
     ignoreHTTPSErrors: true,
-    httpCredentials: {
-      username: process.env.PLAYWRIGHT_USER || 'syncloud',
-      password: process.env.PLAYWRIGHT_PASSWORD || 'syncloud'
-    },
+    storageState,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure'
   },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile', use: { ...devices['Pixel 7'] } }
+    { name: 'desktop', use: { ...devices['Desktop Chrome'], baseURL, ignoreHTTPSErrors: true, storageState } },
+    { name: 'mobile', use: { ...devices['Pixel 7'], baseURL, ignoreHTTPSErrors: true, storageState } }
   ]
 })
