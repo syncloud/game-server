@@ -57,8 +57,16 @@ echo "[steamcmd.sh] binary: ${RUNTIME}/linux32/steamcmd $(stat -c '%U:%G %a' ${R
 echo "[steamcmd.sh] interpreter target: ${INTERP_TARGET} $(stat -c '%U:%G %a %s bytes' ${INTERP_TARGET} 2>/dev/null || echo MISSING)" >&2
 echo "[steamcmd.sh] runtime/linux32 listing:" >&2
 ls -la "${RUNTIME}/linux32/" >&2 || true
-echo "[steamcmd.sh] /proc/self/exe of THIS shell = $(readlink /proc/self/exe)" >&2
 echo "[steamcmd.sh] mount namespace inode: $(readlink /proc/self/ns/mnt)" >&2
+# Read PT_INTERP straight from the ELF, no patchelf required.
+# .interp section is a NUL-terminated string near the start of the file.
+echo "[steamcmd.sh] PT_INTERP per dd+strings:" >&2
+dd if="${RUNTIME}/linux32/steamcmd" bs=1 count=1024 2>/dev/null | strings -a -n 8 | head -3 >&2 || true
+# Confirm kernel can stat the interpreter path EXACTLY as the binary has it
+echo "[steamcmd.sh] readlink on interp target dir:" >&2
+ls -lH /var/snap/game-server/current/.steam-runtime/linux32/ld-linux.so.2 >&2 || true
+echo "[steamcmd.sh] resolved path:" >&2
+realpath /var/snap/game-server/current/.steam-runtime/linux32/ld-linux.so.2 >&2 || true
 
 # Exec the binary DIRECTLY (no explicit ld-linux invocation). The binary's
 # ELF interpreter was patchelf'd at build time to point at
