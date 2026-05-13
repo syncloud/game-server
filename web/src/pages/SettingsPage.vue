@@ -4,13 +4,16 @@ import { api } from '../api'
 
 const sources = ref({})
 const error = ref(null)
-
-// Steam credentials form — Phase 12 wires the endpoint, this is the UI stub.
-const steam = ref({ username: '', password: '', guardCode: '', state: 'idle', message: '' })
+const steam = ref({ username: '', password: '', guardCode: '', state: 'idle', message: '', linked: false, linkedUsername: '' })
 
 async function load () {
   try { sources.value = await api.catalogSources() }
   catch (e) { error.value = e.message }
+  try {
+    const s = await fetch('/api/v1/steam/status').then(r => r.json())
+    steam.value.linked = !!s.linked
+    steam.value.linkedUsername = s.username || ''
+  } catch (_) { /* */ }
 }
 
 async function steamLogin () {
@@ -64,6 +67,9 @@ onMounted(load)
       We don't store your Steam password — after a successful login we keep only the
       session token (sentry file). You may need to enter a Steam Guard code from your
       email or mobile app on first login.
+    </p>
+    <p v-if="steam.linked" class="form-msg ok" data-testid="steam-linked">
+      Connected as <strong>{{ steam.linkedUsername }}</strong>. Re-submit below to change.
     </p>
     <form @submit.prevent="steamLogin">
       <label>

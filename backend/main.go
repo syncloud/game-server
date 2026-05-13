@@ -20,6 +20,7 @@ import (
 	"github.com/syncloud/game-server/backend/query"
 	"github.com/syncloud/game-server/backend/runner"
 	"github.com/syncloud/game-server/backend/server"
+	"github.com/syncloud/game-server/backend/steam"
 )
 
 type Game = catalog.Game
@@ -73,6 +74,15 @@ func main() {
 	})
 	mux.HandleFunc("/api/v1/catalog/sources", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, catalog.Sources())
+	})
+	mux.HandleFunc("/api/v1/steam/login", func(w http.ResponseWriter, r *http.Request) {
+		handleSteamLogin(w, r)
+	})
+	mux.HandleFunc("/api/v1/steam/status", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, map[string]any{
+			"linked":   steam.StoredUsername() != "",
+			"username": steam.StoredUsername(),
+		})
 	})
 	mux.HandleFunc("/api/v1/servers", func(w http.ResponseWriter, r *http.Request) {
 		handleServers(w, r, store)
@@ -287,6 +297,43 @@ func handleQuery(w http.ResponseWriter, r *http.Request, store *server.Store, id
 	writeJSON(w, http.StatusOK, info)
 }
 
+type steamLoginRequest struct {
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	GuardCode string `json:"guardCode"`
+}
+
+func handleSteamLogin(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", "POST")
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	var req steamLoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid body")
+		return
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Minute)
+	defer cancel()
+	res, err := steam.Login(ctx, req.Username, req.Password, req.GuardCode)
+	if res != nil && res.Needs2FA {
+		writeJSON(w, http.StatusOK, map[string]any{
+			"needsGuard": true,
+			"prompt":     res.Prompt,
+		})
+		return
+	}
+	if err != nil {
+		writeError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{
+		"linked":   true,
+		"username": res.Username,
+	})
+}
+
 func currentStatus(s *server.Server, run *runner.Runner) string {
 	if s.Status == "installing" || s.Status == "install-error" {
 		return s.Status
@@ -304,7 +351,8 @@ func runInstall(logger *log.Logger, store *server.Store, id int64, g Game) {
 	if err != nil || s == nil {
 		return
 	}
-	logger.Printf("install[%d] starting: game=%s source=%s appid=%d egg=%s", id, g.ID, g.Source, g.SteamAppID, g.EggURL)
+	steamUser := steam.StoredUsername() // empty unless user linked an account
+	logger.Printf("install[%d] starting: game=%s source=%s appid=%d steamUser=%q", id, g.ID, g.Source, g.SteamAppID, steamUser)
 	result, err := installer.Install(ctx, installer.Game{
 		ID:          g.ID,
 		Name:        g.Name,
@@ -312,7 +360,7 @@ func runInstall(logger *log.Logger, store *server.Store, id int64, g Game) {
 		SteamAppID:  g.SteamAppID,
 		EggURL:      g.EggURL,
 		DefaultPort: g.DefaultPort,
-	}, s.Name, s.Port, "", "")
+	}, s.Name, s.Port, steamUser, "")
 	if err != nil {
 		logger.Printf("install[%d] FAILED: %v", id, err)
 		_ = store.UpdateLastError(id, err.Error())
