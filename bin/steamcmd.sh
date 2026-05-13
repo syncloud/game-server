@@ -67,6 +67,12 @@ echo "[steamcmd.sh] readlink on interp target dir:" >&2
 ls -lH /var/snap/game-server/current/.steam-runtime/linux32/ld-linux.so.2 >&2 || true
 echo "[steamcmd.sh] resolved path:" >&2
 realpath /var/snap/game-server/current/.steam-runtime/linux32/ld-linux.so.2 >&2 || true
+echo "[steamcmd.sh] first 4 bytes of interpreter:" >&2
+od -c -N 4 "${INTERP_TARGET}" >&2 || true
+echo "[steamcmd.sh] running interpreter --version:" >&2
+"${INTERP_TARGET}" --version >&2 || echo "[steamcmd.sh] interp exit: $?" >&2
+echo "[steamcmd.sh] running /snap-bundled interpreter --version (control):" >&2
+"${LIBS}/ld-linux.so.2" --version >&2 || echo "[steamcmd.sh] /snap interp exit: $?" >&2
 
 # Exec the binary DIRECTLY (no explicit ld-linux invocation). The binary's
 # ELF interpreter was patchelf'd at build time to point at
