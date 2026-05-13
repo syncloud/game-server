@@ -351,6 +351,40 @@ def test_hlds_cs_real_install(api, auth, device):
     requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
 
 
+def test_minecraft_real_install(api, auth, device):
+    """Pick a Minecraft Java entry from the catalog and install it. Asserts
+    the bundled JRE is functional (the egg's startup uses 'java') and a
+    .jar landed under /data/games/servers/. We don't start the server —
+    Minecraft EULA acceptance is an explicit user-consent step that
+    shouldn't be baked into the test fixture."""
+    games = requests.get(api + '/games', auth=auth, verify=False).json()
+    candidates = [
+        g for g in games
+        if 'minecraft' in g['id'].lower()
+        and ('java' in g['id'].lower() or 'vanilla' in g['id'].lower())
+        and g.get('tier') in ('supported', 'compatible')
+    ]
+    assert candidates, 'no Minecraft Java entries in catalog with tier supported|compatible'
+    g = candidates[0]
+    print('using minecraft entry:', g['id'], 'name=', g['name'])
+
+    create = requests.post(
+        api + '/servers', auth=auth,
+        json={'name': 'mc-real', 'gameId': g['id'], 'port': 25575},
+        verify=False)
+    assert create.status_code == 201, create.text
+    sid = create.json()['id']
+
+    install = requests.post(api + '/servers/{0}/install'.format(sid), auth=auth, verify=False)
+    assert install.status_code == 200, install.text
+    _wait_status(api, auth, sid, 'stopped', timeout=600)
+
+    out = device.run_ssh('ls /data/games/servers/mc-real/ 2>&1')
+    assert '.jar' in out, 'minecraft .jar missing post-install: ' + out
+
+    requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
+
+
 @pytest.mark.xfail(
     reason='HLDS startup needs Steam Pipe / lsteamclient shim to satisfy '
            'SteamAPI_Init -> IClientUtils::GetConnectedUniverse. SteamCMD '
