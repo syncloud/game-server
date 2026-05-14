@@ -7,8 +7,6 @@ LIBS="${SCDIR}/lib32"
 export HOME=/var/snap/games/current/.steam-home
 mkdir -p "${HOME}"
 
-export LD_LIBRARY_PATH="${SCDIR}/linux32:${LIBS}:${LD_LIBRARY_PATH:-}"
-
 cd "${HOME}"
 
 exec "${SCDIR}/linux32/ld-linux.so.2" --library-path "${SCDIR}/linux32:${LIBS}" "${SCDIR}/linux32/steamcmd" "$@"
