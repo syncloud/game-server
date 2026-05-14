@@ -220,7 +220,13 @@ button { font: inherit; cursor: pointer; }
 
 @media (max-width: 640px) {
   .desktop-only { display: none !important; }
-  .mobile-only { display: flex; }
+  /* Default mobile-only = block; the nav bar overrides to flex below.
+     Was display:flex unconditionally — that turned the Settings
+     <section class="detail-card mobile-only"> into a flex row,
+     stacking the Account, Theme and logout rows horizontally and
+     blowing out the viewport. */
+  .mobile-only { display: block; }
+  .bottom-bar.mobile-only { display: flex; }
   .header-inner { padding: 12px 16px; }
   .brand-name { font-size: 16px; }
   main { padding: 20px 16px 120px; }
@@ -237,12 +243,15 @@ button { font: inherit; cursor: pointer; }
 
 .theme-toggle {
   border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  border-radius: 8px;
-  padding: 6px 10px;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 4px 12px;
   font-size: 14px;
+  line-height: 1;
+  min-width: 36px;
 }
+.theme-toggle:hover { color: var(--text); background: var(--bg-elevated); }
 
 main {
   flex: 1;
