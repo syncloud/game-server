@@ -93,15 +93,35 @@ local platform_image(distro, arch) =
         './package.sh ' + name + ' $VERSION',
       ],
     },
-  ] + std.flattenArrays([
-    [
-      { name: 'nginx test ' + distro, image: platform_image(distro, arch), commands: ['./nginx/test.sh'] },
-      { name: 'jre test ' + distro, image: platform_image(distro, arch), commands: ['./jre/test.sh'] },
-      { name: 'steamcmd test ' + distro, image: platform_image(distro, arch), commands: ['./steamcmd/test.sh'] },
-      { name: 'cli test ' + distro, image: platform_image(distro, arch), commands: ['./cli/test.sh'] },
-    ]
+  ] + [
+    {
+      name: 'nginx test ' + distro,
+      image: platform_image(distro, arch),
+      commands: ['./nginx/test.sh'],
+    }
     for distro in distros
-  ]) + [
+  ] + [
+    {
+      name: 'jre test ' + distro,
+      image: platform_image(distro, arch),
+      commands: ['./jre/test.sh'],
+    }
+    for distro in distros
+  ] + [
+    {
+      name: 'steamcmd test ' + distro,
+      image: platform_image(distro, arch),
+      commands: ['./steamcmd/test.sh'],
+    }
+    for distro in distros
+  ] + [
+    {
+      name: 'cli test ' + distro,
+      image: platform_image(distro, arch),
+      commands: ['./cli/test.sh'],
+    }
+    for distro in distros
+  ] + [
     {
       name: 'test ' + distro_default,
       image: 'python:' + python,
