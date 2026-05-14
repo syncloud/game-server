@@ -50,11 +50,6 @@ done
 
 cd ${DIR}
 
-BOOT_HOME=$(mktemp -d)
-HOME=${BOOT_HOME} ${OUT}/linux32/steamcmd +quit
-rm -rf ${BOOT_HOME}
-
 ls -la ${OUT}
 echo "lib32 file count: $(ls ${OUT}/lib32 | wc -l), size: $(du -sh ${OUT}/lib32 | cut -f1)"
 echo "lib64 file count: $(ls ${OUT}/lib64 | wc -l), size: $(du -sh ${OUT}/lib64 | cut -f1)"
-echo "steamcmd post-bootstrap size: $(du -sh ${OUT} | cut -f1)"
