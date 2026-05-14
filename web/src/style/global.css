@@ -84,6 +84,11 @@ button { font: inherit; cursor: pointer; }
   font-size: 18px;
 }
 
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
 .brand-icon {
   width: 32px;
   height: 32px;

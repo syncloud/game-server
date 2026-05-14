@@ -5,6 +5,7 @@ import ThemeToggle from './components/ThemeToggle.vue'
 import catalogIcon from './assets/icons/catalog.svg'
 import serversIcon from './assets/icons/servers.svg'
 import settingsIcon from './assets/icons/settings.svg'
+import syncloudLogo from './assets/syncloud-logo.svg'
 
 const route = useRoute()
 const user = ref(null)
@@ -29,8 +30,8 @@ function logout () { window.location.assign('/auth/logout') }
     <header class="header">
       <div class="header-inner">
         <router-link to="/catalog" class="brand" data-testid="brand">
-          <div class="brand-icon">G</div>
-          <span class="brand-name">Game Server</span>
+          <img class="brand-logo" :src="syncloudLogo" alt="Syncloud" />
+          <span class="brand-name">Syncloud Game Hub</span>
         </router-link>
         <div class="spacer" />
         <nav class="tabs desktop-only">
