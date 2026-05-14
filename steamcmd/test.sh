@@ -17,6 +17,12 @@ mkdir -p /snap/games /var/snap/games
 ln -sfn ${BUILD_DIR} /snap/games/current
 ln -sfn ${SCRATCH}   /var/snap/games/current
 
+# bin/steamcmd.sh only lands in build/snap/bin during package.sh, which
+# hasn't run at this stage of the pipeline — drop it in by hand so the
+# wrapper resolves via the symlink above.
+mkdir -p ${BUILD_DIR}/bin
+cp ${DIR}/../bin/steamcmd.sh ${BUILD_DIR}/bin/steamcmd.sh
+
 # Wrapper chowns the runtime dir to games:games when run as root; create
 # the user so set -e doesn't kill the script on a missing group.
 id games >/dev/null 2>&1 || adduser --system --group --no-create-home games
