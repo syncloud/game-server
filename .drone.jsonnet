@@ -100,13 +100,7 @@ local platform_image(distro, arch) =
       name: 'cli',
       image: 'golang:' + go,
       commands: [
-        'cd cli',
-        'mkdir -p ../build/snap/meta/hooks',
-        'CGO_ENABLED=0 go build -buildvcs=false -o ../build/snap/meta/hooks/install ./cmd/install',
-        'CGO_ENABLED=0 go build -buildvcs=false -o ../build/snap/meta/hooks/configure ./cmd/configure',
-        'CGO_ENABLED=0 go build -buildvcs=false -o ../build/snap/meta/hooks/pre-refresh ./cmd/pre-refresh',
-        'CGO_ENABLED=0 go build -buildvcs=false -o ../build/snap/meta/hooks/post-refresh ./cmd/post-refresh',
-        'CGO_ENABLED=0 go build -buildvcs=false -o ../build/snap/bin/cli ./cmd/cli',
+        './cli/build.sh',
       ],
     },
   ] + [
