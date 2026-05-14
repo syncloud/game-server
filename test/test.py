@@ -316,6 +316,7 @@ echo SECTION done
          'cat /tmp/ld-debug.* 2>/dev/null | head -200 || echo "(no ld-debug output)"')
 
 
+@pytest.mark.flaky(retries=2, delay=15)
 def test_hlds_cs_real_install(api, auth, device):
     """Real CS 1.6 dedicated server install via SteamCMD (~822 MB download).
 
@@ -330,6 +331,14 @@ def test_hlds_cs_real_install(api, auth, device):
     shim). The install itself is the proof that SteamCMD works inside
     the snap, which was the phase 3b goal.
     """
+    # Retries: drop any half-installed leftover from a previous attempt so
+    # the create step doesn't conflict on the UNIQUE(name) constraint, and
+    # so steamcmd's runtime dir state from a failed run isn't reused.
+    existing = requests.get(api + '/servers', auth=auth, verify=False).json()
+    for s in existing or []:
+        if s.get('name') == 'hlds-real':
+            requests.delete(api + '/servers/{0}'.format(s['id']), auth=auth, verify=False)
+    device.run_ssh('rm -rf /data/games/servers/hlds-real', throw=False)
     create = requests.post(
         api + '/servers',
         auth=auth,
