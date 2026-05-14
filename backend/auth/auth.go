@@ -231,10 +231,19 @@ func (s *Service) userFromBasic(r *http.Request) *User {
 	if !ok || user == "" {
 		return nil
 	}
-	req, _ := http.NewRequest("GET", s.authUrl+"/api/authz/auth-request/basic", nil)
+	// Authelia's auth-request endpoint is /api/authz/auth-request — the
+	// `/basic` we used before came from the nginx location *name* in the
+	// old forward-auth conf, not the upstream path. With Basic Auth set
+	// on the request, Authelia validates against LDAP and returns 200 +
+	// Remote-User / Remote-Email / Remote-Name response headers.
+	req, _ := http.NewRequest("GET", s.authUrl+"/api/authz/auth-request", nil)
 	req.SetBasicAuth(user, pass)
 	req.Header.Set("X-Original-Method", r.Method)
 	req.Header.Set("X-Original-URL", "https://"+r.Host+r.URL.Path)
+	req.Header.Set("X-Forwarded-Method", r.Method)
+	req.Header.Set("X-Forwarded-Proto", "https")
+	req.Header.Set("X-Forwarded-Host", r.Host)
+	req.Header.Set("X-Forwarded-Uri", r.URL.Path)
 	resp, err := s.tlsClient.Do(req)
 	if err != nil {
 		s.logger.Printf("auth basic delegate to authelia: %v", err)
