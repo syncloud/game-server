@@ -28,8 +28,11 @@ const oidcConfigPath = "/var/snap/games/current/oidc.json"
 
 type Game = catalog.Game
 
-const socketPath = "/var/snap/games/current/backend.sock"
-const dbPath = "/var/snap/games/current/database.db"
+const (
+	socketPath    = "/var/snap/games/current/backend.sock"
+	cliSocketPath = "/var/snap/games/current/cli.sock"
+	dbPath        = "/var/snap/games/current/database.db"
+)
 
 func writeJSON(w http.ResponseWriter, code int, v any) {
 	w.Header().Set("Content-Type", "application/json")
@@ -65,6 +68,15 @@ func main() {
 	}
 	if err := os.Chmod(socketPath, 0666); err != nil {
 		logger.Fatalf("chmod: %v", err)
+	}
+
+	_ = os.Remove(cliSocketPath)
+	cliListener, err := net.Listen("unix", cliSocketPath)
+	if err != nil {
+		logger.Fatalf("listen cli: %v", err)
+	}
+	if err := os.Chmod(cliSocketPath, 0660); err != nil {
+		logger.Fatalf("chmod cli: %v", err)
 	}
 
 	authSvc := loadAuth(logger)
@@ -112,6 +124,16 @@ func main() {
 		logger.Printf("auth disabled — OIDC config not loaded; /api/ unprotected (dev mode)")
 		mux.Handle("/api/", api)
 	}
+
+	cliMux := http.NewServeMux()
+	cliMux.Handle("/api/", api)
+
+	go func() {
+		logger.Printf("listening on %s (cli)", cliSocketPath)
+		if err := http.Serve(cliListener, cliMux); err != nil {
+			logger.Fatalf("serve cli: %v", err)
+		}
+	}()
 
 	logger.Printf("listening on %s", socketPath)
 	if err := http.Serve(listener, mux); err != nil {

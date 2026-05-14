@@ -48,6 +48,10 @@ func main() {
 		},
 	})
 
+	cmd.AddCommand(serverCmd())
+	cmd.AddCommand(gamesCmd())
+	cmd.AddCommand(healthCmd())
+
 	if err := cmd.Execute(); err != nil {
 		fmt.Print(err)
 		os.Exit(1)

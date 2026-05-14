@@ -12,9 +12,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -25,10 +23,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const (
-	SyncloudCAPath     = "/var/snap/platform/current/syncloud.ca.crt"
-	AutheliaSocketPath = "/var/snap/platform/current/authelia.socket"
-)
+const SyncloudCAPath = "/var/snap/platform/current/syncloud.ca.crt"
 
 const (
 	SessionCookie = "games_session"
@@ -44,15 +39,14 @@ type User struct {
 }
 
 type Service struct {
-	mu          sync.Mutex
-	provider    *oidc.Provider
-	verifier    *oidc.IDTokenVerifier
-	cfg         oauth2.Config
-	signKey     []byte
-	tlsClient   *http.Client
-	localClient *http.Client
-	authUrl     string
-	logger      *log.Logger
+	mu        sync.Mutex
+	provider  *oidc.Provider
+	verifier  *oidc.IDTokenVerifier
+	cfg       oauth2.Config
+	signKey   []byte
+	tlsClient *http.Client
+	authUrl   string
+	logger    *log.Logger
 }
 
 type ctxKey struct{}
@@ -89,25 +83,15 @@ func NewService(ctx context.Context, logger *log.Logger, authUrl, clientID, clie
 	}
 	verifier := provider.Verifier(&oidc.Config{ClientID: clientID})
 
-	localClient := &http.Client{
-		Transport: &http.Transport{
-			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-				return net.Dial("unix", AutheliaSocketPath)
-			},
-		},
-		Timeout: 5 * time.Second,
-	}
-
 	key := sha256.Sum256([]byte(signSecret + "|games-session-v1"))
 	return &Service{
-		provider:    provider,
-		verifier:    verifier,
-		cfg:         cfg,
-		signKey:     key[:],
-		tlsClient:   hc,
-		localClient: localClient,
-		authUrl:     authUrl,
-		logger:      logger,
+		provider:  provider,
+		verifier:  verifier,
+		cfg:       cfg,
+		signKey:   key[:],
+		tlsClient: hc,
+		authUrl:   authUrl,
+		logger:    logger,
 	}, nil
 }
 
@@ -203,12 +187,7 @@ func (s *Service) Middleware(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKey{}, u)))
 			return
 		}
-		if u := s.userFromBasic(r); u != nil {
-			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKey{}, u)))
-			return
-		}
 		if strings.HasPrefix(r.URL.Path, "/api/") {
-			w.Header().Set("WWW-Authenticate", `Basic realm="games"`)
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
@@ -226,36 +205,6 @@ func (s *Service) userFromCookie(r *http.Request) *User {
 		return nil
 	}
 	return u
-}
-
-func (s *Service) userFromBasic(r *http.Request) *User {
-	user, pass, ok := r.BasicAuth()
-	if !ok || user == "" {
-		return nil
-	}
-	req, _ := http.NewRequest("GET", "http://authelia/api/authz/auth-request", nil)
-	req.SetBasicAuth(user, pass)
-	req.Header.Set("X-Original-Method", r.Method)
-	req.Header.Set("X-Original-URL", "https://"+r.Host+r.URL.Path)
-	req.Header.Set("X-Forwarded-Method", r.Method)
-	req.Header.Set("X-Forwarded-Proto", "https")
-	req.Header.Set("X-Forwarded-Host", r.Host)
-	req.Header.Set("X-Forwarded-Uri", r.URL.Path)
-	resp, err := s.localClient.Do(req)
-	if err != nil {
-		s.logger.Printf("auth basic delegate to authelia: %v", err)
-		return nil
-	}
-	defer resp.Body.Close()
-	_, _ = io.Copy(io.Discard, resp.Body)
-	if resp.StatusCode != 200 {
-		return nil
-	}
-	return &User{
-		Sub:   resp.Header.Get("Remote-User"),
-		Name:  resp.Header.Get("Remote-Name"),
-		Email: resp.Header.Get("Remote-Email"),
-	}
 }
 
 type sessionPayload struct {

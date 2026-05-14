@@ -10,17 +10,11 @@ from syncloudlib.http import wait_for_rest
 from syncloudlib.integration.hosts import add_host_alias
 from syncloudlib.integration.installer import local_install
 
+from cli import run as cli_run, run_text as cli_text, wait_status, wait_a2s
+
 TMP_DIR = '/tmp/syncloud'
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
-@pytest.fixture(scope="session")
-def auth(device_user, device_password):
-    return (device_user, device_password)
-
-@pytest.fixture(scope="session")
-def api(app_domain):
-    return 'https://{0}/api/v1'.format(app_domain)
 
 @pytest.fixture(scope="session")
 def module_setup(request, device, app_dir, artifact_dir):
@@ -65,15 +59,12 @@ def test_install(app_archive_path, device_host, device_password, device):
 def test_index(app_domain):
     wait_for_rest(requests.session(), "https://{0}".format(app_domain), 200, 10)
 
-def test_health(api, auth):
-    response = requests.get(api + '/health', auth=auth, verify=False)
-    assert response.status_code == 200, response.text
-    assert response.json().get('status') == 'ok', response.text
+def test_health(device):
+    out = cli_text(device, 'health').strip()
+    assert out == 'ok', out
 
-def test_games_catalog(api, auth):
-    response = requests.get(api + '/games', auth=auth, verify=False)
-    assert response.status_code == 200, response.text
-    games = response.json()
+def test_games_catalog(device):
+    games = cli_run(device, 'games', 'list')
     ids = {g['id'] for g in games}
     assert 'teeworlds' in ids, 'teeworlds (smallest pelican egg, our CI fixture) must be in catalog'
     assert 'cs2' in ids, 'cs2 anonymous-friendly steam server must be in catalog'
@@ -82,134 +73,63 @@ def test_games_catalog(api, auth):
         assert g.get('tier') in ('verified', 'compatible', 'experimental'), \
             'game {} has no tier: {}'.format(g.get('id'), g)
 
-def test_catalog_sources(api, auth):
-    response = requests.get(api + '/catalog/sources', auth=auth, verify=False)
-    assert response.status_code == 200, response.text
-    sources = response.json()
+def test_catalog_sources(device):
+    sources = cli_run(device, 'games', 'sources')
     assert 'parkervcp/eggs' in sources
     assert 'pelican-eggs/games' in sources
 
-def test_servers_empty(api, auth):
-    response = requests.get(api + '/servers', auth=auth, verify=False)
-    assert response.status_code == 200, response.text
-    assert response.json() == [], 'no servers installed at start'
+def test_servers_empty(device):
+    assert cli_run(device, 'server', 'list') == []
 
-def test_create_server(api, auth):
-    response = requests.post(
-        api + '/servers',
-        auth=auth,
-        json={'name': 'test-tw', 'gameId': 'teeworlds', 'port': 8303},
-        verify=False)
-    assert response.status_code == 201, response.text
-    body = response.json()
-    assert body['id'] > 0
-    assert body['name'] == 'test-tw'
-    assert body['gameId'] == 'teeworlds'
-    assert body['status'] == 'stopped'
+def test_create_server(device):
+    s = cli_run(device, 'server', 'create', 'test-tw', 'teeworlds', '--port', '8303')
+    assert s['id'] > 0
+    assert s['name'] == 'test-tw'
+    assert s['gameId'] == 'teeworlds'
+    assert s['status'] == 'stopped'
 
-def test_list_after_create(api, auth):
-    response = requests.get(api + '/servers', auth=auth, verify=False)
-    assert response.status_code == 200
-    servers = response.json()
+def test_list_after_create(device):
+    servers = cli_run(device, 'server', 'list')
     assert len(servers) == 1
     assert servers[0]['name'] == 'test-tw'
 
-def test_delete_server(api, auth):
-    list_resp = requests.get(api + '/servers', auth=auth, verify=False)
-    sid = list_resp.json()[0]['id']
-    d = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
-    assert d.status_code == 204, d.text
-    after = requests.get(api + '/servers', auth=auth, verify=False).json()
-    assert after == []
+def test_delete_server(device):
+    cli_run(device, 'server', 'delete', 'test-tw')
+    assert cli_run(device, 'server', 'list') == []
 
-def test_create_unknown_game_rejected(api, auth):
-    r = requests.post(
-        api + '/servers',
-        auth=auth,
-        json={'name': 'bad', 'gameId': 'not-a-game', 'port': 1234},
-        verify=False)
-    assert r.status_code == 400, r.text
+def test_create_unknown_game_rejected(device):
+    out = device.run_ssh(
+        'games.cli server create bad not-a-game --port 1234 2>&1; echo EXIT=$?',
+        throw=False)
+    assert 'unknown gameId' in out, out
+    assert 'EXIT=1' in out, out
 
-def test_logs_endpoint(api, auth):
-    create = requests.post(
-        api + '/servers',
-        auth=auth,
-        json={
-            'name': 'log-stub',
-            'gameId': 'teeworlds',
-            'port': 8304,
-            'startCmd': 'echo hello-from-runner; sleep 5',
-        },
-        verify=False)
-    assert create.status_code == 201, create.text
-    sid = create.json()['id']
-    start = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
-    assert start.status_code == 200, start.text
+def test_logs_endpoint(device):
+    cli_run(device, 'server', 'create', 'log-stub', 'teeworlds',
+            '--port', '8304', '--start-cmd', 'echo hello-from-runner; sleep 5')
+    cli_run(device, 'server', 'start', 'log-stub')
     time.sleep(2)
-    logs = requests.get(api + '/servers/{0}/logs'.format(sid), auth=auth, verify=False)
-    assert logs.status_code == 200, logs.text
-    lines = logs.json().get('lines', [])
+    lines = cli_run(device, 'server', 'logs', 'log-stub')
     assert any('hello-from-runner' in l for l in lines), 'log buffer should capture stdout: ' + str(lines)
-    requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
-    requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
+    cli_run(device, 'server', 'stop', 'log-stub')
+    cli_run(device, 'server', 'delete', 'log-stub')
 
-def _wait_a2s(api, auth, sid, timeout):
-    deadline = time.time() + timeout
-    last = None
-    while time.time() < deadline:
-        r = requests.get(api + '/servers/{0}/query'.format(sid), auth=auth, verify=False)
-        last = (r.status_code, r.text[:200])
-        if r.status_code == 200:
-            return r.json()
-        time.sleep(3)
-    raise AssertionError('timeout waiting for A2S response, last={0}'.format(last))
+def test_teeworlds_real_install_and_play(device):
+    cli_run(device, 'server', 'create', 'tw-real', 'teeworlds', '--port', '8313')
+    cli_run(device, 'server', 'install', 'tw-real')
+    wait_status(device, 'tw-real', 'stopped', timeout=180)
 
-def _wait_status(api, auth, sid, target, timeout):
-    deadline = time.time() + timeout
-    last = None
-    while time.time() < deadline:
-        r = requests.get(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
-        if r.status_code == 200:
-            last = r.json().get('status')
-            if last == target:
-                return last
-            if last == 'install-error':
-                raise AssertionError('install errored: ' + r.text)
-        time.sleep(2)
-    raise AssertionError('timeout waiting for status={0}, last={1}'.format(target, last))
-
-def test_teeworlds_real_install_and_play(api, auth, device):
-    create = requests.post(
-        api + '/servers',
-        auth=auth,
-        json={'name': 'tw-real', 'gameId': 'teeworlds', 'port': 8313},
-        verify=False)
-    assert create.status_code == 201, create.text
-    sid = create.json()['id']
-
-    install = requests.post(api + '/servers/{0}/install'.format(sid), auth=auth, verify=False)
-    assert install.status_code == 200, install.text
-    _wait_status(api, auth, sid, 'stopped', timeout=180)
-
-    start = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
-    assert start.status_code == 200, start.text
-    assert start.json()['status'] == 'running'
+    s = cli_run(device, 'server', 'start', 'tw-real')
+    assert s['status'] == 'running'
 
     time.sleep(4)
     probe = device.run_ssh('ss -ulnp | grep 8313 || true')
     assert '8313' in probe, 'teeworlds_srv should be bound on udp:8313 — ss output: {0!r}'.format(probe)
 
-    stop = requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
-    assert stop.status_code == 200, stop.text
-
-    cleanup = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
-    assert cleanup.status_code == 204, cleanup.text
+    cli_run(device, 'server', 'stop', 'tw-real')
+    cli_run(device, 'server', 'delete', 'tw-real')
 
 def test_steamcmd_diagnostics(device):
-    """Capture exactly what steamcmd needs and what's missing. Always runs;
-    output goes to pytest stdout and is visible in the CI log. Not an
-    assertion — diagnostic only."""
-
     def show(title, cmd):
         print('\n===== {} =====\nCMD: {}'.format(title, cmd))
         out = device.run_ssh(cmd, throw=False)
@@ -236,64 +156,13 @@ ls -la /var/snap/games/current/.steam-runtime/ 2>&1
 echo SECTION steamlogs-after-seed
 ls -la /var/snap/games/current/.steam-home/Steam/logs/ 2>&1
 cat /var/snap/games/current/.steam-home/Steam/logs/stderr.txt 2>&1 | head -20
-echo SECTION exp1-run-from-tmp
-rm -rf /tmp/sctest
-mkdir -p /tmp/sctest
-cp -r /snap/games/current/steamcmd/linux32 /tmp/sctest/
-cd /tmp/sctest
-HOME=/tmp/sctest LD_LIBRARY_PATH=/snap/games/current/steamcmd/lib32 /snap/games/current/steamcmd/lib32/ld-linux.so.2 --library-path /tmp/sctest/linux32:/snap/games/current/steamcmd/lib32 /tmp/sctest/linux32/steamcmd +exit 2>&1 | head -20
-echo SECTION strace-bare
-cd /var/snap/games/current/.steam-runtime
-strace -f -e trace=openat,connect,statfs,fstatfs,access,write -ttt -s 200 -o /tmp/strace.log /snap/games/current/bin/steamcmd.sh +exit 2>&1 | head -20
-echo SECTION strace-tail
-tail -150 /tmp/strace.log 2>&1
 echo SECTION done
 '''
     device.run_ssh("cat > /tmp/diag.sh <<'DIAGEOF'\n" + diag + "DIAGEOF\n", throw=False)
     show('comprehensive diag', 'bash /tmp/diag.sh')
 
-    show('ldd on the 32-bit steamcmd binary (look for "not found")',
-         'ldd /snap/games/current/steamcmd/linux32/steamcmd 2>&1 || true')
-
-    show('ldd via our bundled loader',
-         'LD_LIBRARY_PATH=/snap/games/current/steamcmd/lib32 '
-         '/snap/games/current/steamcmd/lib32/ld-linux.so.2 --verify '
-         '/snap/games/current/steamcmd/linux32/steamcmd 2>&1 || true')
-
-    show('lib32 file listing',
-         'ls /snap/games/current/steamcmd/lib32 | sort')
-
-    show('lib32 contains key SSL/curl/nss libs?',
-         'ls /snap/games/current/steamcmd/lib32 | grep -E '
-         '"libssl|libcurl|libnghttp2|libidn2|libnss|libgssapi|libkrb5|'
-         'libsasl|libssh|librtmp|libpsl|libcom_err|libkeyutils|libbrotli" '
-         '| sort')
-
-    show('host can resolve Steam CDN',
-         'getent hosts steamcdn-a.akamaihd.net 2>&1; '
-         'getent hosts client-update.akamaihd.net 2>&1')
-
-    show('host TLS works to Steam',
-         'curl -sIv --max-time 10 https://steamcdn-a.akamaihd.net/client/ 2>&1 '
-         '| head -40 || true')
-
-    show('runtime dir state after a bare steamcmd +exit',
-         'sudo -u games -E HOME=/var/snap/games/current/.steam-home '
-         '/snap/games/current/bin/steamcmd.sh +exit 2>&1 | head -40 || true')
-
-    show('Steam logs after that attempt',
-         'cat /var/snap/games/current/.steam-home/Steam/logs/stderr.txt 2>&1 || true; '
-         'echo ---bootstrap---; '
-         'cat /var/snap/games/current/.steam-home/Steam/logs/bootstrap_log.txt 2>&1 || true')
-
-    show('LD_DEBUG=libs on a +exit (first 80 lines)',
-         'sudo -u games -E HOME=/var/snap/games/current/.steam-home '
-         'LD_DEBUG=libs LD_DEBUG_OUTPUT=/tmp/ld-debug '
-         '/snap/games/current/bin/steamcmd.sh +exit 2>&1 >/dev/null || true; '
-         'cat /tmp/ld-debug.* 2>/dev/null | head -200 || echo "(no ld-debug output)"')
-
 @pytest.mark.flaky(retries=2, delay=15)
-def test_hlds_cs_real_install(api, auth, device):
+def test_hlds_cs_real_install(device):
     """Real CS 1.6 dedicated server install via SteamCMD (~822 MB download).
 
     Asserts the install path of phase 3b end-to-end: bundled SteamCMD,
@@ -302,33 +171,21 @@ def test_hlds_cs_real_install(api, auth, device):
 
     Starting hlds_linux is xfail'd separately — it requires a Steam
     Auth Server reachable for SteamAPI_Init / IClientUtils, which the
-    snap can't provide without a full Steam runtime emulator. That's
-    its own piece of work (likely needs lsteamclient or a Steam Pipe
-    shim). The install itself is the proof that SteamCMD works inside
-    the snap, which was the phase 3b goal.
-    """
-    existing = requests.get(api + '/servers', auth=auth, verify=False).json()
-    for s in existing or []:
+    snap can't provide without a full Steam runtime emulator."""
+    for s in cli_run(device, 'server', 'list') or []:
         if s.get('name') == 'hlds-real':
-            requests.delete(api + '/servers/{0}'.format(s['id']), auth=auth, verify=False)
+            cli_run(device, 'server', 'delete', 'hlds-real')
     device.run_ssh('rm -rf /data/games/servers/hlds-real', throw=False)
-    create = requests.post(
-        api + '/servers',
-        auth=auth,
-        json={'name': 'hlds-real', 'gameId': 'hlds-cs', 'port': 27115},
-        verify=False)
-    assert create.status_code == 201, create.text
-    sid = create.json()['id']
 
-    install = requests.post(api + '/servers/{0}/install'.format(sid), auth=auth, verify=False)
-    assert install.status_code == 200, install.text
-    _wait_status(api, auth, sid, 'stopped', timeout=900)
+    cli_run(device, 'server', 'create', 'hlds-real', 'hlds-cs', '--port', '27115')
+    cli_run(device, 'server', 'install', 'hlds-real')
+    wait_status(device, 'hlds-real', 'stopped', timeout=900)
 
     out = device.run_ssh('ls /data/games/servers/hlds-real/hlds_linux 2>&1')
     assert 'hlds_linux' in out and 'No such file' not in out, \
         'hlds_linux missing post-install: ' + out
 
-    requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
+    cli_run(device, 'server', 'delete', 'hlds-real')
 
 @pytest.mark.xfail(
     reason="Paper/Fabric/etc. Minecraft eggs need `jq` (Paper) or apt "
@@ -337,13 +194,13 @@ def test_hlds_cs_real_install(api, auth, device):
            "a curated minecraft-vanilla entry that fetches server.jar "
            "from Mojang launchermeta with curl alone, no jq.",
     strict=False, run=True)
-def test_minecraft_real_install_and_play(api, auth, device):
+def test_minecraft_real_install_and_play(device):
     """Full Minecraft cycle: install via Pelican egg + bundled JRE, accept
     EULA, start the server, verify it binds the TCP port (proves the JVM
     came up and the server is listening on the Minecraft protocol), stop
     and delete. EULA is accepted explicitly here for CI — the product
     itself never auto-accepts."""
-    games = requests.get(api + '/games', auth=auth, verify=False).json()
+    games = cli_run(device, 'games', 'list')
     candidates = [
         g for g in games
         if 'minecraft/java' in g.get('upstreamRef', '').lower()
@@ -357,16 +214,9 @@ def test_minecraft_real_install_and_play(api, auth, device):
     print('using minecraft entry:', g['id'], 'name=', g['name'], 'ref=', g.get('upstreamRef'))
 
     port = g.get('defaultPort') or 25565
-    create = requests.post(
-        api + '/servers', auth=auth,
-        json={'name': 'mc-real', 'gameId': g['id'], 'port': port},
-        verify=False)
-    assert create.status_code == 201, create.text
-    sid = create.json()['id']
-
-    install = requests.post(api + '/servers/{0}/install'.format(sid), auth=auth, verify=False)
-    assert install.status_code == 200, install.text
-    _wait_status(api, auth, sid, 'stopped', timeout=900)
+    cli_run(device, 'server', 'create', 'mc-real', g['id'], '--port', str(port))
+    cli_run(device, 'server', 'install', 'mc-real')
+    wait_status(device, 'mc-real', 'stopped', timeout=900)
 
     install_dir = '/data/games/servers/mc-real'
     out = device.run_ssh('ls {0} 2>&1'.format(install_dir))
@@ -375,9 +225,8 @@ def test_minecraft_real_install_and_play(api, auth, device):
     device.run_ssh(
         'echo eula=true > {0}/eula.txt && chown games:games {0}/eula.txt'.format(install_dir))
 
-    start = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
-    assert start.status_code == 200, start.text
-    assert start.json()['status'] == 'running'
+    s = cli_run(device, 'server', 'start', 'mc-real')
+    assert s['status'] == 'running'
 
     deadline = time.time() + 240
     bound = ''
@@ -389,71 +238,44 @@ def test_minecraft_real_install_and_play(api, auth, device):
     assert 'java' in bound or ':{0}'.format(port) in bound, \
         'minecraft java server should be listening on tcp — ss output: {0!r}'.format(bound)
 
-    logs = requests.get(api + '/servers/{0}/logs'.format(sid), auth=auth, verify=False).json()
-    print('mc server first 20 log lines:', logs.get('lines', [])[:20])
+    lines = cli_run(device, 'server', 'logs', 'mc-real')
+    print('mc server first 20 log lines:', lines[:20])
 
-    stop = requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
-    assert stop.status_code == 200, stop.text
-
-    cleanup = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
-    assert cleanup.status_code == 204, cleanup.text
+    cli_run(device, 'server', 'stop', 'mc-real')
+    cli_run(device, 'server', 'delete', 'mc-real')
 
 @pytest.mark.xfail(
     reason='HLDS startup needs Steam Pipe / lsteamclient shim to satisfy '
            'SteamAPI_Init -> IClientUtils::GetConnectedUniverse. SteamCMD '
-           'install itself works (see test_hlds_cs_real_install). Tracked '
-           'as a follow-up; needs investigation of lsteamclient or '
-           'CSGOSL-style Steam runtime emulation inside the snap.',
+           'install itself works (see test_hlds_cs_real_install).',
     strict=False, run=True)
-def test_hlds_cs_a2s_query(api, auth, device):
-    create = requests.post(
-        api + '/servers',
-        auth=auth,
-        json={'name': 'hlds-query', 'gameId': 'hlds-cs', 'port': 27116},
-        verify=False)
-    assert create.status_code == 201, create.text
-    sid = create.json()['id']
+def test_hlds_cs_a2s_query(device):
+    cli_run(device, 'server', 'create', 'hlds-query', 'hlds-cs', '--port', '27116')
+    cli_run(device, 'server', 'install', 'hlds-query')
+    wait_status(device, 'hlds-query', 'stopped', timeout=900)
+    cli_run(device, 'server', 'start', 'hlds-query')
 
-    install = requests.post(api + '/servers/{0}/install'.format(sid), auth=auth, verify=False)
-    assert install.status_code == 200
-    _wait_status(api, auth, sid, 'stopped', timeout=900)
-
-    start = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
-    assert start.status_code == 200
-
-    info = _wait_a2s(api, auth, sid, timeout=60)
+    info = wait_a2s(device, 'hlds-query', timeout=60)
     assert 'Counter-Strike' in info.get('Game', '') or 'cstrike' in info.get('Folder', ''), info
 
-    requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
-    requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
+    cli_run(device, 'server', 'stop', 'hlds-query')
+    cli_run(device, 'server', 'delete', 'hlds-query')
 
-def test_lifecycle(api, auth):
-    create = requests.post(
-        api + '/servers',
-        auth=auth,
-        json={
-            'name': 'stub',
-            'gameId': 'teeworlds',
-            'port': 8303,
-            'startCmd': 'sleep 30',
-        },
-        verify=False)
-    assert create.status_code == 201, create.text
-    sid = create.json()['id']
+def test_lifecycle(device):
+    cli_run(device, 'server', 'create', 'stub', 'teeworlds',
+            '--port', '8303', '--start-cmd', 'sleep 30')
 
-    start = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
-    assert start.status_code == 200, start.text
-    assert start.json()['status'] == 'running'
+    s = cli_run(device, 'server', 'start', 'stub')
+    assert s['status'] == 'running'
 
-    again = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
-    assert again.status_code == 409, again.text
+    again = device.run_ssh('games.cli server start stub 2>&1; echo EXIT=$?', throw=False)
+    assert 'already running' in again, again
+    assert 'EXIT=1' in again, again
 
-    stop = requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
-    assert stop.status_code == 200, stop.text
-    assert stop.json()['status'] == 'stopped'
+    s = cli_run(device, 'server', 'stop', 'stub')
+    assert s['status'] == 'stopped'
 
-    cleanup = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
-    assert cleanup.status_code == 204, cleanup.text
+    cli_run(device, 'server', 'delete', 'stub')
 
 def test_storage_change_event(device):
     device.run_ssh('snap run games.storage-change > {0}/storage-change.log'.format(TMP_DIR))
