@@ -1,5 +1,5 @@
 local name = 'games';
-local go = '1.23';
+local go = '1.25';
 local nginx = '1.24.0';
 local node = '20';
 local platform = '26.04.7';

@@ -1,9 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { api } from '../api'
+import ThemeToggle from '../components/ThemeToggle.vue'
 
 const sources = ref({})
 const error = ref(null)
+const user = ref(null)
 const steam = ref({ username: '', password: '', guardCode: '', state: 'idle', message: '', linked: false, linkedUsername: '' })
 
 async function load () {
@@ -14,7 +16,13 @@ async function load () {
     steam.value.linked = !!s.linked
     steam.value.linkedUsername = s.username || ''
   } catch (_) { /* */ }
+  try {
+    const r = await fetch('/api/v1/me')
+    if (r.ok) user.value = await r.json()
+  } catch (_) { /* */ }
 }
+
+function logout () { window.location.assign('/auth/logout') }
 
 async function steamLogin () {
   steam.value.state = 'submitting'
@@ -56,6 +64,24 @@ onMounted(load)
 
 <template>
   <h1 class="page-title">Settings</h1>
+
+  <section class="detail-card mobile-only" data-testid="settings-account">
+    <h2>Account</h2>
+    <div v-if="user" class="account-row">
+      <div class="account-info">
+        <div class="account-name" data-testid="account-name">{{ user.name || user.sub }}</div>
+        <div v-if="user.email" class="account-email" data-testid="account-email">{{ user.email }}</div>
+      </div>
+      <button class="logout-btn" data-testid="account-logout" @click="logout">Logout</button>
+    </div>
+    <div class="account-row">
+      <div class="account-info">
+        <div class="account-name">Theme</div>
+        <div class="account-email">Switch between light and dark</div>
+      </div>
+      <ThemeToggle />
+    </div>
+  </section>
 
   <section class="detail-card" data-testid="settings-steam">
     <h2>Steam account</h2>
@@ -139,4 +165,9 @@ onMounted(load)
 .detail-card dt { color: var(--text-muted); font-size: 13px; }
 .detail-card dd { margin: 0; word-break: break-all; }
 .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
+.account-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.account-row:last-child { border-bottom: 0; }
+.account-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.account-name { color: var(--text); font-weight: 600; font-size: 14px; }
+.account-email { color: var(--text-muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>

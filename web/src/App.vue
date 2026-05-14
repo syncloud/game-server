@@ -4,14 +4,9 @@ import { useRoute } from 'vue-router'
 import ThemeToggle from './components/ThemeToggle.vue'
 
 const route = useRoute()
-const menuOpen = ref(false)
 const user = ref(null)
 const isActive = (name) => computed(() => route.name === name || (name === 'servers' && route.name === 'server-detail'))
-function go () { menuOpen.value = false }
 
-// On first load, ask backend who we are. 401 means no session — start the
-// OIDC code flow by redirecting to /auth/login. Backend will bounce to
-// Authelia and back via /auth/callback, then back to /.
 onMounted(async () => {
   try {
     const r = await fetch('/api/v1/me')
@@ -30,7 +25,7 @@ function logout () { window.location.assign('/auth/logout') }
   <div class="page">
     <header class="header">
       <div class="header-inner">
-        <router-link to="/catalog" class="brand" data-testid="brand" @click="go">
+        <router-link to="/catalog" class="brand" data-testid="brand">
           <div class="brand-icon">G</div>
           <span class="brand-name">Game Server</span>
         </router-link>
@@ -45,39 +40,35 @@ function logout () { window.location.assign('/auth/logout') }
           <button class="logout-btn" data-testid="logout" @click="logout">Logout</button>
         </div>
         <ThemeToggle class="desktop-only" />
-        <button class="hamburger mobile-only" :aria-expanded="menuOpen" aria-label="Menu" data-testid="hamburger" @click="menuOpen = !menuOpen">
-          <span /><span /><span />
-        </button>
       </div>
-      <transition name="slide">
-        <nav v-if="menuOpen" class="mobile-menu mobile-only">
-          <router-link to="/catalog" class="mobile-link" data-testid="mobile-tab-catalog" :class="{ active: isActive('catalog').value }" @click="go">Catalog</router-link>
-          <router-link to="/servers" class="mobile-link" data-testid="mobile-tab-servers" :class="{ active: isActive('servers').value }" @click="go">My Servers</router-link>
-          <router-link to="/settings" class="mobile-link" data-testid="mobile-tab-settings" :class="{ active: isActive('settings').value }" @click="go">Settings</router-link>
-          <div v-if="user" class="mobile-link-row" data-testid="mobile-user">
-            <span class="mobile-user-name">{{ user.name || user.sub }}</span>
-            <button class="logout-btn" @click="logout">Logout</button>
-          </div>
-          <div class="mobile-link-row">
-            <ThemeToggle />
-          </div>
-        </nav>
-      </transition>
     </header>
     <main>
       <router-view />
     </main>
-    <nav class="bottom-bar mobile-only">
+    <nav class="bottom-bar mobile-only" data-testid="bottom-nav">
       <router-link to="/catalog" class="bottom-tab" :class="{ active: isActive('catalog').value }" data-testid="bottom-catalog">
-        <span class="bottom-icon">🎮</span>
+        <svg class="bottom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="6" width="18" height="12" rx="3" />
+          <path d="M7 12h3M8.5 10.5v3" />
+          <circle cx="15" cy="11" r="1" />
+          <circle cx="17" cy="13" r="1" />
+        </svg>
         <span class="bottom-label">Catalog</span>
       </router-link>
       <router-link to="/servers" class="bottom-tab" :class="{ active: isActive('servers').value }" data-testid="bottom-servers">
-        <span class="bottom-icon">⚙</span>
+        <svg class="bottom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="6" rx="2" />
+          <rect x="3" y="14" width="18" height="6" rx="2" />
+          <circle cx="7" cy="7" r="0.8" fill="currentColor" />
+          <circle cx="7" cy="17" r="0.8" fill="currentColor" />
+        </svg>
         <span class="bottom-label">Servers</span>
       </router-link>
       <router-link to="/settings" class="bottom-tab" :class="{ active: isActive('settings').value }" data-testid="bottom-settings">
-        <span class="bottom-icon">☰</span>
+        <svg class="bottom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06A2 2 0 1 1 4.21 16.96l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
         <span class="bottom-label">Settings</span>
       </router-link>
     </nav>

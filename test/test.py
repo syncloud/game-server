@@ -351,12 +351,12 @@ def test_hlds_cs_real_install(api, auth, device):
     requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
 
 
-def test_minecraft_real_install(api, auth, device):
-    """Pick a Minecraft Java entry from the catalog and install it. Asserts
-    the bundled JRE is functional (the egg's startup uses 'java') and a
-    .jar landed under /data/games/servers/. We don't start the server —
-    Minecraft EULA acceptance is an explicit user-consent step that
-    shouldn't be baked into the test fixture."""
+def test_minecraft_real_install_and_play(api, auth, device):
+    """Full Minecraft cycle: install via Pelican egg + bundled JRE, accept
+    EULA, start the server, verify it binds the TCP port (proves the JVM
+    came up and the server is listening on the Minecraft protocol), stop
+    and delete. EULA is accepted explicitly here for CI — the product
+    itself never auto-accepts."""
     games = requests.get(api + '/games', auth=auth, verify=False).json()
     candidates = [
         g for g in games
@@ -368,21 +368,53 @@ def test_minecraft_real_install(api, auth, device):
     g = candidates[0]
     print('using minecraft entry:', g['id'], 'name=', g['name'])
 
+    port = g.get('defaultPort') or 25565
     create = requests.post(
         api + '/servers', auth=auth,
-        json={'name': 'mc-real', 'gameId': g['id'], 'port': 25575},
+        json={'name': 'mc-real', 'gameId': g['id'], 'port': port},
         verify=False)
     assert create.status_code == 201, create.text
     sid = create.json()['id']
 
     install = requests.post(api + '/servers/{0}/install'.format(sid), auth=auth, verify=False)
     assert install.status_code == 200, install.text
-    _wait_status(api, auth, sid, 'stopped', timeout=600)
+    _wait_status(api, auth, sid, 'stopped', timeout=900)
 
-    out = device.run_ssh('ls /data/games/servers/mc-real/ 2>&1')
+    install_dir = '/data/games/servers/mc-real'
+    out = device.run_ssh('ls {0} 2>&1'.format(install_dir))
     assert '.jar' in out, 'minecraft .jar missing post-install: ' + out
 
-    requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
+    # Accept EULA before start. Minecraft refuses to boot otherwise. The
+    # product itself never auto-accepts — that's an explicit user step.
+    device.run_ssh(
+        'echo eula=true > {0}/eula.txt && chown games:games {0}/eula.txt'.format(install_dir))
+
+    start = requests.post(api + '/servers/{0}/start'.format(sid), auth=auth, verify=False)
+    assert start.status_code == 200, start.text
+    assert start.json()['status'] == 'running'
+
+    # World gen + plugin load can take a while on the CI box. Probe for a
+    # java listener — Minecraft's actual port comes from server.properties
+    # which the egg writes on first boot. "ss -tlnp" with the java pid is
+    # the most reliable bind check.
+    deadline = time.time() + 240
+    bound = ''
+    while time.time() < deadline:
+        bound = device.run_ssh('ss -tlnp 2>/dev/null | grep -E "java|:{0}\\b" || true'.format(port))
+        if 'java' in bound or ':{0}'.format(port) in bound:
+            break
+        time.sleep(5)
+    assert 'java' in bound or ':{0}'.format(port) in bound, \
+        'minecraft java server should be listening on tcp — ss output: {0!r}'.format(bound)
+
+    logs = requests.get(api + '/servers/{0}/logs'.format(sid), auth=auth, verify=False).json()
+    print('mc server first 20 log lines:', logs.get('lines', [])[:20])
+
+    stop = requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
+    assert stop.status_code == 200, stop.text
+
+    cleanup = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
+    assert cleanup.status_code == 204, cleanup.text
 
 
 @pytest.mark.xfail(
