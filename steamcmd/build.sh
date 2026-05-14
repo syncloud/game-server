@@ -7,7 +7,12 @@ apt update
 apt -y install wget ca-certificates
 
 OUT=${DIR}/../build/snap/steamcmd
-mkdir -p ${OUT}
+BIN_OUT=${DIR}/../build/snap/bin
+mkdir -p ${OUT} ${BIN_OUT}
+
+# Wrapper that the runner uses to invoke steamcmd — owned by this
+# component since it knows about the lib32/lib64 layout produced below.
+install -m 0755 ${DIR}/bin/steamcmd.sh ${BIN_OUT}/steamcmd.sh
 
 wget -q https://media.steampowered.com/installer/steamcmd_linux.tar.gz -O steamcmd.tar.gz
 tar xf steamcmd.tar.gz -C ${OUT}
