@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
@@ -55,8 +56,12 @@ func ContextUser(ctx context.Context) (*User, bool) {
 }
 
 func NewService(ctx context.Context, logger *log.Logger, authUrl, clientID, clientSecret, signSecret, redirectURL string) (*Service, error) {
-	tr := &http.Transport{}
-	// Authelia uses a self-signed Syncloud CA — accept it for OIDC discovery.
+	// Authelia uses a self-signed Syncloud CA on the platform; the backend
+	// process doesn't have it in its trust store. Skip verification for the
+	// internal auth-host calls (OIDC discovery, token exchange, basic-auth
+	// delegate) — they only talk to the platform's local Authelia, never
+	// out to the public internet.
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	hc := &http.Client{Transport: tr, Timeout: 15 * time.Second}
 	ctx = oidc.ClientContext(ctx, hc)
 
