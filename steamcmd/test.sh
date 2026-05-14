@@ -5,26 +5,26 @@ cd ${DIR}
 
 BUILD_DIR=${DIR}/../build/snap
 
-# The wrapper at bin/steamcmd.sh hardcodes /snap/games/current/* and
-# /var/snap/games/current/.steam-runtime — same paths the snap exposes
-# on a real device. Symlink them to the CI build output + a writable
-# scratch dir so we can exercise the actual wrapper instead of
-# reconstructing the loader/library-path invocation by hand. If the
-# wrapper drifts (lib order, runtime-dir layout, chown timing) the
-# test catches it.
-SCRATCH=$(mktemp -d)
+# Create games user upfront — both the wrapper-as-games invocation
+# below AND any chown the wrapper attempts need it to exist.
+id games >/dev/null 2>&1 || adduser --system --group --no-create-home games
+
+# Writable scratch for what the snap would expose as $SNAP_DATA. Use a
+# known path (not mktemp) so the parent dir is world-traversable; mktemp
+# defaults to mode 700 which blocks the games user from cd-ing through.
+SCRATCH=/tmp/games-snap-data
+rm -rf ${SCRATCH}
+install -d -o games -g games -m 0755 ${SCRATCH}
+
 mkdir -p /snap/games /var/snap/games
 ln -sfn ${BUILD_DIR} /snap/games/current
 ln -sfn ${SCRATCH}   /var/snap/games/current
 
-# Wrapper chowns the runtime dir to games:games when run as root; create
-# the user so set -e doesn't kill the script on a missing group.
-id games >/dev/null 2>&1 || adduser --system --group --no-create-home games
-
-# +exit short-circuits steamcmd after the loader hands off — proves the
-# wrapper's path math, the lib32 closure, the linux32 self-update copy
-# and the final ld-linux invocation all work end to end.
-/snap/games/current/bin/steamcmd.sh +exit
+# On a real device the backend runs the wrapper as user `games` (snap.yaml
+# apps.backend.user = games). Match that here so steamcmd's STEAMROOT
+# discovery sees a games-owned runtime tree from the start, and the
+# wrapper's root-only chown branch is skipped (which is what prod does).
+runuser -u games -- /snap/games/current/bin/steamcmd.sh +exit
 
 # 64-bit loader: nothing in the snap invokes it directly (per-game start
 # commands do via wrapAmd64). Sanity-check it can at least link its own
