@@ -32,8 +32,8 @@ test('install dialog opens, creates a server, lands on server detail', async ({ 
   await page.getByTestId('subtab-query').click()
   await expect(page.getByTestId('detail-query')).toBeVisible()
 
-  // confirm() prompt — auto-accept
-  page.once('dialog', d => d.accept())
   await page.getByTestId('action-delete').click()
+  await expect(page.getByTestId('confirm-dialog')).toBeVisible()
+  await page.getByTestId('confirm-ok').click()
   await expect(page.getByTestId('servers-empty')).toBeVisible()
 })

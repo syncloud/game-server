@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../api'
+import ConfirmDialog from '../components/ConfirmDialog.vue'
 
 const props = defineProps({ id: { type: String, required: true } })
 const router = useRouter()
@@ -10,6 +11,7 @@ const logs = ref([])
 const queryInfo = ref(null)
 const error = ref(null)
 const tab = ref('overview')
+const confirmingDelete = ref(false)
 let pollServer, pollLogs
 
 async function load () {
@@ -37,8 +39,8 @@ async function runQuery () {
   catch (e) { queryInfo.value = { error: e.message } }
 }
 
-async function del () {
-  if (!confirm('Delete this server? Game files will remain on disk.')) return
+async function confirmDelete () {
+  confirmingDelete.value = false
   await api.deleteServer(props.id)
   router.push('/servers')
 }
@@ -75,7 +77,7 @@ onUnmounted(() => { clearInterval(pollServer); clearInterval(pollLogs) })
       <button v-if="!installed" class="btn" data-testid="action-install" @click="action('install')">Install</button>
       <button v-else-if="status === 'running'" class="btn ghost" data-testid="action-stop" @click="action('stop')">Stop</button>
       <button v-else class="btn" data-testid="action-start" @click="action('start')">Start</button>
-      <button class="btn ghost" data-testid="action-delete" @click="del">Delete</button>
+      <button class="btn ghost" data-testid="action-delete" @click="confirmingDelete = true">Delete</button>
     </div>
   </div>
 
@@ -107,6 +109,16 @@ onUnmounted(() => { clearInterval(pollServer); clearInterval(pollLogs) })
     <button class="btn" data-testid="query-run" @click="runQuery">Run query</button>
     <pre v-if="queryInfo" class="mono">{{ JSON.stringify(queryInfo, null, 2) }}</pre>
   </section>
+
+  <ConfirmDialog
+    v-if="confirmingDelete && server"
+    title="Delete server?"
+    :message="`Remove '${server.name}' from the catalog. Installed game files under /data/games/servers/${server.name} will stay on disk — delete them manually if you no longer want them.`"
+    confirm-label="Delete"
+    danger
+    @cancel="confirmingDelete = false"
+    @confirm="confirmDelete"
+  />
 </template>
 
 <style scoped>

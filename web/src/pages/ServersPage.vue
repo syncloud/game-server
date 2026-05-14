@@ -3,11 +3,13 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../api'
 import ServerRow from '../components/ServerRow.vue'
+import ConfirmDialog from '../components/ConfirmDialog.vue'
 
 const router = useRouter()
 const servers = ref([])
 const loading = ref(true)
 const error = ref(null)
+const pendingDelete = ref(null)
 let poll
 
 async function load () {
@@ -21,9 +23,11 @@ async function action (id, name) {
   await load()
 }
 
-async function del (id) {
-  if (!confirm('Delete this server? Game files will remain on disk.')) return
-  await api.deleteServer(id)
+async function confirmDelete () {
+  const s = pendingDelete.value
+  pendingDelete.value = null
+  if (!s) return
+  await api.deleteServer(s.id)
   await load()
 }
 
@@ -51,7 +55,17 @@ onUnmounted(() => clearInterval(poll))
       @start="action(s.id, 'start')"
       @stop="action(s.id, 'stop')"
       @install="action(s.id, 'install')"
-      @delete="del(s.id)"
+      @delete="pendingDelete = s"
     />
   </div>
+
+  <ConfirmDialog
+    v-if="pendingDelete"
+    title="Delete server?"
+    :message="`Remove '${pendingDelete.name}' from the catalog. Installed game files under /data/games/servers/${pendingDelete.name} will stay on disk — delete them manually if you no longer want them.`"
+    confirm-label="Delete"
+    danger
+    @cancel="pendingDelete = null"
+    @confirm="confirmDelete"
+  />
 </template>
