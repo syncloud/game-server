@@ -37,6 +37,14 @@ local platform_image(distro, arch) =
         './nginx/build.sh',
       ],
     },
+  ] + [
+    {
+      name: 'nginx test ' + distro,
+      image: platform_image(distro, arch),
+      commands: ['./nginx/test.sh'],
+    }
+    for distro in distros
+  ] + [
     {
       name: 'web',
       image: 'node:' + node,
@@ -58,18 +66,34 @@ local platform_image(distro, arch) =
         './jre/build.sh',
       ],
     },
+  ] + [
     {
-      name: 'backend',
-      image: 'golang:' + go,
-      commands: [
-        './backend/build.sh',
-      ],
-    },
+      name: 'jre test ' + distro,
+      image: platform_image(distro, arch),
+      commands: ['./jre/test.sh'],
+    }
+    for distro in distros
+  ] + [
     {
       name: 'steamcmd',
       image: 'debian:bookworm-slim',
       commands: [
         './steamcmd/build.sh',
+      ],
+    },
+  ] + [
+    {
+      name: 'steamcmd test ' + distro,
+      image: platform_image(distro, arch),
+      commands: ['./steamcmd/test.sh'],
+    }
+    for distro in distros
+  ] + [
+    {
+      name: 'backend',
+      image: 'golang:' + go,
+      commands: [
+        './backend/build.sh',
       ],
     },
     {
@@ -85,6 +109,14 @@ local platform_image(distro, arch) =
         'CGO_ENABLED=0 go build -buildvcs=false -o ../build/snap/bin/cli ./cmd/cli',
       ],
     },
+  ] + [
+    {
+      name: 'cli test ' + distro,
+      image: platform_image(distro, arch),
+      commands: ['./cli/test.sh'],
+    }
+    for distro in distros
+  ] + [
     {
       name: 'package',
       image: 'debian:bookworm-slim',
@@ -93,34 +125,6 @@ local platform_image(distro, arch) =
         './package.sh ' + name + ' $VERSION',
       ],
     },
-  ] + [
-    {
-      name: 'nginx test ' + distro,
-      image: platform_image(distro, arch),
-      commands: ['./nginx/test.sh'],
-    }
-    for distro in distros
-  ] + [
-    {
-      name: 'jre test ' + distro,
-      image: platform_image(distro, arch),
-      commands: ['./jre/test.sh'],
-    }
-    for distro in distros
-  ] + [
-    {
-      name: 'steamcmd test ' + distro,
-      image: platform_image(distro, arch),
-      commands: ['./steamcmd/test.sh'],
-    }
-    for distro in distros
-  ] + [
-    {
-      name: 'cli test ' + distro,
-      image: platform_image(distro, arch),
-      commands: ['./cli/test.sh'],
-    }
-    for distro in distros
   ] + [
     {
       name: 'test ' + distro_default,
