@@ -71,7 +71,7 @@ func init() {
 
 func tierRank(t string) int {
 	switch t {
-	case "supported":
+	case "verified":
 		return 0
 	case "compatible":
 		return 1

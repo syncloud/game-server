@@ -16,7 +16,7 @@ const installing = ref(null)
 
 const TIERS = [
   { id: 'all', label: 'All' },
-  { id: 'supported', label: 'Supported' },
+  { id: 'verified', label: 'Verified' },
   { id: 'compatible', label: 'Compatible' },
   { id: 'experimental', label: 'Experimental' }
 ]
@@ -44,7 +44,7 @@ const filtered = computed(() => {
 })
 
 const counts = computed(() => {
-  const c = { supported: 0, compatible: 0, experimental: 0 }
+  const c = { verified: 0, compatible: 0, experimental: 0 }
   for (const g of games.value) if (c[g.tier] !== undefined) c[g.tier]++
   return c
 })

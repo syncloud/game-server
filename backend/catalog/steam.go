@@ -2,7 +2,7 @@ package catalog
 
 // Hand-curated Steam dedicated servers. These run via the bundled SteamCMD
 // path (not via Pelican eggs). Tier reflects whether we've successfully
-// install-tested in CI (supported), have a known startCmd template
+// install-tested in CI (verified), have a known startCmd template
 // (compatible), or just know the appid is anonymous-friendly (experimental).
 //
 // Authoritative reference: LinuxGSM game registry plus our own CI runs.
@@ -13,7 +13,7 @@ func steamEntries() []Game {
 			Source: "steam", SteamAppID: 90,
 			Summary:     "Classic Half-Life dedicated server running CS 1.6 (~250MB). Smallest Source A2S-queryable Steam server, used as our CI Steam fixture.",
 			DefaultPort: 27015, Protocols: []string{"udp"},
-			Tier: "supported",
+			Tier: "verified",
 		},
 		{
 			ID: "cs2", Name: "Counter-Strike 2",

@@ -206,7 +206,7 @@ func convertEgg(egg Egg, source, path, root string) *CatalogGame {
 	return &g
 }
 
-// classify returns the tier (supported|compatible|experimental) and an
+// classify returns the tier (verified|compatible|experimental) and an
 // optional reason for downgrades.
 func classify(egg Egg, g CatalogGame) (string, string) {
 	ep := strings.ToLower(strings.TrimSpace(egg.Scripts.Installation.Entrypoint))

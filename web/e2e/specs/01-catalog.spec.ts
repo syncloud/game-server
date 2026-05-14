@@ -22,13 +22,13 @@ test('search filters games', async ({ page }, info) => {
 test('tier filter pills', async ({ page }, info) => {
   await page.goto('/#/catalog')
   await expect(page.getByTestId('tier-all')).toBeVisible()
-  await expect(page.getByTestId('tier-supported')).toBeVisible()
+  await expect(page.getByTestId('tier-verified')).toBeVisible()
   await expect(page.getByTestId('tier-compatible')).toBeVisible()
   await expect(page.getByTestId('tier-experimental')).toBeVisible()
-  // pick supported — hlds-cs is hand-curated as supported.
-  await page.getByTestId('tier-supported').click()
+  // pick verified — hlds-cs is hand-curated as verified.
+  await page.getByTestId('tier-verified').click()
   await expect(page.getByTestId('game-hlds-cs')).toBeVisible()
-  await shoot(page, info, 'tier-supported')
+  await shoot(page, info, 'tier-verified')
   // pick compatible — teeworlds (from the egg catalog) lands here.
   await page.getByTestId('tier-compatible').click()
   await expect(page.getByTestId('game-teeworlds')).toBeVisible()

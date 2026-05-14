@@ -89,7 +89,7 @@ def test_games_catalog(api, auth):
     assert 'hlds-cs' in ids, 'hlds-cs (CI Steam fixture) must be in catalog'
     # every game should have a tier
     for g in games:
-        assert g.get('tier') in ('supported', 'compatible', 'experimental'), \
+        assert g.get('tier') in ('verified', 'compatible', 'experimental'), \
             'game {} has no tier: {}'.format(g.get('id'), g)
 
 
@@ -376,16 +376,16 @@ def test_minecraft_real_install_and_play(api, auth, device):
     games = requests.get(api + '/games', auth=auth, verify=False).json()
     # Minecraft eggs live under game_eggs/minecraft/java/<variant>/ — the
     # 'minecraft' token is in upstreamRef, not the egg's flat name (Paper,
-    # Fabric, etc.). Restrict to compatible|supported so we only run a
+    # Fabric, etc.). Restrict to compatible|verified so we only run a
     # variant we expect to install cleanly without docker.
     candidates = [
         g for g in games
         if 'minecraft/java' in g.get('upstreamRef', '').lower()
-        and g.get('tier') in ('supported', 'compatible')
+        and g.get('tier') in ('verified', 'compatible')
     ]
     print('minecraft candidates ({}): {}'.format(
         len(candidates), [g['id'] for g in candidates[:10]]))
-    assert candidates, 'no Minecraft Java entries in catalog with tier supported|compatible'
+    assert candidates, 'no Minecraft Java entries in catalog with tier verified|compatible'
     # Prefer Paper (most popular Minecraft server software, just a single
     # .jar download + java startup) when available.
     candidates.sort(key=lambda g: (0 if g['id'] == 'paper' else 1, g['id']))

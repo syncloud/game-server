@@ -28,7 +28,7 @@ defineEmits(['install'])
   font-size: 10px;
   letter-spacing: 0.05em;
 }
-.tier-supported { background: rgba(22, 163, 74, 0.14); color: var(--success); }
+.tier-verified { background: rgba(22, 163, 74, 0.14); color: var(--success); }
 .tier-compatible { background: rgba(217, 119, 6, 0.14); color: var(--warning); }
 .tier-experimental { background: rgba(220, 38, 38, 0.14); color: var(--danger); }
 .tier-unknown { background: var(--accent-soft); color: var(--text-muted); }

@@ -19,7 +19,7 @@ const games = [
     summary: 'Classic GoldSrc CS 1.6 dedicated server (HLDS). Bundled mod = cstrike.',
     defaultPort: 27015,
     protocols: ['udp'],
-    tier: 'supported',
+    tier: 'verified',
     steamAppId: 90
   },
   {
@@ -30,7 +30,7 @@ const games = [
     summary: 'Source 2 successor to CS:GO. Anonymous-friendly install, ~30 GB.',
     defaultPort: 27015,
     protocols: ['udp'],
-    tier: 'supported',
+    tier: 'verified',
     steamAppId: 730
   },
   {
@@ -41,7 +41,7 @@ const games = [
     summary: 'Co-op Viking survival. Dedicated server bundled by the publisher.',
     defaultPort: 2456,
     protocols: ['udp'],
-    tier: 'supported',
+    tier: 'verified',
     steamAppId: 896660
   },
   {

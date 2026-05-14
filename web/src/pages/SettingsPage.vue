@@ -161,13 +161,15 @@ onMounted(load)
 .form-msg.ok { color: var(--success); }
 .form-msg.error { color: var(--danger); }
 .form-msg.needs-guard { color: var(--warning); }
-.detail-card dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; margin: 0; }
+.detail-card dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 16px; margin: 0; }
 .detail-card dt { color: var(--text-muted); font-size: 13px; }
-.detail-card dd { margin: 0; word-break: break-all; }
+.detail-card dd { margin: 0; word-break: break-all; min-width: 0; }
 .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
 .account-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .account-row:last-child { border-bottom: 0; }
-.account-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.account-name { color: var(--text); font-weight: 600; font-size: 14px; }
+/* flex:1 + min-width:0 + overflow:hidden together let a very long sub /
+   email shrink to fit the row instead of forcing the parent wider. */
+.account-info { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+.account-name { color: var(--text); font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .account-email { color: var(--text-muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
