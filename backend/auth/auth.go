@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -24,7 +25,10 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const SyncloudCAPath = "/var/snap/platform/current/syncloud.ca.crt"
+const (
+	SyncloudCAPath     = "/var/snap/platform/current/syncloud.ca.crt"
+	AutheliaSocketPath = "/var/snap/platform/current/authelia.socket"
+)
 
 const (
 	SessionCookie = "games_session"
@@ -40,15 +44,15 @@ type User struct {
 }
 
 type Service struct {
-	mu           sync.Mutex
-	provider     *oidc.Provider
-	verifier     *oidc.IDTokenVerifier
-	cfg          oauth2.Config
-	signKey      []byte
-	authzAPI     string
-	tlsClient    *http.Client
-	authUrl      string
-	logger       *log.Logger
+	mu          sync.Mutex
+	provider    *oidc.Provider
+	verifier    *oidc.IDTokenVerifier
+	cfg         oauth2.Config
+	signKey     []byte
+	tlsClient   *http.Client
+	localClient *http.Client
+	authUrl     string
+	logger      *log.Logger
 }
 
 type ctxKey struct{}
@@ -85,15 +89,25 @@ func NewService(ctx context.Context, logger *log.Logger, authUrl, clientID, clie
 	}
 	verifier := provider.Verifier(&oidc.Config{ClientID: clientID})
 
+	localClient := &http.Client{
+		Transport: &http.Transport{
+			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+				return net.Dial("unix", AutheliaSocketPath)
+			},
+		},
+		Timeout: 5 * time.Second,
+	}
+
 	key := sha256.Sum256([]byte(signSecret + "|games-session-v1"))
 	return &Service{
-		provider:  provider,
-		verifier:  verifier,
-		cfg:       cfg,
-		signKey:   key[:],
-		tlsClient: hc,
-		authUrl:   authUrl,
-		logger:    logger,
+		provider:    provider,
+		verifier:    verifier,
+		cfg:         cfg,
+		signKey:     key[:],
+		tlsClient:   hc,
+		localClient: localClient,
+		authUrl:     authUrl,
+		logger:      logger,
 	}, nil
 }
 
@@ -219,7 +233,7 @@ func (s *Service) userFromBasic(r *http.Request) *User {
 	if !ok || user == "" {
 		return nil
 	}
-	req, _ := http.NewRequest("GET", s.authUrl+"/api/authz/auth-request", nil)
+	req, _ := http.NewRequest("GET", "http://authelia/api/authz/auth-request", nil)
 	req.SetBasicAuth(user, pass)
 	req.Header.Set("X-Original-Method", r.Method)
 	req.Header.Set("X-Original-URL", "https://"+r.Host+r.URL.Path)
@@ -227,7 +241,7 @@ func (s *Service) userFromBasic(r *http.Request) *User {
 	req.Header.Set("X-Forwarded-Proto", "https")
 	req.Header.Set("X-Forwarded-Host", r.Host)
 	req.Header.Set("X-Forwarded-Uri", r.URL.Path)
-	resp, err := s.tlsClient.Do(req)
+	resp, err := s.localClient.Do(req)
 	if err != nil {
 		s.logger.Printf("auth basic delegate to authelia: %v", err)
 		return nil
