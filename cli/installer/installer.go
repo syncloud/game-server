@@ -1,6 +1,7 @@
 package installer
 
 import (
+	"fmt"
 	cp "github.com/otiai10/copy"
 	"github.com/syncloud/golib/config"
 	"github.com/syncloud/golib/linux"
@@ -161,7 +162,20 @@ func (i *Installer) registerOIDC() error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path.Join(DataDir, "oidc.secret"), []byte(password), 0640)
+	if err := os.WriteFile(path.Join(DataDir, "oidc.secret"), []byte(password), 0640); err != nil {
+		return err
+	}
+	authUrl, err := i.platformClient.GetAppUrl("auth")
+	if err != nil {
+		return err
+	}
+	appUrl, err := i.platformClient.GetAppUrl(App)
+	if err != nil {
+		return err
+	}
+	cfg := fmt.Sprintf(`{"authUrl":%q,"clientId":%q,"clientSecret":%q,"redirectUrl":%q}`,
+		authUrl, App, password, appUrl+"/auth/callback")
+	return os.WriteFile(path.Join(DataDir, "oidc.json"), []byte(cfg), 0640)
 }
 
 func (i *Installer) FixPermissions() error {

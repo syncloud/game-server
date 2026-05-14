@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/syncloud/games/backend/auth"
 	"github.com/syncloud/games/backend/catalog"
 	"github.com/syncloud/games/backend/db"
 	"github.com/syncloud/games/backend/installer"
@@ -22,6 +23,8 @@ import (
 	"github.com/syncloud/games/backend/server"
 	"github.com/syncloud/games/backend/steam"
 )
+
+const oidcConfigPath = "/var/snap/games/current/oidc.json"
 
 type Game = catalog.Game
 
@@ -65,36 +68,89 @@ func main() {
 		logger.Fatalf("chmod: %v", err)
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/api/v1/health", func(w http.ResponseWriter, r *http.Request) {
+	authSvc := loadAuth(logger)
+
+	api := http.NewServeMux()
+	api.HandleFunc("/api/v1/health", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 	})
-	mux.HandleFunc("/api/v1/games", func(w http.ResponseWriter, r *http.Request) {
+	api.HandleFunc("/api/v1/me", func(w http.ResponseWriter, r *http.Request) {
+		if authSvc != nil {
+			authSvc.HandleMe(w, r)
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]string{"sub": "unknown"})
+	})
+	api.HandleFunc("/api/v1/games", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, catalog.All())
 	})
-	mux.HandleFunc("/api/v1/catalog/sources", func(w http.ResponseWriter, r *http.Request) {
+	api.HandleFunc("/api/v1/catalog/sources", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, catalog.Sources())
 	})
-	mux.HandleFunc("/api/v1/steam/login", func(w http.ResponseWriter, r *http.Request) {
+	api.HandleFunc("/api/v1/steam/login", func(w http.ResponseWriter, r *http.Request) {
 		handleSteamLogin(w, r)
 	})
-	mux.HandleFunc("/api/v1/steam/status", func(w http.ResponseWriter, r *http.Request) {
+	api.HandleFunc("/api/v1/steam/status", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]any{
 			"linked":   steam.StoredUsername() != "",
 			"username": steam.StoredUsername(),
 		})
 	})
-	mux.HandleFunc("/api/v1/servers", func(w http.ResponseWriter, r *http.Request) {
+	api.HandleFunc("/api/v1/servers", func(w http.ResponseWriter, r *http.Request) {
 		handleServers(w, r, store)
 	})
-	mux.HandleFunc("/api/v1/servers/", func(w http.ResponseWriter, r *http.Request) {
+	api.HandleFunc("/api/v1/servers/", func(w http.ResponseWriter, r *http.Request) {
 		handleServerByID(w, r, store, run)
 	})
+
+	mux := http.NewServeMux()
+	if authSvc != nil {
+		mux.HandleFunc("/auth/login", authSvc.HandleLogin)
+		mux.HandleFunc("/auth/callback", authSvc.HandleCallback)
+		mux.HandleFunc("/auth/logout", authSvc.HandleLogout)
+		mux.Handle("/api/", authSvc.Middleware(api))
+	} else {
+		logger.Printf("auth disabled — OIDC config not loaded; /api/ unprotected (dev mode)")
+		mux.Handle("/api/", api)
+	}
 
 	logger.Printf("listening on %s", socketPath)
 	if err := http.Serve(listener, mux); err != nil {
 		logger.Fatalf("serve: %v", err)
 	}
+}
+
+type oidcFileConfig struct {
+	AuthUrl      string `json:"authUrl"`
+	ClientID     string `json:"clientId"`
+	ClientSecret string `json:"clientSecret"`
+	RedirectUrl  string `json:"redirectUrl"`
+}
+
+// loadAuth reads /var/snap/games/current/oidc.json written by the cli
+// configure hook and inits the OIDC service. Returns nil + logs when the
+// file is missing (eg. local dev). The backend service still starts so
+// integration tests installing the snap fresh aren't blocked.
+func loadAuth(logger *log.Logger) *auth.Service {
+	data, err := os.ReadFile(oidcConfigPath)
+	if err != nil {
+		logger.Printf("auth: oidc.json missing (%v); /api/ will be unprotected", err)
+		return nil
+	}
+	var c oidcFileConfig
+	if err := json.Unmarshal(data, &c); err != nil {
+		logger.Printf("auth: oidc.json parse: %v", err)
+		return nil
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	svc, err := auth.NewService(ctx, logger, c.AuthUrl, c.ClientID, c.ClientSecret, c.ClientSecret, c.RedirectUrl)
+	if err != nil {
+		logger.Printf("auth: init: %v", err)
+		return nil
+	}
+	logger.Printf("auth: OIDC ready (provider=%s client=%s redirect=%s)", c.AuthUrl, c.ClientID, c.RedirectUrl)
+	return svc
 }
 
 func openStore(logger *log.Logger) (*server.Store, error) {

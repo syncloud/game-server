@@ -212,6 +212,29 @@ button { font: inherit; cursor: pointer; }
 .slide-enter-from, .slide-leave-to { max-height: 0; opacity: 0; }
 .slide-enter-to, .slide-leave-from { max-height: 320px; opacity: 1; }
 
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  padding: 4px 4px 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.logout-btn:hover { color: var(--text); background: var(--bg-elevated); }
+.mobile-user-name { color: var(--text); font-weight: 600; }
+
 @media (max-width: 640px) {
   .desktop-only { display: none !important; }
   .mobile-only { display: flex; }
