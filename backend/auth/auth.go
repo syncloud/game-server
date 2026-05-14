@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
@@ -22,6 +23,8 @@ import (
 	"github.com/coreos/go-oidc/v3/oidc"
 	"golang.org/x/oauth2"
 )
+
+const SyncloudCAPath = "/var/snap/platform/current/syncloud.ca.crt"
 
 const (
 	SessionCookie = "games_session"
@@ -56,12 +59,20 @@ func ContextUser(ctx context.Context) (*User, bool) {
 }
 
 func NewService(ctx context.Context, logger *log.Logger, authUrl, clientID, clientSecret, signSecret, redirectURL string) (*Service, error) {
-	// Authelia uses a self-signed Syncloud CA on the platform; the backend
-	// process doesn't have it in its trust store. Skip verification for the
-	// internal auth-host calls (OIDC discovery, token exchange, basic-auth
-	// delegate) — they only talk to the platform's local Authelia, never
-	// out to the public internet.
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	// Authelia ships with a self-signed Syncloud CA. The configure hook
+	// drops it into /usr/local/share/ca-certificates/ + update-ca-certificates
+	// so the OS trust store covers us; this is the in-process safety net
+	// for first-boot races and for when the hook copy gets skipped.
+	pool, err := x509.SystemCertPool()
+	if err != nil || pool == nil {
+		pool = x509.NewCertPool()
+	}
+	if pem, err := os.ReadFile(SyncloudCAPath); err == nil {
+		pool.AppendCertsFromPEM(pem)
+	} else {
+		logger.Printf("auth: syncloud CA not readable at %s: %v", SyncloudCAPath, err)
+	}
+	tr := &http.Transport{TLSClientConfig: &tls.Config{RootCAs: pool}}
 	hc := &http.Client{Transport: tr, Timeout: 15 * time.Second}
 	ctx = oidc.ClientContext(ctx, hc)
 

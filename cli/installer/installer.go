@@ -140,6 +140,10 @@ func (i *Installer) UpdateConfigs() error {
 		return fmt.Errorf("oidc register: %w", err)
 	}
 
+	if err := i.trustSyncloudCA(); err != nil {
+		i.logger.Warn("syncloud CA install failed (backend has in-process fallback)", zap.Error(err))
+	}
+
 	variables := Variables{
 		AuthUrl: authUrl,
 	}
@@ -153,6 +157,23 @@ func (i *Installer) UpdateConfigs() error {
 	}
 
 	return i.FixPermissions()
+}
+
+// trustSyncloudCA copies the platform's self-signed CA into the system
+// trust store and runs update-ca-certificates so that anything in this
+// snap doing TLS (Go's stdlib http.Client, curl in install scripts, …)
+// validates auth.<domain> cleanly. Same pattern platform/test uses to
+// seed the CA into a test image.
+func (i *Installer) trustSyncloudCA() error {
+	src := "/var/snap/platform/current/syncloud.ca.crt"
+	if _, err := os.Stat(src); err != nil {
+		return fmt.Errorf("syncloud CA missing: %w", err)
+	}
+	dst := "/usr/local/share/ca-certificates/syncloud.crt"
+	if err := cp.Copy(src, dst); err != nil {
+		return fmt.Errorf("install CA: %w", err)
+	}
+	return i.executor.Run("/usr/sbin/update-ca-certificates")
 }
 
 func (i *Installer) registerOIDC() error {
