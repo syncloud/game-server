@@ -2,12 +2,17 @@ local name = 'games';
 local go = '1.25';
 local nginx = '1.24.0';
 local node = '20';
-local platform = '26.04.7';
+local platform = '26.04.10';
 local python = '3.12-slim-bookworm';
 local deployer = 'https://github.com/syncloud/store/releases/download/4/syncloud-release';
-local distros = ['bookworm'];
+// Binary smoke tests run on every distro we ship for, full integration
+// (pytest, playwright) only on the default distro.
+local distros = ['bookworm', 'buster'];
 local distro_default = 'bookworm';
 local arch = 'amd64';
+
+local platform_image(distro, arch) =
+  'syncloud/platform-' + distro + '-' + arch + ':' + platform;
 
 [{
   kind: 'pipeline',
@@ -30,13 +35,6 @@ local arch = 'amd64';
       image: 'nginx:' + nginx,
       commands: [
         './nginx/build.sh',
-      ],
-    },
-    {
-      name: 'nginx test',
-      image: 'syncloud/platform-' + distro_default + '-' + arch + ':' + platform,
-      commands: [
-        './nginx/test.sh',
       ],
     },
     {
@@ -95,22 +93,29 @@ local arch = 'amd64';
         './package.sh ' + name + ' $VERSION',
       ],
     },
-  ] + [
+  ] + std.flattenArrays([
+    [
+      { name: 'nginx test ' + distro, image: platform_image(distro, arch), commands: ['./nginx/test.sh'] },
+      { name: 'jre test ' + distro, image: platform_image(distro, arch), commands: ['./jre/test.sh'] },
+      { name: 'steamcmd test ' + distro, image: platform_image(distro, arch), commands: ['./steamcmd/test.sh'] },
+      { name: 'cli test ' + distro, image: platform_image(distro, arch), commands: ['./cli/test.sh'] },
+    ]
+    for distro in distros
+  ]) + [
     {
-      name: 'test ' + distro,
+      name: 'test ' + distro_default,
       image: 'python:' + python,
       commands: [
-        'DOMAIN="' + distro + '.com"',
-        'APP_DOMAIN="' + name + '.' + distro + '.com"',
+        'DOMAIN="' + distro_default + '.com"',
+        'APP_DOMAIN="' + name + '.' + distro_default + '.com"',
         'getent hosts $APP_DOMAIN | sed "s/$APP_DOMAIN/auth.$DOMAIN/g" | tee -a /etc/hosts',
         'cat /etc/hosts',
         'APP_ARCHIVE_PATH=$(realpath $(cat package.name))',
         'cd test',
         './deps.sh',
-        'py.test -x -s test.py --distro=' + distro + ' --app-archive-path=$APP_ARCHIVE_PATH --app=' + name + ' --arch=' + arch,
+        'py.test -x -s test.py --distro=' + distro_default + ' --app-archive-path=$APP_ARCHIVE_PATH --app=' + name + ' --arch=' + arch,
       ],
-    }
-    for distro in distros
+    },
   ] + [
     {
       name: 'test-ui-' + projectName,
@@ -188,15 +193,14 @@ local arch = 'amd64';
   },
   services: [
     {
-      name: name + '.' + distro + '.com',
-      image: 'syncloud/platform-' + distro + '-' + arch + ':' + platform,
+      name: name + '.' + distro_default + '.com',
+      image: platform_image(distro_default, arch),
       privileged: true,
       volumes: [
         { name: 'dbus', path: '/var/run/dbus' },
         { name: 'dev', path: '/dev' },
       ],
-    }
-    for distro in distros
+    },
   ],
   volumes: [
     { name: 'dbus', host: { path: '/var/run/dbus' } },
