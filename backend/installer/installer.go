@@ -19,16 +19,9 @@ const (
 	SteamLib32   = "/snap/games/current/steamcmd/lib32"
 	SteamLib64   = "/snap/games/current/steamcmd/lib64"
 	JREBinDir    = "/snap/games/current/jre/bin"
-	// Game installs live on /data/<app>/ (external storage if available)
-	// so backups stay small and snap refresh rollback doesn't wipe the
-	// downloaded game files. /var/snap/games/current is for small state
-	// only (DB, configs, sentry).
 	ServersBaseDir = "/data/games/servers"
 )
 
-// wrapAmd64 builds a startCmd that invokes a 64-bit binary via our bundled
-// ld-linux-x86-64.so.2 + lib64, so games don't depend on host glibc/
-// libstdc++/libGL/etc.
 func wrapAmd64(binary string, extraPaths string, args string) string {
 	libs := SteamLib64
 	if extraPaths != "" {
@@ -39,8 +32,6 @@ func wrapAmd64(binary string, extraPaths string, args string) string {
 		libs, SteamLib64, libs, binary, args)
 }
 
-// wrapI386 builds a startCmd that invokes a 32-bit binary via our bundled
-// ld-linux.so.2 + lib32. For HLDS and friends.
 func wrapI386(binary string, extraPaths string, args string) string {
 	libs := SteamLib32
 	if extraPaths != "" {
@@ -118,11 +109,6 @@ func installSteam(ctx context.Context, g Game, installDir, user, pass string) (*
 		"+force_install_dir", installDir,
 		"+login", login,
 	}
-	// HLDS appid 90 needs an explicit mod to populate cstrike/dod/valve/etc.;
-	// without it +app_update 90 only fetches the base server stub.
-	// It also needs the 'steam_legacy' beta branch — Valve retired the
-	// default branch for legacy GoldSrc; without -beta steam_legacy you
-	// get K_EAppUpdateError 0x10E "platform doesn't match".
 	if g.ID == "hlds-cs" {
 		args = append(args, "+app_set_config", "90", "mod", "cstrike")
 		args = append(args, "+app_update", "90", "-beta", "steam_legacy", "validate")
@@ -149,21 +135,14 @@ func steamStartCmd(g Game, dir string) string {
 		bin := dir + "/game/bin/linuxsteamrt64/cs2"
 		return wrapAmd64(bin, dir+"/game/bin/linuxsteamrt64", fmt.Sprintf("-dedicated +map de_dust2 +port %d", g.DefaultPort))
 	case "tf2":
-		// SrcDS is 32-bit (TF2 dedicated)
 		return wrapI386(dir+"/srcds_linux", dir+":"+dir+"/bin", fmt.Sprintf("-game tf +map ctf_2fort +port %d", g.DefaultPort))
 	case "gmod":
 		return wrapI386(dir+"/srcds_linux", dir+":"+dir+"/bin", fmt.Sprintf("-game garrysmod +port %d", g.DefaultPort))
 	case "valheim":
-		// Valheim is amd64
 		return wrapAmd64(dir+"/valheim_server.x86_64", dir, fmt.Sprintf("-port %d -world Dedicated -password changeme", g.DefaultPort))
 	case "zomboid":
-		// Zomboid wraps its own JVM; let the start-server.sh handle libs
 		return fmt.Sprintf("cd %s && ./start-server.sh -port %d", dir, g.DefaultPort)
 	case "hlds-cs":
-		// HLDS is 32-bit; mod dir needs to be in library search for libstdc++/libsteam_api.
-		// -insecure: skip the VAC connection that fails inside the snap (Steam
-		// auth isn't reachable, HLDS dies with 'Unable to initialize Steam' otherwise).
-		// +sv_lan 1: same — disable master server registration on first launch.
 		return wrapI386(dir+"/hlds_linux", dir+":"+dir+"/cstrike",
 			fmt.Sprintf("-game cstrike -insecure +sv_lan 1 +map de_dust2 +port %d +maxplayers 8", g.DefaultPort))
 	default:
@@ -254,8 +233,5 @@ func renderStartup(egg *Egg, g Game, installDir string) string {
 	if startup == "" {
 		return fmt.Sprintf("echo 'no startup defined for %s'", g.ID)
 	}
-	// Bundled JRE on PATH so eggs that invoke `java` (Minecraft, Terraria
-	// TShock, etc.) resolve to our /snap/.../jre/bin/java without needing
-	// a host JDK install.
 	return fmt.Sprintf("cd %s && export PATH=%s:$PATH && %s", installDir, JREBinDir, startup)
 }

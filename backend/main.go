@@ -31,7 +31,6 @@ type Game = catalog.Game
 const socketPath = "/var/snap/games/current/backend.sock"
 const dbPath = "/var/snap/games/current/database.db"
 
-
 func writeJSON(w http.ResponseWriter, code int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
@@ -127,10 +126,6 @@ type oidcFileConfig struct {
 	RedirectUrl  string `json:"redirectUrl"`
 }
 
-// loadAuth reads /var/snap/games/current/oidc.json written by the cli
-// configure hook and inits the OIDC service. Returns nil + logs when the
-// file is missing (eg. local dev). The backend service still starts so
-// integration tests installing the snap fresh aren't blocked.
 func loadAuth(logger *log.Logger) *auth.Service {
 	data, err := os.ReadFile(oidcConfigPath)
 	if err != nil {
@@ -407,7 +402,7 @@ func runInstall(logger *log.Logger, store *server.Store, id int64, g Game) {
 	if err != nil || s == nil {
 		return
 	}
-	steamUser := steam.StoredUsername() // empty unless user linked an account
+	steamUser := steam.StoredUsername()
 	logger.Printf("install[%d] starting: game=%s source=%s appid=%d steamUser=%q", id, g.ID, g.Source, g.SteamAppID, steamUser)
 	result, err := installer.Install(ctx, installer.Game{
 		ID:          g.ID,

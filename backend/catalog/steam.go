@@ -1,11 +1,5 @@
 package catalog
 
-// Hand-curated Steam dedicated servers. These run via the bundled SteamCMD
-// path (not via Pelican eggs). Tier reflects whether we've successfully
-// install-tested in CI (verified), have a known startCmd template
-// (compatible), or just know the appid is anonymous-friendly (experimental).
-//
-// Authoritative reference: LinuxGSM game registry plus our own CI runs.
 func steamEntries() []Game {
 	return []Game{
 		{

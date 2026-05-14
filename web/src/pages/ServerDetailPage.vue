@@ -25,7 +25,7 @@ async function loadLogs () {
   try {
     const r = await api.logs(props.id)
     logs.value = r.lines || []
-  } catch (_) { /* ignore */ }
+  } catch (_) {  }
 }
 
 async function action (name) {

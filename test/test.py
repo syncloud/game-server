@@ -14,16 +14,13 @@ TMP_DIR = '/tmp/syncloud'
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-
 @pytest.fixture(scope="session")
 def auth(device_user, device_password):
     return (device_user, device_password)
 
-
 @pytest.fixture(scope="session")
 def api(app_domain):
     return 'https://{0}/api/v1'.format(app_domain)
-
 
 @pytest.fixture(scope="session")
 def module_setup(request, device, app_dir, artifact_dir):
@@ -52,32 +49,26 @@ def module_setup(request, device, app_dir, artifact_dir):
 
     request.addfinalizer(module_teardown)
 
-
 def test_start(module_setup, device, device_host, app, domain):
     add_host_alias(app, device_host, domain)
     device.run_ssh('date', retries=100)
     device.run_ssh('mkdir {0}'.format(TMP_DIR))
-
 
 @pytest.mark.flaky(retries=50, delay=10)
 def test_activate_device(device):
     response = device.activate_custom()
     assert response.status_code == 200, response.text
 
-
 def test_install(app_archive_path, device_host, device_password, device):
     local_install(device_host, device_password, app_archive_path)
 
-
 def test_index(app_domain):
     wait_for_rest(requests.session(), "https://{0}".format(app_domain), 200, 10)
-
 
 def test_health(api, auth):
     response = requests.get(api + '/health', auth=auth, verify=False)
     assert response.status_code == 200, response.text
     assert response.json().get('status') == 'ok', response.text
-
 
 def test_games_catalog(api, auth):
     response = requests.get(api + '/games', auth=auth, verify=False)
@@ -87,26 +78,21 @@ def test_games_catalog(api, auth):
     assert 'teeworlds' in ids, 'teeworlds (smallest pelican egg, our CI fixture) must be in catalog'
     assert 'cs2' in ids, 'cs2 anonymous-friendly steam server must be in catalog'
     assert 'hlds-cs' in ids, 'hlds-cs (CI Steam fixture) must be in catalog'
-    # every game should have a tier
     for g in games:
         assert g.get('tier') in ('verified', 'compatible', 'experimental'), \
             'game {} has no tier: {}'.format(g.get('id'), g)
-
 
 def test_catalog_sources(api, auth):
     response = requests.get(api + '/catalog/sources', auth=auth, verify=False)
     assert response.status_code == 200, response.text
     sources = response.json()
-    # parkervcp/eggs + pelican-eggs/games pinned versions are present
     assert 'parkervcp/eggs' in sources
     assert 'pelican-eggs/games' in sources
-
 
 def test_servers_empty(api, auth):
     response = requests.get(api + '/servers', auth=auth, verify=False)
     assert response.status_code == 200, response.text
     assert response.json() == [], 'no servers installed at start'
-
 
 def test_create_server(api, auth):
     response = requests.post(
@@ -121,14 +107,12 @@ def test_create_server(api, auth):
     assert body['gameId'] == 'teeworlds'
     assert body['status'] == 'stopped'
 
-
 def test_list_after_create(api, auth):
     response = requests.get(api + '/servers', auth=auth, verify=False)
     assert response.status_code == 200
     servers = response.json()
     assert len(servers) == 1
     assert servers[0]['name'] == 'test-tw'
-
 
 def test_delete_server(api, auth):
     list_resp = requests.get(api + '/servers', auth=auth, verify=False)
@@ -138,7 +122,6 @@ def test_delete_server(api, auth):
     after = requests.get(api + '/servers', auth=auth, verify=False).json()
     assert after == []
 
-
 def test_create_unknown_game_rejected(api, auth):
     r = requests.post(
         api + '/servers',
@@ -146,7 +129,6 @@ def test_create_unknown_game_rejected(api, auth):
         json={'name': 'bad', 'gameId': 'not-a-game', 'port': 1234},
         verify=False)
     assert r.status_code == 400, r.text
-
 
 def test_logs_endpoint(api, auth):
     create = requests.post(
@@ -171,7 +153,6 @@ def test_logs_endpoint(api, auth):
     requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
     requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
 
-
 def _wait_a2s(api, auth, sid, timeout):
     deadline = time.time() + timeout
     last = None
@@ -182,7 +163,6 @@ def _wait_a2s(api, auth, sid, timeout):
             return r.json()
         time.sleep(3)
     raise AssertionError('timeout waiting for A2S response, last={0}'.format(last))
-
 
 def _wait_status(api, auth, sid, target, timeout):
     deadline = time.time() + timeout
@@ -197,7 +177,6 @@ def _wait_status(api, auth, sid, target, timeout):
                 raise AssertionError('install errored: ' + r.text)
         time.sleep(2)
     raise AssertionError('timeout waiting for status={0}, last={1}'.format(target, last))
-
 
 def test_teeworlds_real_install_and_play(api, auth, device):
     create = requests.post(
@@ -226,7 +205,6 @@ def test_teeworlds_real_install_and_play(api, auth, device):
     cleanup = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
     assert cleanup.status_code == 204, cleanup.text
 
-
 def test_steamcmd_diagnostics(device):
     """Capture exactly what steamcmd needs and what's missing. Always runs;
     output goes to pytest stdout and is visible in the CI log. Not an
@@ -237,7 +215,6 @@ def test_steamcmd_diagnostics(device):
         out = device.run_ssh(cmd, throw=False)
         print(out if out else '(no output)')
 
-    # heredoc body — use simple bash, no parens in echo args
     diag = '''#!/bin/bash
 set +e
 echo SECTION df
@@ -315,7 +292,6 @@ echo SECTION done
          '/snap/games/current/bin/steamcmd.sh +exit 2>&1 >/dev/null || true; '
          'cat /tmp/ld-debug.* 2>/dev/null | head -200 || echo "(no ld-debug output)"')
 
-
 @pytest.mark.flaky(retries=2, delay=15)
 def test_hlds_cs_real_install(api, auth, device):
     """Real CS 1.6 dedicated server install via SteamCMD (~822 MB download).
@@ -331,9 +307,6 @@ def test_hlds_cs_real_install(api, auth, device):
     shim). The install itself is the proof that SteamCMD works inside
     the snap, which was the phase 3b goal.
     """
-    # Retries: drop any half-installed leftover from a previous attempt so
-    # the create step doesn't conflict on the UNIQUE(name) constraint, and
-    # so steamcmd's runtime dir state from a failed run isn't reused.
     existing = requests.get(api + '/servers', auth=auth, verify=False).json()
     for s in existing or []:
         if s.get('name') == 'hlds-real':
@@ -351,14 +324,11 @@ def test_hlds_cs_real_install(api, auth, device):
     assert install.status_code == 200, install.text
     _wait_status(api, auth, sid, 'stopped', timeout=900)
 
-    # Verify a real Steam asset landed on disk — proves SteamCMD did the
-    # full anonymous-login + app_update flow inside the snap.
     out = device.run_ssh('ls /data/games/servers/hlds-real/hlds_linux 2>&1')
     assert 'hlds_linux' in out and 'No such file' not in out, \
         'hlds_linux missing post-install: ' + out
 
     requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
-
 
 @pytest.mark.xfail(
     reason="Paper/Fabric/etc. Minecraft eggs need `jq` (Paper) or apt "
@@ -374,10 +344,6 @@ def test_minecraft_real_install_and_play(api, auth, device):
     and delete. EULA is accepted explicitly here for CI — the product
     itself never auto-accepts."""
     games = requests.get(api + '/games', auth=auth, verify=False).json()
-    # Minecraft eggs live under game_eggs/minecraft/java/<variant>/ — the
-    # 'minecraft' token is in upstreamRef, not the egg's flat name (Paper,
-    # Fabric, etc.). Restrict to compatible|verified so we only run a
-    # variant we expect to install cleanly without docker.
     candidates = [
         g for g in games
         if 'minecraft/java' in g.get('upstreamRef', '').lower()
@@ -386,8 +352,6 @@ def test_minecraft_real_install_and_play(api, auth, device):
     print('minecraft candidates ({}): {}'.format(
         len(candidates), [g['id'] for g in candidates[:10]]))
     assert candidates, 'no Minecraft Java entries in catalog with tier verified|compatible'
-    # Prefer Paper (most popular Minecraft server software, just a single
-    # .jar download + java startup) when available.
     candidates.sort(key=lambda g: (0 if g['id'] == 'paper' else 1, g['id']))
     g = candidates[0]
     print('using minecraft entry:', g['id'], 'name=', g['name'], 'ref=', g.get('upstreamRef'))
@@ -408,8 +372,6 @@ def test_minecraft_real_install_and_play(api, auth, device):
     out = device.run_ssh('ls {0} 2>&1'.format(install_dir))
     assert '.jar' in out, 'minecraft .jar missing post-install: ' + out
 
-    # Accept EULA before start. Minecraft refuses to boot otherwise. The
-    # product itself never auto-accepts — that's an explicit user step.
     device.run_ssh(
         'echo eula=true > {0}/eula.txt && chown games:games {0}/eula.txt'.format(install_dir))
 
@@ -417,10 +379,6 @@ def test_minecraft_real_install_and_play(api, auth, device):
     assert start.status_code == 200, start.text
     assert start.json()['status'] == 'running'
 
-    # World gen + plugin load can take a while on the CI box. Probe for a
-    # java listener — Minecraft's actual port comes from server.properties
-    # which the egg writes on first boot. "ss -tlnp" with the java pid is
-    # the most reliable bind check.
     deadline = time.time() + 240
     bound = ''
     while time.time() < deadline:
@@ -439,7 +397,6 @@ def test_minecraft_real_install_and_play(api, auth, device):
 
     cleanup = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
     assert cleanup.status_code == 204, cleanup.text
-
 
 @pytest.mark.xfail(
     reason='HLDS startup needs Steam Pipe / lsteamclient shim to satisfy '
@@ -470,7 +427,6 @@ def test_hlds_cs_a2s_query(api, auth, device):
     requests.post(api + '/servers/{0}/stop'.format(sid), auth=auth, verify=False)
     requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
 
-
 def test_lifecycle(api, auth):
     create = requests.post(
         api + '/servers',
@@ -499,19 +455,15 @@ def test_lifecycle(api, auth):
     cleanup = requests.delete(api + '/servers/{0}'.format(sid), auth=auth, verify=False)
     assert cleanup.status_code == 204, cleanup.text
 
-
 def test_storage_change_event(device):
     device.run_ssh('snap run games.storage-change > {0}/storage-change.log'.format(TMP_DIR))
-
 
 def test_access_change_event(device):
     device.run_ssh('snap run games.access-change > {0}/access-change.log'.format(TMP_DIR))
 
-
 def test_remove(device, app):
     response = device.app_remove(app)
     assert response.status_code == 200, response.text
-
 
 def test_reinstall(app_archive_path, device_host, device_password):
     local_install(device_host, device_password, app_archive_path)

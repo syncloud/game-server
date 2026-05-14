@@ -1,11 +1,5 @@
 import { Page } from '@playwright/test'
 
-/**
- * Drive the Authelia login form once and let the browser keep the
- * session cookie. Authelia redirects /any-protected-url to
- * https://auth.<domain>/?rd=<encoded>. The login form's exact element
- * ids/names depend on Authelia version — we try a few selectors.
- */
 export async function loginViaAuthelia (
   page: Page,
   baseURL: string,
@@ -14,19 +8,12 @@ export async function loginViaAuthelia (
 ) {
   await page.goto(baseURL)
 
-  // The app no longer bounces unauthenticated visits via nginx; the SPA
-  // mounts, fetches /api/v1/me, gets 401, and only THEN does
-  // window.location.assign('/auth/login'), which the backend redirects to
-  // Authelia. Wait for the URL to leave the app host before scanning for
-  // the username field.
   try {
     await page.waitForURL((url) => {
       const h = new URL(url.toString()).host
       return h.startsWith('auth.')
     }, { timeout: 15_000 })
   } catch (_) {
-    // already on auth host, or app didn't redirect — fall through and let
-    // the selector loop produce a useful error.
   }
 
   const usernameSelectors = [
@@ -54,7 +41,7 @@ export async function loginViaAuthelia (
       try {
         await el.waitFor({ state: 'visible', timeout: 5_000 })
         return sel
-      } catch (_) { /* try next */ }
+      } catch (_) {  }
     }
     const url = page.url()
     const title = await page.title().catch(() => '?')

@@ -1,7 +1,7 @@
 async function jsonOrThrow (res) {
   if (!res.ok) {
     let msg = `http ${res.status}`
-    try { msg = (await res.json()).error || msg } catch (_) { /* */ }
+    try { msg = (await res.json()).error || msg } catch (_) {  }
     throw new Error(msg)
   }
   if (res.status === 204) return null

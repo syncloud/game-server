@@ -6,9 +6,6 @@ cd ${DIR}
 apt update
 apt -y install wget ca-certificates
 
-# Eclipse Temurin OpenJDK 17 JRE headless. Java 17 is the current LTS for
-# Minecraft Java (1.18+); covers everything users will install. Headless =
-# no GUI bits, ~45MB unpacked.
 JRE_VERSION="${JRE_VERSION:-17.0.13+11}"
 JRE_VERSION_ENC=$(echo ${JRE_VERSION} | sed 's/+/%2B/')
 JRE_VERSION_FILE=$(echo ${JRE_VERSION} | sed 's/+/_/')

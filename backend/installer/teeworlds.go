@@ -15,11 +15,6 @@ import (
 	"github.com/ulikunitz/xz"
 )
 
-// Pinned. Bump when a new linux_x86_64 release ships. We hit the asset URL
-// directly instead of api.github.com/.../releases/latest because the API
-// imposes 60 unauthenticated requests/hour per IP and CI hits that ceiling
-// fast across rebuilds. The asset URL serves from a different bucket with
-// no auth quota.
 const (
 	teeworldsVersion  = "0.7.5"
 	teeworldsAssetURL = "https://github.com/teeworlds/teeworlds/releases/download/" + teeworldsVersion + "/teeworlds-" + teeworldsVersion + "-linux_x86_64.tar.gz"

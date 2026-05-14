@@ -19,7 +19,7 @@ onMounted(async () => {
       return
     }
     if (r.ok) user.value = await r.json()
-  } catch (_) { /* ignore */ }
+  } catch (_) {  }
 })
 
 function logout () { window.location.assign('/auth/logout') }

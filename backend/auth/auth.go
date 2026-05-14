@@ -45,7 +45,7 @@ type Service struct {
 	verifier     *oidc.IDTokenVerifier
 	cfg          oauth2.Config
 	signKey      []byte
-	authzAPI     string // for HTTP-Basic delegated check, optional
+	authzAPI     string
 	tlsClient    *http.Client
 	authUrl      string
 	logger       *log.Logger
@@ -59,10 +59,6 @@ func ContextUser(ctx context.Context) (*User, bool) {
 }
 
 func NewService(ctx context.Context, logger *log.Logger, authUrl, clientID, clientSecret, signSecret, redirectURL string) (*Service, error) {
-	// Authelia ships with a self-signed Syncloud CA. The configure hook
-	// drops it into /usr/local/share/ca-certificates/ + update-ca-certificates
-	// so the OS trust store covers us; this is the in-process safety net
-	// for first-boot races and for when the hook copy gets skipped.
 	pool, err := x509.SystemCertPool()
 	if err != nil || pool == nil {
 		pool = x509.NewCertPool()
@@ -187,10 +183,6 @@ func (s *Service) HandleMe(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(u)
 }
 
-// Middleware enforces auth on the wrapped handler. Accepts:
-// 1. games_session cookie (set after OIDC login)
-// 2. HTTP Basic Auth — delegated to Authelia's /api/authz/auth-request
-//    endpoint for validation. Lets integration tests + curl users in.
 func (s *Service) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if u := s.userFromCookie(r); u != nil {
@@ -201,7 +193,6 @@ func (s *Service) Middleware(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKey{}, u)))
 			return
 		}
-		// For SPA users: redirect to login. For API clients: 401.
 		if strings.HasPrefix(r.URL.Path, "/api/") {
 			w.Header().Set("WWW-Authenticate", `Basic realm="games"`)
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
@@ -223,19 +214,11 @@ func (s *Service) userFromCookie(r *http.Request) *User {
 	return u
 }
 
-// userFromBasic delegates to Authelia's auth-request endpoint to validate
-// the Basic credentials. Authelia checks against the platform LDAP and
-// returns 200 with Remote-User on success.
 func (s *Service) userFromBasic(r *http.Request) *User {
 	user, pass, ok := r.BasicAuth()
 	if !ok || user == "" {
 		return nil
 	}
-	// Authelia's auth-request endpoint is /api/authz/auth-request — the
-	// `/basic` we used before came from the nginx location *name* in the
-	// old forward-auth conf, not the upstream path. With Basic Auth set
-	// on the request, Authelia validates against LDAP and returns 200 +
-	// Remote-User / Remote-Email / Remote-Name response headers.
 	req, _ := http.NewRequest("GET", s.authUrl+"/api/authz/auth-request", nil)
 	req.SetBasicAuth(user, pass)
 	req.Header.Set("X-Original-Method", r.Method)
@@ -324,8 +307,6 @@ func pkceChallenge(verifier string) string {
 	return base64.RawURLEncoding.EncodeToString(h[:])
 }
 
-// LoadClientSecret reads the OIDC client_secret persisted by the cli's
-// configure hook at /var/snap/games/current/oidc.secret.
 func LoadClientSecret(path string) (string, error) {
 	b, err := os.ReadFile(path)
 	if err != nil {

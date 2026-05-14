@@ -141,15 +141,10 @@ button { font: inherit; cursor: pointer; }
 }
 .brand:hover { text-decoration: none; }
 
-/* Responsive nav: desktop in top tabs, mobile in bottom bar */
 .desktop-only { display: inherit; }
 .mobile-only { display: none; }
 
 .bottom-bar {
-  /* Hidden on desktop. The mobile media query below flips display:flex.
-     Was display:flex unconditional, which beat `.mobile-only{display:none}`
-     on equal specificity (bottom-bar rule came later) so the bar leaked
-     onto desktop layouts. */
   display: none;
   position: fixed;
   bottom: 0;
@@ -225,11 +220,6 @@ button { font: inherit; cursor: pointer; }
 
 @media (max-width: 640px) {
   .desktop-only { display: none !important; }
-  /* Default mobile-only = block; the nav bar overrides to flex below.
-     Was display:flex unconditionally — that turned the Settings
-     <section class="detail-card mobile-only"> into a flex row,
-     stacking the Account, Theme and logout rows horizontally and
-     blowing out the viewport. */
   .mobile-only { display: block; }
   .bottom-bar.mobile-only { display: flex; }
   .header-inner { padding: 12px 16px; }
@@ -239,9 +229,6 @@ button { font: inherit; cursor: pointer; }
   .search { max-width: none; flex: 1 1 100%; }
   .tier-pills { flex-wrap: wrap; }
   .grid { grid-template-columns: 1fr; gap: 12px; }
-  /* anchored scrolls (button clicks, scrollIntoView) must leave room for
-     the fixed bottom-bar — otherwise the bottom-most card lands behind
-     the bar and its Install button is unreachable. */
   html { scroll-padding-bottom: 96px; }
   .card { scroll-margin-bottom: 96px; }
 }

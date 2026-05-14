@@ -1,7 +1,3 @@
-// steam handles paid Steam account login via the bundled steamcmd. The
-// password is never persisted — after a successful login steamcmd writes
-// a sentry file to $HOME/Steam/ which acts as a long-lived session token;
-// future installs use \`+login <username>\` and pick up the cached sentry.
 package steam
 
 import (
@@ -77,7 +73,6 @@ func Login(ctx context.Context, username, password, guardCode string) (*LoginRes
 		return res, ErrInvalidCredentials
 	}
 
-	// Treat unknown failure as invalid creds rather than success — safer.
 	return res, errors.New("steamcmd login failed (unknown response)")
 }
 

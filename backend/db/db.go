@@ -35,7 +35,6 @@ func Open(path string) (*DB, error) {
 	if _, err := conn.Exec(createSchema); err != nil {
 		return nil, fmt.Errorf("schema: %w", err)
 	}
-	// idempotent migration for snaps upgraded from a schema without last_error
 	_, _ = conn.Exec(`ALTER TABLE servers ADD COLUMN last_error TEXT`)
 	return &DB{conn}, nil
 }

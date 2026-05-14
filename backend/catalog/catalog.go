@@ -1,6 +1,3 @@
-// catalog: the game registry. Generated at build time from
-// parkervcp/eggs and pelican-eggs/games (see catalog/build.sh), plus
-// hand-curated Steam entries (steam.go).
 package catalog
 
 import (
@@ -54,7 +51,6 @@ func init() {
 	if err := json.Unmarshal(raw, &loaded); err != nil {
 		panic("catalog: parse embedded catalog.json: " + err.Error())
 	}
-	// merge curated Steam entries
 	loaded.Games = append(loaded.Games, steamEntries()...)
 	byID = map[string]Game{}
 	for _, g := range loaded.Games {

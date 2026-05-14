@@ -5,7 +5,6 @@ test('catalog renders with brand and game grid', async ({ page }, info) => {
   await page.goto('/#/catalog')
   await expect(page.getByTestId('brand')).toBeVisible()
   await expect(page.getByTestId('game-grid')).toBeVisible()
-  // teeworlds is our pinned-fixture egg; cs2 is hand-curated steam; hlds-cs is CI fixture
   await expect(page.getByTestId('game-teeworlds')).toBeVisible()
   await expect(page.getByTestId('game-cs2')).toBeVisible()
   await shoot(page, info, 'catalog')
@@ -25,11 +24,9 @@ test('tier filter pills', async ({ page }, info) => {
   await expect(page.getByTestId('tier-verified')).toBeVisible()
   await expect(page.getByTestId('tier-compatible')).toBeVisible()
   await expect(page.getByTestId('tier-experimental')).toBeVisible()
-  // pick verified — hlds-cs is hand-curated as verified.
   await page.getByTestId('tier-verified').click()
   await expect(page.getByTestId('game-hlds-cs')).toBeVisible()
   await shoot(page, info, 'tier-verified')
-  // pick compatible — teeworlds (from the egg catalog) lands here.
   await page.getByTestId('tier-compatible').click()
   await expect(page.getByTestId('game-teeworlds')).toBeVisible()
 })

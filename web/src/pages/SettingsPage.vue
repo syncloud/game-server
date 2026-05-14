@@ -15,11 +15,11 @@ async function load () {
     const s = await fetch('/api/v1/steam/status').then(r => r.json())
     steam.value.linked = !!s.linked
     steam.value.linkedUsername = s.username || ''
-  } catch (_) { /* */ }
+  } catch (_) {  }
   try {
     const r = await fetch('/api/v1/me')
     if (r.ok) user.value = await r.json()
-  } catch (_) { /* */ }
+  } catch (_) {  }
 }
 
 function logout () { window.location.assign('/auth/logout') }
@@ -167,8 +167,6 @@ onMounted(load)
 .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
 .account-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .account-row:last-child { border-bottom: 0; }
-/* flex:1 + min-width:0 + overflow:hidden together let a very long sub /
-   email shrink to fit the row instead of forcing the parent wider. */
 .account-info { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
 .account-name { color: var(--text); font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .account-email { color: var(--text-muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

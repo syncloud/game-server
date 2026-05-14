@@ -72,10 +72,6 @@ func (r *Runner) Start(id int64, startCmd string, workDir string) error {
 			cmd.Dir = workDir
 		}
 	}
-	// Override HOME to the workDir so games that write to $HOME/.local/share/*
-	// (Teeworlds, many SDL2-based games, Minecraft) have a writable home.
-	// The snap user `games` has /usr/games as its system HOME (Debian default
-	// for the conventional `games` user) which isn't writable.
 	if workDir != "" {
 		cmd.Env = append(os.Environ(), "HOME="+workDir)
 	}

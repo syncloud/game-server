@@ -1,6 +1,3 @@
-// catalog converter: walks parkervcp/eggs and pelican-eggs/games, parses
-// each egg-*.json, applies filter rules to assign a tier, dedupes, writes
-// a single catalog.json that the snap embeds at build time.
 package main
 
 import (
@@ -152,9 +149,6 @@ func walkAndIngest(root, sourceLabel string, out map[string]CatalogGame) {
 		if g == nil {
 			return nil
 		}
-		// Prefer earlier-seen (parkervcp before pelican on iteration order, but
-		// since we may want pelican as the more current source, take the later
-		// one). Easier: prefer pelican over parkervcp on conflict.
 		if existing, ok := out[g.ID]; ok {
 			if existing.Source == "parkervcp" && g.Source == "pelican" {
 				out[g.ID] = *g
@@ -206,27 +200,20 @@ func convertEgg(egg Egg, source, path, root string) *CatalogGame {
 	return &g
 }
 
-// classify returns the tier (verified|compatible|experimental) and an
-// optional reason for downgrades.
 func classify(egg Egg, g CatalogGame) (string, string) {
 	ep := strings.ToLower(strings.TrimSpace(egg.Scripts.Installation.Entrypoint))
 	if ep != "bash" && ep != "sh" && ep != "ash" && ep != "" {
 		return "experimental", "install entrypoint is " + ep + " (not bash/sh/ash)"
 	}
 	container := strings.ToLower(egg.Scripts.Installation.Container)
-	// Generic base images we can run install scripts against.
 	if !strings.Contains(container, "debian") &&
 		!strings.Contains(container, "ubuntu") &&
 		!strings.Contains(container, "alpine") {
 		return "experimental", "install container is " + egg.Scripts.Installation.Container + " (need debian/ubuntu/alpine)"
 	}
-	// If the runtime image is a Docker-only "yolk", we can't reliably reproduce
-	// that environment in the snap — best-effort install at most.
 	if dockerContainerRE.MatchString(egg.Image) && egg.Image != "" {
 		return "compatible", "runtime image is a Pterodactyl/Pelican yolk; install may need adaptation"
 	}
-	// Install script that apt-get installs build deps tends to need root + apt
-	// access we don't have at install time.
 	if strings.Contains(egg.Scripts.Installation.Script, "apt update") ||
 		strings.Contains(egg.Scripts.Installation.Script, "apt-get update") {
 		return "compatible", "install script runs apt update (won't have apt at runtime)"

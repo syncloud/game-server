@@ -173,7 +173,6 @@ export function mock () {
         return new Response(204)
       })
 
-      // /servers/:id/{install,start,stop,restart} — flip status, return server
       const action = (next) => (_, request) => {
         const s = servers.find(x => x.id === Number(request.params.id))
         if (!s) return new Response(404, {}, { error: 'not found' })

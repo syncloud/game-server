@@ -6,9 +6,6 @@ cd ${DIR}
 apt update
 apt -y install wget ca-certificates
 
-# Pinned upstream catalog sources. Bump these constants to roll the catalog
-# forward; reproducible until then. parkervcp/eggs is archived (frozen),
-# pelican-eggs/games is actively maintained.
 PARKERVCP_SHA="${PARKERVCP_SHA:-fcfd5a3549769ade15127a7577d6d3c397e83b05}"
 PELICAN_GAMES_SHA="${PELICAN_GAMES_SHA:-34331fce33c83df752d94e2a90b1e43ca6280f82}"
 

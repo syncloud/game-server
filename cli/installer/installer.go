@@ -102,8 +102,6 @@ func (i *Installer) StorageChange() error {
 	if err != nil {
 		return err
 	}
-	// Game install dirs go under storage (/data/games/servers/) so they
-	// survive snap refresh rollback and aren't included in platform backups.
 	if err := i.createMissingDirs(
 		path.Join(storageDir, "servers"),
 	); err != nil {
@@ -159,11 +157,6 @@ func (i *Installer) UpdateConfigs() error {
 	return i.FixPermissions()
 }
 
-// trustSyncloudCA copies the platform's self-signed CA into the system
-// trust store and runs update-ca-certificates so that anything in this
-// snap doing TLS (Go's stdlib http.Client, curl in install scripts, …)
-// validates auth.<domain> cleanly. Same pattern platform/test uses to
-// seed the CA into a test image.
 func (i *Installer) trustSyncloudCA() error {
 	src := "/var/snap/platform/current/syncloud.ca.crt"
 	if _, err := os.Stat(src); err != nil {
