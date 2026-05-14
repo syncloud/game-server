@@ -13,14 +13,6 @@ mkdir -p ${OUT} ${BIN_OUT}
 install -m 0755 ${DIR}/bin/steamcmd.sh ${BIN_OUT}/steamcmd.sh
 
 wget -q https://media.steampowered.com/installer/steamcmd_linux.tar.gz -O steamcmd.tar.gz
-
-ACTUAL_SHA=$(sha256sum steamcmd.tar.gz | awk '{print $1}')
-echo "steamcmd_linux.tar.gz sha256: ${ACTUAL_SHA}"
-if [ -n "${STEAMCMD_SHA256:-}" ] && [ "${STEAMCMD_SHA256}" != "${ACTUAL_SHA}" ]; then
-    echo "ERROR: tarball sha256 mismatch — expected ${STEAMCMD_SHA256}" >&2
-    exit 1
-fi
-
 tar xf steamcmd.tar.gz -C ${OUT}
 rm steamcmd.tar.gz
 

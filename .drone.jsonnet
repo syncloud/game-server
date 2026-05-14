@@ -5,7 +5,6 @@ local node = '20';
 local platform = '26.04.10';
 local python = '3.12-slim-bookworm';
 local deployer = 'https://github.com/syncloud/store/releases/download/4/syncloud-release';
-local steamcmd_sha256 = '';
 local distros = ['bookworm', 'buster'];
 local distro_default = 'bookworm';
 local arch = 'amd64';
@@ -76,9 +75,6 @@ local platform_image(distro, arch) =
     {
       name: 'steamcmd',
       image: 'debian:bookworm-slim',
-      environment: {
-        STEAMCMD_SHA256: steamcmd_sha256,
-      },
       commands: [
         './steamcmd/build.sh',
       ],
