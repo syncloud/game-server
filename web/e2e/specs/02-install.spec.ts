@@ -7,7 +7,13 @@ test('install dialog opens, creates a server, lands on server detail', async ({ 
   const name = `e2e-tw-${Date.now()}`
 
   await page.goto('/#/catalog')
-  await page.getByTestId('game-teeworlds').getByTestId('install-btn').click()
+  // On mobile the fixed bottom-bar overlaps cards near the viewport
+  // bottom. scroll-margin-bottom on .card handles the natural anchor
+  // scroll; this explicit scroll covers the case where the card is
+  // partly above the viewport too.
+  const teeCard = page.getByTestId('game-teeworlds')
+  await teeCard.scrollIntoViewIfNeeded()
+  await teeCard.getByTestId('install-btn').click()
   await expect(page.getByTestId('install-dialog')).toBeVisible()
   await page.getByTestId('dialog-name').fill(name)
   // Some egg variants don't have a SERVER_PORT variable so the catalog
