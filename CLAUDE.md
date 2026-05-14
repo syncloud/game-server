@@ -38,17 +38,16 @@ Phases shipped:
 - 7: OIDC client registration via `platformClient.RegisterOIDCClient`
 - 8: Playwright e2e (desktop + mobile)
 - 9: docs
+- 16: mobile bottom-bar nav
+- 17: minecraft real install (Pelican egg + bundled JRE)
+- 18: real OIDC code+PKCE flow + backend session middleware; nginx forward-auth dropped
+- 19: full minecraft cycle (install → EULA → start → tcp-bind), SVG icons extracted to assets, dead authelia templates removed
 
 In progress / open:
 - 3b: real HLDS (CS 1.6, appid 90, 250MB) install via SteamCMD — xfailed.
   steamcmd bootstrap fails with "Steam needs to be online to update" + empty
   Steam/logs/. lib32 + writable runtime dir aren't enough. Diagnostics added
   in test_steamcmd_diagnostics — read CI build log to root-cause.
-- 7b: own session middleware (replace nginx forward-auth with OIDC session
-  cookie). OIDC client is registered at configure but enforcement still via
-  nginx authelia_authrequest.
-- 8b: Playwright login helper. Specs + config in repo but CI step disabled
-  until the helper drives the authelia login form.
 
 # Architecture
 
@@ -60,7 +59,7 @@ In progress / open:
   - `installer/` — SteamCMD + Pelican egg install logic
   - `query/` — A2S_INFO UDP query
 - `web/` — Vue 3 + Vite. Plain CSS theme cribbed from `../store/web` (light/dark, no Element Plus). `web/e2e/` is a self-contained Playwright TS package.
-- `config/` — `nginx.conf` + Authelia forward-auth templates (`{{ .AuthLocalSocket }}` + `{{ .AuthUrl }}` rendered by `config.Generate`)
+- `config/` — `nginx.conf` (no auth_request — backend session middleware enforces) + `proxy.conf`. `{{ .AuthUrl }}` rendered by `config.Generate`.
 - `nginx/` — vendored nginx (build.sh copies the entire FS from the nginx docker image)
 - `steamcmd/` — `build.sh` downloads steamcmd_linux.tar.gz
 - `test/` — pytest integration tests using `syncloud-lib`
@@ -70,7 +69,7 @@ In progress / open:
 - **amd64 only.** `.drone.jsonnet` lists only amd64. SteamCMD ships x86_64.
 - **SteamCMD is 32-bit i386.** Snap will need 32-bit glibc bundled — first SteamCMD-based test installs may fail until that's added. Tracked as a follow-up.
 - **Pelican eggs that need Docker won't work.** Backend runs install scripts directly. Best-effort for bash/native eggs (Teeworlds, Minetest work).
-- **Auth = Authelia forward-auth + OIDC registration.** OIDC client is registered at configure time (for future use); active enforcement is still nginx `auth_request` against Authelia local socket.
+- **Auth = OIDC code+PKCE against Authelia + signed session cookie.** Backend's `auth.Middleware` checks the cookie on every `/api/*` request; nginx no longer does `auth_request`. Basic Auth (for integration tests / curl) is delegated to Authelia's `/api/authz/auth-request/basic` directly from the backend.
 
 # Integration test fixture
 

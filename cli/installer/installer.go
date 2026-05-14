@@ -19,8 +19,7 @@ const (
 )
 
 type Variables struct {
-	AuthUrl         string
-	AuthLocalSocket string
+	AuthUrl string
 }
 
 type Installer struct {
@@ -138,12 +137,11 @@ func (i *Installer) UpdateConfigs() error {
 	}
 
 	if err := i.registerOIDC(); err != nil {
-		i.logger.Warn("oidc register failed (continuing with forward-auth)", zap.Error(err))
+		return fmt.Errorf("oidc register: %w", err)
 	}
 
 	variables := Variables{
-		AuthUrl:         authUrl,
-		AuthLocalSocket: i.platformClient.GetAuthLocalSocket(),
+		AuthUrl: authUrl,
 	}
 
 	if err := config.Generate(

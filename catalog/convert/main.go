@@ -210,8 +210,8 @@ func convertEgg(egg Egg, source, path, root string) *CatalogGame {
 // optional reason for downgrades.
 func classify(egg Egg, g CatalogGame) (string, string) {
 	ep := strings.ToLower(strings.TrimSpace(egg.Scripts.Installation.Entrypoint))
-	if ep != "bash" && ep != "sh" && ep != "" {
-		return "experimental", "install entrypoint is " + ep + " (not bash/sh)"
+	if ep != "bash" && ep != "sh" && ep != "ash" && ep != "" {
+		return "experimental", "install entrypoint is " + ep + " (not bash/sh/ash)"
 	}
 	container := strings.ToLower(egg.Scripts.Installation.Container)
 	// Generic base images we can run install scripts against.

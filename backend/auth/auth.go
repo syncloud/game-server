@@ -1,7 +1,3 @@
-// auth implements OIDC code+PKCE login against the platform's Authelia
-// OIDC provider, and a signed session cookie that backend middleware
-// validates on every /api/* request. Replaces the previous nginx
-// forward-auth wiring.
 package auth
 
 import (
