@@ -14,6 +14,21 @@ export async function loginViaAuthelia (
 ) {
   await page.goto(baseURL)
 
+  // The app no longer bounces unauthenticated visits via nginx; the SPA
+  // mounts, fetches /api/v1/me, gets 401, and only THEN does
+  // window.location.assign('/auth/login'), which the backend redirects to
+  // Authelia. Wait for the URL to leave the app host before scanning for
+  // the username field.
+  try {
+    await page.waitForURL((url) => {
+      const h = new URL(url.toString()).host
+      return h.startsWith('auth.')
+    }, { timeout: 15_000 })
+  } catch (_) {
+    // already on auth host, or app didn't redirect — fall through and let
+    // the selector loop produce a useful error.
+  }
+
   const usernameSelectors = [
     'input[name="username"]',
     'input#username-textfield',
