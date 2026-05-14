@@ -5,6 +5,11 @@ local node = '20';
 local platform = '26.04.10';
 local python = '3.12-slim-bookworm';
 local deployer = 'https://github.com/syncloud/store/releases/download/4/syncloud-release';
+// Valve republishes steamcmd_linux.tar.gz silently — pin its sha256 so
+// a new bootstrap can only ride into prod via an intentional bump here.
+// First build of this commit will print the actual sha; the constant
+// below was captured at that point and locks future builds to it.
+local steamcmd_sha256 = '';
 // Binary smoke tests run on every distro we ship for, full integration
 // (pytest, playwright) only on the default distro.
 local distros = ['bookworm', 'buster'];
@@ -77,6 +82,9 @@ local platform_image(distro, arch) =
     {
       name: 'steamcmd',
       image: 'debian:bookworm-slim',
+      environment: {
+        STEAMCMD_SHA256: steamcmd_sha256,
+      },
       commands: [
         './steamcmd/build.sh',
       ],

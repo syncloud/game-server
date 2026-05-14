@@ -15,6 +15,19 @@ mkdir -p ${OUT} ${BIN_OUT}
 install -m 0755 ${DIR}/bin/steamcmd.sh ${BIN_OUT}/steamcmd.sh
 
 wget -q https://media.steampowered.com/installer/steamcmd_linux.tar.gz -O steamcmd.tar.gz
+
+# Pin the bootstrap tarball: snap refresh is the only thing that should
+# change steamcmd's version in prod, so the build refuses to silently
+# pick up a republished tarball. Pass STEAMCMD_SHA256 in CI; leave it
+# unset for ad-hoc local builds and the script just prints the actual
+# hash so you can bump the constant.
+ACTUAL_SHA=$(sha256sum steamcmd.tar.gz | awk '{print $1}')
+echo "steamcmd_linux.tar.gz sha256: ${ACTUAL_SHA}"
+if [ -n "${STEAMCMD_SHA256:-}" ] && [ "${STEAMCMD_SHA256}" != "${ACTUAL_SHA}" ]; then
+    echo "ERROR: tarball sha256 mismatch — expected ${STEAMCMD_SHA256}" >&2
+    exit 1
+fi
+
 tar xf steamcmd.tar.gz -C ${OUT}
 rm steamcmd.tar.gz
 
@@ -73,6 +86,22 @@ done
 # at its default.
 
 cd ${DIR}
+
+# Pre-bootstrap. Out of the box Valve's tarball is a ~3MB shim that
+# downloads the full ~30MB client on first launch — that's where the
+# "Steam needs to be online" cascade happened, and it's what forced the
+# runtime-copy gymnastics in the wrapper. Run +quit here, in the build
+# container with network and writable cwd, so the snap ships a fully
+# baked client. At runtime the install is read-only squashfs — Valve
+# does silently re-check for updates on startup but with our bundled
+# version current and the install RO, the check is a no-op (or fails
+# its write and steamcmd falls back to the current install). snap
+# refresh is the only thing that re-rolls the bundled version.
+BOOT_HOME=$(mktemp -d)
+HOME=${BOOT_HOME} ${OUT}/linux32/steamcmd +quit
+rm -rf ${BOOT_HOME}
+
 ls -la ${OUT}
 echo "lib32 file count: $(ls ${OUT}/lib32 | wc -l), size: $(du -sh ${OUT}/lib32 | cut -f1)"
 echo "lib64 file count: $(ls ${OUT}/lib64 | wc -l), size: $(du -sh ${OUT}/lib64 | cut -f1)"
+echo "steamcmd post-bootstrap size: $(du -sh ${OUT} | cut -f1)"
