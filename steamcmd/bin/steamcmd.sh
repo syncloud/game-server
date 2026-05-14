@@ -4,7 +4,7 @@ set -e
 SCDIR=/snap/games/current/steamcmd
 LIBS="${SCDIR}/lib32"
 
-export HOME="${HOME_OVERRIDE:-/var/snap/games/current/.steam-home}"
+export HOME=/var/snap/games/current/.steam-home
 mkdir -p "${HOME}"
 
 export LD_LIBRARY_PATH="${SCDIR}/linux32:${LIBS}:${LD_LIBRARY_PATH:-}"
