@@ -25,4 +25,11 @@ export LD_LIBRARY_PATH="${RUNTIME}/linux32:${LIBS}:${LD_LIBRARY_PATH:-}"
 
 cd "${RUNTIME}"
 
-exec "${RUNTIME}/linux32/ld-linux.so.2" --library-path "${RUNTIME}/linux32:${LIBS}" "${RUNTIME}/linux32/steamcmd" "$@"
+STATUS=42
+while [ "${STATUS}" -eq 42 ]; do
+    set +e
+    "${RUNTIME}/linux32/ld-linux.so.2" --library-path "${RUNTIME}/linux32:${LIBS}" "${RUNTIME}/linux32/steamcmd" "$@"
+    STATUS=$?
+    set -e
+done
+exit "${STATUS}"
