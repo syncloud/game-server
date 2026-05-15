@@ -12,10 +12,12 @@ import (
 )
 
 const (
-	App       = "games"
-	AppDir    = "/snap/games/current"
-	DataDir   = "/var/snap/games/current"
-	CommonDir = "/var/snap/games/common"
+	App             = "games"
+	AppDir          = "/snap/games/current"
+	DataDir         = "/var/snap/games/current"
+	CommonDir       = "/var/snap/games/common"
+	SteamcmdSrcDir  = AppDir + "/steamcmd"
+	SteamRuntimeDir = DataDir + "/.steam-runtime"
 )
 
 type Variables struct {
@@ -129,6 +131,10 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
+	if err := i.SeedSteamRuntime(); err != nil {
+		return fmt.Errorf("steam runtime seed: %w", err)
+	}
+
 	authUrl, err := i.platformClient.GetAppUrl("auth")
 	if err != nil {
 		return err
@@ -155,6 +161,31 @@ func (i *Installer) UpdateConfigs() error {
 	}
 
 	return i.FixPermissions()
+}
+
+func (i *Installer) SeedSteamRuntime() error {
+	if _, err := os.Stat(path.Join(SteamRuntimeDir, "linux32", "steamcmd")); os.IsNotExist(err) {
+		if err := os.MkdirAll(SteamRuntimeDir, 0755); err != nil {
+			return err
+		}
+		entries, err := os.ReadDir(SteamcmdSrcDir)
+		if err != nil {
+			return err
+		}
+		for _, e := range entries {
+			if e.Name() == "lib32" || e.Name() == "lib64" {
+				continue
+			}
+			if err := cp.Copy(path.Join(SteamcmdSrcDir, e.Name()), path.Join(SteamRuntimeDir, e.Name())); err != nil {
+				return err
+			}
+		}
+	}
+	ldDst := path.Join(SteamRuntimeDir, "linux32", "ld-linux.so.2")
+	if err := os.MkdirAll(path.Dir(ldDst), 0755); err != nil {
+		return err
+	}
+	return cp.Copy(path.Join(SteamcmdSrcDir, "lib32", "ld-linux.so.2"), ldDst)
 }
 
 func (i *Installer) trustSyncloudCA() error {
