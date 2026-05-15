@@ -99,7 +99,7 @@ def test_delete_server(device):
 
 def test_create_unknown_game_rejected(device):
     out = device.run_ssh(
-        'games.cli server create bad not-a-game --port 1234 2>&1; echo EXIT=$?',
+        '/snap/bin/games.cli server create bad not-a-game --port 1234 2>&1; echo EXIT=$?',
         throw=False)
     assert 'unknown gameId' in out, out
     assert 'EXIT=1' in out, out
@@ -268,7 +268,7 @@ def test_lifecycle(device):
     s = cli_run(device, 'server', 'start', 'stub')
     assert s['status'] == 'running'
 
-    again = device.run_ssh('games.cli server start stub 2>&1; echo EXIT=$?', throw=False)
+    again = device.run_ssh('/snap/bin/games.cli server start stub 2>&1; echo EXIT=$?', throw=False)
     assert 'already running' in again, again
     assert 'EXIT=1' in again, again
 
