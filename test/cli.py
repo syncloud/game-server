@@ -7,7 +7,7 @@ def run(device, *args, want_json=True):
     """Invoke games.cli on the device. Auto-appends --json when want_json is
     set and --json isn't already in args. Returns the parsed JSON (None for
     empty output) or the raw stdout if want_json=False."""
-    parts = ['games.cli'] + list(args)
+    parts = ['/snap/bin/games.cli'] + list(args)
     if want_json and '--json' not in args:
         parts.append('--json')
     out = device.run_ssh(' '.join(shlex.quote(p) for p in parts))
