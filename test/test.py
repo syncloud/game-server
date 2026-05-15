@@ -10,7 +10,7 @@ from syncloudlib.http import wait_for_rest
 from syncloudlib.integration.hosts import add_host_alias
 from syncloudlib.integration.installer import local_install
 
-from cli import run as cli_run, run_text as cli_text, wait_status, wait_a2s
+from test.cli import run as cli_run, run_text as cli_text, wait_status, wait_a2s
 
 TMP_DIR = '/tmp/syncloud'
 
