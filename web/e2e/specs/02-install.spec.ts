@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { shoot } from '../helpers/screenshot'
 
+test.use({ video: 'on' })
+
 test('install dialog opens, creates a server, lands on server detail', async ({ page }, info) => {
   const name = `e2e-tw-${Date.now()}`
 
