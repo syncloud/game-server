@@ -129,38 +129,6 @@ def test_teeworlds_real_install_and_play(device):
     cli_run(device, 'server', 'stop', 'tw-real')
     cli_run(device, 'server', 'delete', 'tw-real')
 
-def test_steamcmd_diagnostics(device):
-    def show(title, cmd):
-        print('\n===== {} =====\nCMD: {}'.format(title, cmd))
-        out = device.run_ssh(cmd, throw=False)
-        print(out if out else '(no output)')
-
-    diag = '''#!/bin/bash
-set +e
-echo SECTION df
-df -h /var/snap /tmp / 2>&1
-echo SECTION statf-varsnap
-stat -f /var/snap/games/current 2>&1
-echo SECTION statf-tmp
-stat -f /tmp 2>&1
-echo SECTION apt-strace
-apt-get install -y strace 2>&1 | tail -3
-echo SECTION 32bit-curl-test
-ls -la /snap/games/current/steamcmd/lib32/curl.i386 2>&1
-echo --- 32-bit curl HEAD to Steam CDN ---
-LD_LIBRARY_PATH=/snap/games/current/steamcmd/lib32 /snap/games/current/steamcmd/lib32/ld-linux.so.2 --library-path /snap/games/current/steamcmd/lib32 /snap/games/current/steamcmd/lib32/curl.i386 -sIv --max-time 10 https://steamcdn-a.akamaihd.net/client/ 2>&1 | head -40
-echo SECTION seed-runtime-as-games
-sudo -u games -H bash -c "/snap/games/current/bin/steamcmd.sh +exit" 2>&1 | head -20
-echo SECTION ls-runtime
-ls -la /var/snap/games/current/.steam-runtime/ 2>&1
-echo SECTION steamlogs-after-seed
-ls -la /var/snap/games/current/.steam-home/Steam/logs/ 2>&1
-cat /var/snap/games/current/.steam-home/Steam/logs/stderr.txt 2>&1 | head -20
-echo SECTION done
-'''
-    device.run_ssh("cat > /tmp/diag.sh <<'DIAGEOF'\n" + diag + "DIAGEOF\n", throw=False)
-    show('comprehensive diag', 'bash /tmp/diag.sh')
-
 @pytest.mark.flaky(retries=2, delay=15)
 def test_hlds_cs_real_install(device):
     """Real CS 1.6 dedicated server install via SteamCMD (~822 MB download).
