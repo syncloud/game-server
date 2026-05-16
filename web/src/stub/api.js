@@ -133,12 +133,15 @@ export function mock () {
       this.get('/api/v1/me', () => ({ sub: 'devstub', name: 'Dev Stub', email: 'dev@stub.local' }))
       this.get('/api/v1/games', () => games)
       this.get('/api/v1/catalog/sources', () => sources)
-      this.get('/api/v1/steam/status', () => ({ linked: false, username: '' }))
+      const steamState = { linked: false, username: '' }
+      this.get('/api/v1/steam/status', () => ({ ...steamState }))
       this.post('/api/v1/steam/login', (_, request) => {
         const body = JSON.parse(request.requestBody || '{}')
         if (!body.guardCode) {
           return { needsGuard: true, prompt: 'Steam Guard code (stub: any 5 chars accepted)' }
         }
+        steamState.linked = true
+        steamState.username = body.username
         return { linked: true, username: body.username }
       })
 

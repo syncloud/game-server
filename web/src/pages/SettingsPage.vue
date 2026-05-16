@@ -50,7 +50,9 @@ async function steamLogin () {
       return
     }
     steam.value.state = 'ok'
-    steam.value.message = 'Linked as ' + (b.username || steam.value.username)
+    steam.value.linked = true
+    steam.value.linkedUsername = b.username || steam.value.username
+    steam.value.message = 'Linked as ' + steam.value.linkedUsername
     steam.value.password = ''
     steam.value.guardCode = ''
   } catch (e) {
@@ -119,7 +121,6 @@ onMounted(load)
 
   <section class="detail-card" data-testid="settings-sources">
     <h2>Catalog sources</h2>
-    <p class="muted">Pinned upstream versions vendored at this snap's build time. Bump to refresh the catalog.</p>
     <dl v-if="Object.keys(sources).length">
       <template v-for="(ver, name) in sources" :key="name">
         <dt>{{ name }}</dt>
@@ -133,8 +134,7 @@ onMounted(load)
     <h2>About</h2>
     <p class="muted">
       <a href="https://github.com/syncloud/games" target="_blank">syncloud/games</a>
-      — Syncloud panel for SteamCMD and Pelican-egg game servers. WIP, see issue
-      <a href="https://github.com/syncloud/platform/issues/35" target="_blank">platform#35</a>.
+      — Syncloud panel for SteamCMD and Pelican-egg game servers.
     </p>
   </section>
 </template>

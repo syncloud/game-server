@@ -147,10 +147,8 @@ button { font: inherit; cursor: pointer; }
 
 .bottom-bar {
   display: none;
-  position: fixed;
+  position: sticky;
   bottom: 0;
-  left: 0;
-  right: 0;
   background: var(--bg-elevated);
   border-top: 1px solid var(--border);
   padding: 6px 0 max(6px, env(safe-area-inset-bottom));
@@ -225,13 +223,11 @@ button { font: inherit; cursor: pointer; }
   .bottom-bar.mobile-only { display: flex; }
   .header-inner { padding: 12px 16px; }
   .brand-name { font-size: 16px; }
-  main { padding: 20px 16px calc(72px + env(safe-area-inset-bottom) + 48px); }
+  main { padding: 20px 16px; }
   .toolbar { flex-wrap: wrap; gap: 8px; }
   .search { max-width: none; flex: 1 1 100%; }
   .tier-pills { flex-wrap: wrap; }
   .grid { grid-template-columns: 1fr; gap: 12px; }
-  html { scroll-padding-bottom: 96px; }
-  .card { scroll-margin-bottom: 96px; }
 }
 
 .theme-toggle {
