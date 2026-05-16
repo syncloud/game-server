@@ -36,9 +36,7 @@ def module_setup(request, device, app_dir, artifact_dir):
         device.run_ssh('cat /var/snap/games/current/.steam-home/Steam/logs/bootstrap_log.txt > {0}/steam.bootstrap.log 2>/dev/null'.format(TMP_DIR), throw=False)
         device.run_ssh('ls -la /var/snap/games/current/.steam-home/Steam/logs/ > {0}/steam.logs.ls 2>/dev/null'.format(TMP_DIR), throw=False)
 
-        app_log_dir = join(artifact_dir, 'log')
-        os.mkdir(app_log_dir)
-        device.scp_from_device('{0}/*'.format(TMP_DIR), app_log_dir)
+        device.scp_from_device('{0}/*'.format(TMP_DIR), artifact_dir)
         check_output('chmod -R a+r {0}'.format(artifact_dir), shell=True)
 
     request.addfinalizer(module_teardown)
