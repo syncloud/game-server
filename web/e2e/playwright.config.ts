@@ -10,13 +10,13 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   workers: 1,
   retries: process.env.CI ? 1 : 0,
-  reporter: [['html', { open: 'never' }]],
+  reporter: [['list']],
   globalSetup: './global-setup.ts',
   use: {
     baseURL,
     ignoreHTTPSErrors: true,
     storageState,
-    trace: 'retain-on-failure',
+    trace: 'off',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure'
   },
