@@ -61,6 +61,8 @@ func (rt *httpUnixRoundTripper) RoundTrip(req *http.Request) (*http.Response, er
 	if req.URL.Scheme == "https" {
 		clone := req.Clone(req.Context())
 		clone.URL.Scheme = "http"
+		clone.Header.Set("X-Forwarded-Proto", "https")
+		clone.Header.Set("X-Forwarded-Host", req.URL.Host)
 		req = clone
 	}
 	return rt.base.RoundTrip(req)
