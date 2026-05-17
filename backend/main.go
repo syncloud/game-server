@@ -2,9 +2,7 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -59,10 +57,11 @@ func main() {
 		logger.Fatalf("catalog: %v", err)
 	}
 
-	store, err := openStore(logger)
+	store, err := openDB(logger)
 	if err != nil {
 		logger.Fatalf("db: %v", err)
 	}
+	defer store.Close()
 	run := runner.New(logger)
 	inst := installer.New(
 		installer.ServersBaseDir,
@@ -184,20 +183,20 @@ func loadAuth(logger *log.Logger) *auth.Service {
 	return svc
 }
 
-func openStore(logger *log.Logger) (*server.Store, error) {
-	d, err := db.Open(dbPath)
-	if err != nil {
+func openDB(logger *log.Logger) (*db.DB, error) {
+	d := db.New(dbPath)
+	if err := d.Start(); err != nil {
 		if _, statErr := os.Stat("/var/snap/games/current"); statErr != nil {
 			logger.Printf("data dir missing, falling back to in-memory db: %v", statErr)
-			d, err = db.Open(":memory:")
-			if err != nil {
+			d = db.New(":memory:")
+			if err := d.Start(); err != nil {
 				return nil, err
 			}
-		} else {
-			return nil, err
+			return d, nil
 		}
+		return nil, err
 	}
-	return server.NewStore(d.DB), nil
+	return d, nil
 }
 
 type createRequest struct {
@@ -207,10 +206,10 @@ type createRequest struct {
 	StartCmd string `json:"startCmd"`
 }
 
-func handleServers(w http.ResponseWriter, r *http.Request, store *server.Store) {
+func handleServers(w http.ResponseWriter, r *http.Request, store *db.DB) {
 	switch r.Method {
 	case http.MethodGet:
-		list, err := store.List()
+		list, err := store.ListServers()
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -235,7 +234,7 @@ func handleServers(w http.ResponseWriter, r *http.Request, store *server.Store) 
 		if req.Port == 0 {
 			req.Port = game.DefaultPort
 		}
-		s, err := store.Create(server.Server{
+		s, err := store.CreateServer(server.Server{
 			Name:     req.Name,
 			GameID:   req.GameID,
 			Port:     req.Port,
@@ -252,7 +251,7 @@ func handleServers(w http.ResponseWriter, r *http.Request, store *server.Store) 
 	}
 }
 
-func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Store, run *runner.Runner, inst *installer.Installer) {
+func handleServerByID(w http.ResponseWriter, r *http.Request, store *db.DB, run *runner.Runner, inst *installer.Installer) {
 	rest := strings.TrimPrefix(r.URL.Path, "/api/v1/servers/")
 	parts := strings.SplitN(rest, "/", 2)
 	id, err := strconv.ParseInt(parts[0], 10, 64)
@@ -275,7 +274,7 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Stor
 	}
 	switch r.Method {
 	case http.MethodGet:
-		s, err := store.Get(id)
+		s, err := store.GetServer(id)
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -288,11 +287,7 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Stor
 		writeJSON(w, http.StatusOK, s)
 	case http.MethodDelete:
 		_ = run.Stop(id)
-		if err := store.Delete(id); err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				writeError(w, http.StatusNotFound, "not found")
-				return
-			}
+		if err := store.DeleteServer(id); err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -303,13 +298,13 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Stor
 	}
 }
 
-func handleServerAction(w http.ResponseWriter, r *http.Request, store *server.Store, run *runner.Runner, inst *installer.Installer, id int64, action string) {
+func handleServerAction(w http.ResponseWriter, r *http.Request, store *db.DB, run *runner.Runner, inst *installer.Installer, id int64, action string) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", "POST")
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
-	s, err := store.Get(id)
+	s, err := store.GetServer(id)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -325,7 +320,7 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, store *server.St
 			writeError(w, http.StatusBadRequest, "unknown gameId on server")
 			return
 		}
-		_ = store.UpdateStatus(id, "installing")
+		_ = store.UpdateServerStatus(id, "installing")
 		go runInstall(log.Default(), store, inst, id, *game)
 		s.Status = "installing"
 	case "start":
@@ -333,24 +328,24 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, store *server.St
 			writeError(w, http.StatusConflict, err.Error())
 			return
 		}
-		_ = store.UpdateStatus(id, "running")
+		_ = store.UpdateServerStatus(id, "running")
 	case "stop":
 		if err := run.Stop(id); err != nil {
 			writeError(w, http.StatusConflict, err.Error())
 			return
 		}
-		_ = store.UpdateStatus(id, "stopped")
+		_ = store.UpdateServerStatus(id, "stopped")
 	case "restart":
 		if err := run.Restart(id, s.StartCmd, s.InstallDir); err != nil {
 			writeError(w, http.StatusConflict, err.Error())
 			return
 		}
-		_ = store.UpdateStatus(id, "running")
+		_ = store.UpdateServerStatus(id, "running")
 	default:
 		writeError(w, http.StatusNotFound, "unknown action")
 		return
 	}
-	s, _ = store.Get(id)
+	s, _ = store.GetServer(id)
 	s.Status = currentStatus(s, run)
 	writeJSON(w, http.StatusOK, s)
 }
@@ -364,13 +359,13 @@ func handleLogs(w http.ResponseWriter, r *http.Request, run *runner.Runner, id i
 	writeJSON(w, http.StatusOK, map[string]any{"lines": run.Logs(id)})
 }
 
-func handleQuery(w http.ResponseWriter, r *http.Request, store *server.Store, id int64) {
+func handleQuery(w http.ResponseWriter, r *http.Request, store *db.DB, id int64) {
 	if r.Method != http.MethodGet {
 		w.Header().Set("Allow", "GET")
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
-	s, err := store.Get(id)
+	s, err := store.GetServer(id)
 	if err != nil || s == nil {
 		writeError(w, http.StatusNotFound, "not found")
 		return
@@ -431,10 +426,10 @@ func currentStatus(s *server.Server, run *runner.Runner) string {
 	return "stopped"
 }
 
-func runInstall(logger *log.Logger, store *server.Store, inst *installer.Installer, id int64, g Game) {
+func runInstall(logger *log.Logger, store *db.DB, inst *installer.Installer, id int64, g Game) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
-	s, err := store.Get(id)
+	s, err := store.GetServer(id)
 	if err != nil || s == nil {
 		return
 	}
@@ -450,11 +445,11 @@ func runInstall(logger *log.Logger, store *server.Store, inst *installer.Install
 	}, s.Name, s.Port, steamUser, "")
 	if err != nil {
 		logger.Printf("install[%d] FAILED: %v", id, err)
-		_ = store.UpdateLastError(id, err.Error())
-		_ = store.UpdateStatus(id, "install-error")
+		_ = store.UpdateServerLastError(id, err.Error())
+		_ = store.UpdateServerStatus(id, "install-error")
 		return
 	}
 	logger.Printf("install[%d] OK: dir=%s start=%q", id, result.InstallDir, result.StartCmd)
-	_ = store.UpdateInstall(id, result.InstallDir, result.StartCmd)
-	_ = store.UpdateStatus(id, "stopped")
+	_ = store.UpdateServerInstall(id, result.InstallDir, result.StartCmd)
+	_ = store.UpdateServerStatus(id, "stopped")
 }
