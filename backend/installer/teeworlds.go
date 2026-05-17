@@ -20,7 +20,7 @@ const (
 	teeworldsAssetURL = "https://github.com/teeworlds/teeworlds/releases/download/" + teeworldsVersion + "/teeworlds-" + teeworldsVersion + "-linux_x86_64.tar.gz"
 )
 
-func installTeeworldsNative(ctx context.Context, g Game, installDir string) (*Result, error) {
+func (e *EggInstaller) installTeeworldsNative(ctx context.Context, g Game, installDir string) (*Result, error) {
 	tarballPath := filepath.Join(installDir, filepath.Base(teeworldsAssetURL))
 	if err := download(ctx, teeworldsAssetURL, tarballPath); err != nil {
 		return nil, fmt.Errorf("download: %w", err)

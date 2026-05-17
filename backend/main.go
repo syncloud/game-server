@@ -64,6 +64,11 @@ func main() {
 		logger.Fatalf("db: %v", err)
 	}
 	run := runner.New(logger)
+	inst := installer.New(
+		installer.ServersBaseDir,
+		installer.NewSteamInstaller(installer.SteamCMDPath, installer.SteamLib32, installer.SteamLib64),
+		installer.NewEggInstaller(installer.JREBinDir),
+	)
 
 	_ = os.Remove(socketPath)
 	listener, err := net.Listen("unix", socketPath)
@@ -115,7 +120,7 @@ func main() {
 		handleServers(w, r, store)
 	})
 	api.HandleFunc("/api/v1/servers/", func(w http.ResponseWriter, r *http.Request) {
-		handleServerByID(w, r, store, run)
+		handleServerByID(w, r, store, run, inst)
 	})
 
 	mux := http.NewServeMux()
@@ -247,7 +252,7 @@ func handleServers(w http.ResponseWriter, r *http.Request, store *server.Store) 
 	}
 }
 
-func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Store, run *runner.Runner) {
+func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Store, run *runner.Runner, inst *installer.Installer) {
 	rest := strings.TrimPrefix(r.URL.Path, "/api/v1/servers/")
 	parts := strings.SplitN(rest, "/", 2)
 	id, err := strconv.ParseInt(parts[0], 10, 64)
@@ -264,7 +269,7 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Stor
 			handleQuery(w, r, store, id)
 			return
 		default:
-			handleServerAction(w, r, store, run, id, parts[1])
+			handleServerAction(w, r, store, run, inst, id, parts[1])
 			return
 		}
 	}
@@ -298,7 +303,7 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *server.Stor
 	}
 }
 
-func handleServerAction(w http.ResponseWriter, r *http.Request, store *server.Store, run *runner.Runner, id int64, action string) {
+func handleServerAction(w http.ResponseWriter, r *http.Request, store *server.Store, run *runner.Runner, inst *installer.Installer, id int64, action string) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", "POST")
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
@@ -321,7 +326,7 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, store *server.St
 			return
 		}
 		_ = store.UpdateStatus(id, "installing")
-		go runInstall(log.Default(), store, id, *game)
+		go runInstall(log.Default(), store, inst, id, *game)
 		s.Status = "installing"
 	case "start":
 		if err := run.Start(id, s.StartCmd, s.InstallDir); err != nil {
@@ -426,7 +431,7 @@ func currentStatus(s *server.Server, run *runner.Runner) string {
 	return "stopped"
 }
 
-func runInstall(logger *log.Logger, store *server.Store, id int64, g Game) {
+func runInstall(logger *log.Logger, store *server.Store, inst *installer.Installer, id int64, g Game) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 	s, err := store.Get(id)
@@ -435,7 +440,7 @@ func runInstall(logger *log.Logger, store *server.Store, id int64, g Game) {
 	}
 	steamUser := steam.StoredUsername()
 	logger.Printf("install[%d] starting: game=%s source=%s appid=%d steamUser=%q", id, g.ID, g.Source, g.SteamAppID, steamUser)
-	result, err := installer.Install(ctx, installer.Game{
+	result, err := inst.Install(ctx, installer.Game{
 		ID:          g.ID,
 		Name:        g.Name,
 		Source:      g.Source,
