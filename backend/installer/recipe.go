@@ -96,6 +96,9 @@ func (r *RecipeInstaller) installDownloadExtract(ctx context.Context, g Game, in
 		binPath, err := findFile(installDir, filepath.Base(g.Start.Binary))
 		if err == nil {
 			_ = os.Chmod(binPath, 0755)
+			if rel, relErr := filepath.Rel(installDir, binPath); relErr == nil {
+				g.Start.Binary = rel
+			}
 		}
 	}
 	return &Result{InstallDir: installDir, StartCmd: r.renderStart(g, installDir)}, nil
