@@ -116,17 +116,18 @@ func main() {
 		games[id] = applyOverride(base, ov)
 	}
 
+	dropped := 0
 	for _, g := range games {
 		if g.InstallRecipe == nil {
-			g.Tier = "unsupported"
-			if g.TierReason == "" {
-				g.TierReason = "no install recipe (egg uses apt/docker/non-bash entrypoint)"
-			}
-		} else if g.Tier == "" {
+			dropped++
+			continue
+		}
+		if g.Tier == "" {
 			g.Tier = "compatible"
 		}
 		cat.Games = append(cat.Games, g)
 	}
+	fmt.Fprintf(os.Stderr, "dropped %d games with no install recipe\n", dropped)
 	sort.Slice(cat.Games, func(i, j int) bool { return cat.Games[i].ID < cat.Games[j].ID })
 
 	if *out == "" {
