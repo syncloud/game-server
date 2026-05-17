@@ -9,6 +9,7 @@ import (
 	"go.uber.org/zap"
 	"os"
 	"path"
+	"strings"
 )
 
 const (
@@ -30,20 +31,17 @@ type Installer struct {
 	configDir          string
 	platformClient     *platform.Client
 	installFile        string
-	executor           *Executor
 	logger             *zap.Logger
 }
 
 func New(logger *zap.Logger) *Installer {
 	configDir := path.Join(DataDir, "config")
-	executor := NewExecutor(logger)
 	return &Installer{
 		newVersionFile:     path.Join(AppDir, "version"),
 		currentVersionFile: path.Join(DataDir, "version"),
 		configDir:          configDir,
 		platformClient:     platform.New(),
 		installFile:        path.Join(CommonDir, "installed"),
-		executor:           executor,
 		logger:             logger,
 	}
 }
@@ -144,10 +142,6 @@ func (i *Installer) UpdateConfigs() error {
 		return fmt.Errorf("oidc register: %w", err)
 	}
 
-	if err := i.trustSyncloudCA(); err != nil {
-		i.logger.Warn("syncloud CA install failed (backend has in-process fallback)", zap.Error(err))
-	}
-
 	variables := Variables{
 		AuthUrl: authUrl,
 	}
@@ -188,18 +182,6 @@ func (i *Installer) SeedSteamRuntime() error {
 	return cp.Copy(path.Join(SteamcmdSrcDir, "lib32", "ld-linux.so.2"), ldDst)
 }
 
-func (i *Installer) trustSyncloudCA() error {
-	src := "/var/snap/platform/current/syncloud.ca.crt"
-	if _, err := os.Stat(src); err != nil {
-		return fmt.Errorf("syncloud CA missing: %w", err)
-	}
-	dst := "/usr/local/share/ca-certificates/syncloud.crt"
-	if err := cp.Copy(src, dst); err != nil {
-		return fmt.Errorf("install CA: %w", err)
-	}
-	return i.executor.Run("/usr/sbin/update-ca-certificates")
-}
-
 func (i *Installer) registerOIDC() error {
 	password, err := i.platformClient.RegisterOIDCClient(App, "/auth/callback", true, "client_secret_basic")
 	if err != nil {
@@ -216,8 +198,9 @@ func (i *Installer) registerOIDC() error {
 	if err != nil {
 		return err
 	}
-	cfg := fmt.Sprintf(`{"authUrl":%q,"clientId":%q,"clientSecret":%q,"redirectUrl":%q}`,
-		authUrl, App, password, appUrl+"/auth/callback")
+	authSocket := strings.TrimSuffix(strings.TrimPrefix(i.platformClient.GetAuthLocalSocket(), "http://unix:"), ":")
+	cfg := fmt.Sprintf(`{"authUrl":%q,"authSocket":%q,"clientId":%q,"clientSecret":%q,"redirectUrl":%q}`,
+		authUrl, authSocket, App, password, appUrl+"/auth/callback")
 	return os.WriteFile(path.Join(DataDir, "oidc.json"), []byte(cfg), 0640)
 }
 

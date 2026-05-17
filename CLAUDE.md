@@ -69,7 +69,8 @@ In progress / open:
 - **amd64 only.** `.drone.jsonnet` lists only amd64. SteamCMD ships x86_64.
 - **SteamCMD is 32-bit i386.** Snap will need 32-bit glibc bundled — first SteamCMD-based test installs may fail until that's added. Tracked as a follow-up.
 - **Pelican eggs that need Docker won't work.** Backend runs install scripts directly. Best-effort for bash/native eggs (Teeworlds, Minetest work).
-- **Auth = OIDC code+PKCE against Authelia + signed session cookie.** Backend's `auth.Middleware` checks the cookie on every `/api/*` request; nginx no longer does `auth_request`. Basic Auth (for integration tests / curl) is delegated to Authelia's `/api/authz/auth-request/basic` directly from the backend.
+- **Auth = OIDC code+PKCE against Authelia + signed session cookie.** Backend's `auth.Middleware` checks the cookie on every `/api/*` request on the HTTP socket; nginx no longer does `auth_request`. Integration tests use a separate `cli.sock` (file-mode 0660, no auth middleware) reached via `/snap/bin/games.cli`.
+- **Backend ↔ Authelia goes over `authelia.socket`, not HTTPS.** Discovery / token / JWKS requests dial `/var/snap/platform/current/authelia.socket` (path from `golib`'s `GetAuthLocalSocket()`, stored as `authSocket` in `oidc.json`). A RoundTripper rewrites the public `https://` URLs from the discovery doc to `http://` before dialing. The browser redirect (`AuthCodeURL`) still uses the public HTTPS URL because the browser can't dial a unix socket. No syncloud-CA trust needed in the snap as a result.
 
 # Integration test fixture
 

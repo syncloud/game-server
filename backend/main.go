@@ -143,6 +143,7 @@ func main() {
 
 type oidcFileConfig struct {
 	AuthUrl      string `json:"authUrl"`
+	AuthSocket   string `json:"authSocket"`
 	ClientID     string `json:"clientId"`
 	ClientSecret string `json:"clientSecret"`
 	RedirectUrl  string `json:"redirectUrl"`
@@ -161,12 +162,16 @@ func loadAuth(logger *log.Logger) *auth.Service {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-	svc, err := auth.NewService(ctx, logger, c.AuthUrl, c.ClientID, c.ClientSecret, c.ClientSecret, c.RedirectUrl)
+	if c.AuthSocket == "" {
+		logger.Printf("auth: oidc.json missing authSocket; /api/ will be unprotected")
+		return nil
+	}
+	svc, err := auth.NewService(ctx, logger, c.AuthUrl, c.AuthSocket, c.ClientID, c.ClientSecret, c.ClientSecret, c.RedirectUrl)
 	if err != nil {
 		logger.Printf("auth: init: %v", err)
 		return nil
 	}
-	logger.Printf("auth: OIDC ready (provider=%s client=%s redirect=%s)", c.AuthUrl, c.ClientID, c.RedirectUrl)
+	logger.Printf("auth: OIDC ready (provider=%s socket=%s client=%s redirect=%s)", c.AuthUrl, c.AuthSocket, c.ClientID, c.RedirectUrl)
 	return svc
 }
 

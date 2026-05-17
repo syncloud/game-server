@@ -5,14 +5,13 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -23,13 +22,11 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const SyncloudCAPath = "/var/snap/platform/current/syncloud.ca.crt"
-
 const (
-	SessionCookie = "games_session"
-	StateCookie   = "games_oauth_state"
+	SessionCookie  = "games_session"
+	StateCookie    = "games_oauth_state"
 	VerifierCookie = "games_oauth_verifier"
-	SessionTTL    = 24 * time.Hour
+	SessionTTL     = 24 * time.Hour
 )
 
 type User struct {
@@ -39,14 +36,14 @@ type User struct {
 }
 
 type Service struct {
-	mu        sync.Mutex
-	provider  *oidc.Provider
-	verifier  *oidc.IDTokenVerifier
-	cfg       oauth2.Config
-	signKey   []byte
-	tlsClient *http.Client
-	authUrl   string
-	logger    *log.Logger
+	mu         sync.Mutex
+	provider   *oidc.Provider
+	verifier   *oidc.IDTokenVerifier
+	cfg        oauth2.Config
+	signKey    []byte
+	httpClient *http.Client
+	authUrl    string
+	logger     *log.Logger
 }
 
 type ctxKey struct{}
@@ -56,23 +53,38 @@ func ContextUser(ctx context.Context) (*User, bool) {
 	return u, ok
 }
 
-func NewService(ctx context.Context, logger *log.Logger, authUrl, clientID, clientSecret, signSecret, redirectURL string) (*Service, error) {
-	pool, err := x509.SystemCertPool()
-	if err != nil || pool == nil {
-		pool = x509.NewCertPool()
+type httpUnixRoundTripper struct {
+	base http.RoundTripper
+}
+
+func (rt *httpUnixRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	if req.URL.Scheme == "https" {
+		clone := req.Clone(req.Context())
+		clone.URL.Scheme = "http"
+		req = clone
 	}
-	if pem, err := os.ReadFile(SyncloudCAPath); err == nil {
-		pool.AppendCertsFromPEM(pem)
-	} else {
-		logger.Printf("auth: syncloud CA not readable at %s: %v", SyncloudCAPath, err)
+	return rt.base.RoundTrip(req)
+}
+
+func newUnixAutheliaClient(socketPath string) *http.Client {
+	tr := &http.Transport{
+		DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+			return (&net.Dialer{}).DialContext(ctx, "unix", socketPath)
+		},
 	}
-	tr := &http.Transport{TLSClientConfig: &tls.Config{RootCAs: pool}}
-	hc := &http.Client{Transport: tr, Timeout: 15 * time.Second}
+	return &http.Client{
+		Transport: &httpUnixRoundTripper{base: tr},
+		Timeout:   15 * time.Second,
+	}
+}
+
+func NewService(ctx context.Context, logger *log.Logger, authUrl, authSocket, clientID, clientSecret, signSecret, redirectURL string) (*Service, error) {
+	hc := newUnixAutheliaClient(authSocket)
 	ctx = oidc.ClientContext(ctx, hc)
 
 	provider, err := oidc.NewProvider(ctx, authUrl)
 	if err != nil {
-		return nil, fmt.Errorf("oidc discovery against %s: %w", authUrl, err)
+		return nil, fmt.Errorf("oidc discovery against %s via %s: %w", authUrl, authSocket, err)
 	}
 	cfg := oauth2.Config{
 		ClientID:     clientID,
@@ -85,13 +97,13 @@ func NewService(ctx context.Context, logger *log.Logger, authUrl, clientID, clie
 
 	key := sha256.Sum256([]byte(signSecret + "|games-session-v1"))
 	return &Service{
-		provider:  provider,
-		verifier:  verifier,
-		cfg:       cfg,
-		signKey:   key[:],
-		tlsClient: hc,
-		authUrl:   authUrl,
-		logger:    logger,
+		provider:   provider,
+		verifier:   verifier,
+		cfg:        cfg,
+		signKey:    key[:],
+		httpClient: hc,
+		authUrl:    authUrl,
+		logger:     logger,
 	}, nil
 }
 
@@ -127,7 +139,7 @@ func (s *Service) HandleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := oidc.ClientContext(r.Context(), s.tlsClient)
+	ctx := oidc.ClientContext(r.Context(), s.httpClient)
 	token, err := s.cfg.Exchange(ctx, code, oauth2.SetAuthURLParam("code_verifier", verifierCookie.Value))
 	if err != nil {
 		s.logger.Printf("auth callback: token exchange: %v", err)
