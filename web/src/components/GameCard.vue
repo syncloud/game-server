@@ -9,7 +9,7 @@ defineEmits(['install'])
       <div class="card-icon">{{ game.name.charAt(0) }}</div>
       <div>
         <h3 class="card-title">{{ game.name }}</h3>
-        <span :class="['badge', game.source === 'steam' ? '' : 'egg']">{{ game.source }}</span>
+        <span :class="['badge', (game.source === 'steam' || game.source === 'linuxgsm') ? '' : 'egg']">{{ game.source }}</span>
         <span :class="['badge', 'tier', `tier-${game.tier || 'unknown'}`]">{{ game.tier || 'unknown' }}</span>
       </div>
     </div>

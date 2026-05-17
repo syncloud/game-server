@@ -84,7 +84,7 @@ func Install(ctx context.Context, g Game, name string, port int, steamUser, stea
 		g.DefaultPort = port
 	}
 	switch g.Source {
-	case "steam":
+	case "steam", "linuxgsm":
 		return installSteam(ctx, g, installDir, steamUser, steamPass)
 	case "egg", "pelican", "parkervcp":
 		return installEgg(ctx, g, installDir)

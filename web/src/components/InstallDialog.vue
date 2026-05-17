@@ -40,7 +40,7 @@ async function submit () {
           Port
           <input v-model.number="port" type="number" data-testid="dialog-port" />
         </label>
-        <p v-if="game.source === 'steam'" class="hint">
+        <p v-if="game.source === 'steam' || game.source === 'linuxgsm'" class="hint">
           Steam dedicated server (app {{ game.steamAppId }}). Anonymous login will be used.
         </p>
         <p v-else class="hint">
