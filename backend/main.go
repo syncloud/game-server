@@ -55,6 +55,10 @@ func gameByID(id string) *Game {
 func main() {
 	logger := log.New(os.Stdout, "backend: ", log.LstdFlags)
 
+	if err := catalog.Start(); err != nil {
+		logger.Fatalf("catalog: %v", err)
+	}
+
 	store, err := openStore(logger)
 	if err != nil {
 		logger.Fatalf("db: %v", err)

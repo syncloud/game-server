@@ -3,6 +3,7 @@ package catalog
 import (
 	_ "embed"
 	"encoding/json"
+	"fmt"
 	"sort"
 )
 
@@ -47,22 +48,27 @@ var (
 	allList []Game
 )
 
-func init() {
-	if err := json.Unmarshal(raw, &loaded); err != nil {
-		panic("catalog: parse embedded catalog.json: " + err.Error())
+func Start() error {
+	var b bundle
+	if err := json.Unmarshal(raw, &b); err != nil {
+		return fmt.Errorf("parse embedded catalog.json: %w", err)
 	}
-	loaded.Games = append(loaded.Games, steamEntries()...)
-	byID = map[string]Game{}
-	for _, g := range loaded.Games {
-		byID[g.ID] = g
+	b.Games = append(b.Games, steamEntries()...)
+	index := make(map[string]Game, len(b.Games))
+	for _, g := range b.Games {
+		index[g.ID] = g
 	}
-	allList = append([]Game(nil), loaded.Games...)
-	sort.Slice(allList, func(i, j int) bool {
-		if allList[i].Tier != allList[j].Tier {
-			return tierRank(allList[i].Tier) < tierRank(allList[j].Tier)
+	list := append([]Game(nil), b.Games...)
+	sort.Slice(list, func(i, j int) bool {
+		if list[i].Tier != list[j].Tier {
+			return tierRank(list[i].Tier) < tierRank(list[j].Tier)
 		}
-		return allList[i].Name < allList[j].Name
+		return list[i].Name < list[j].Name
 	})
+	loaded = b
+	byID = index
+	allList = list
+	return nil
 }
 
 func tierRank(t string) int {
