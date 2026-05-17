@@ -205,7 +205,7 @@ local platform_image(distro, arch) =
     },
   ],
   trigger: {
-    event: ['push', 'pull_request'],
+    event: ['push'],
   },
   services: [
     {
