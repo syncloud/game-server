@@ -76,26 +76,33 @@ var (
 var (
 	parkervcpRoot string
 	pelicanRoot   string
+	linuxgsmRoot  string
 	parkervcpRef  string
 	pelicanRef    string
+	linuxgsmRef   string
 )
 
 func main() {
 	parkervcp := flag.String("parkervcp", "", "path to parkervcp game_eggs/")
 	pelican := flag.String("pelican", "", "path to pelican-eggs games/")
+	linuxgsm := flag.String("linuxgsm", "", "path to LinuxGSM checkout root")
 	parkervcpVer := flag.String("parkervcp-version", "", "")
 	pelicanVer := flag.String("pelican-version", "", "")
+	linuxgsmVer := flag.String("linuxgsm-version", "", "")
 	out := flag.String("out", "", "output catalog.json path")
 	flag.Parse()
 	parkervcpRoot = *parkervcp
 	pelicanRoot = *pelican
+	linuxgsmRoot = *linuxgsm
 	parkervcpRef = *parkervcpVer
 	pelicanRef = *pelicanVer
+	linuxgsmRef = *linuxgsmVer
 
 	cat := Catalog{
 		Sources: map[string]string{
-			"parkervcp/eggs":      *parkervcpVer,
-			"pelican-eggs/games":  *pelicanVer,
+			"parkervcp/eggs":     *parkervcpVer,
+			"pelican-eggs/games": *pelicanVer,
+			"linuxgsm":           *linuxgsmVer,
 		},
 	}
 
@@ -105,6 +112,9 @@ func main() {
 	}
 	if *pelican != "" {
 		walkAndIngest(*pelican, "pelican", games)
+	}
+	if *linuxgsm != "" {
+		walkLinuxGSM(*linuxgsm, games)
 	}
 
 	for _, g := range games {

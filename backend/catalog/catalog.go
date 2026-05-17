@@ -53,7 +53,6 @@ func Start() error {
 	if err := json.Unmarshal(raw, &b); err != nil {
 		return fmt.Errorf("parse embedded catalog.json: %w", err)
 	}
-	b.Games = append(b.Games, steamEntries()...)
 	index := make(map[string]Game, len(b.Games))
 	for _, g := range b.Games {
 		index[g.ID] = g
