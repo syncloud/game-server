@@ -228,6 +228,8 @@ button { font: inherit; cursor: pointer; }
   .search { max-width: none; flex: 1 1 100%; }
   .tier-pills { flex-wrap: wrap; }
   .grid { grid-template-columns: 1fr; gap: 12px; }
+  html { scroll-padding-bottom: 96px; }
+  .card { scroll-margin-bottom: 96px; }
 }
 
 .theme-toggle {
