@@ -40,11 +40,14 @@ async function submit () {
           Port
           <input v-model.number="port" type="number" data-testid="dialog-port" />
         </label>
-        <p v-if="game.source === 'steam' || game.source === 'linuxgsm'" class="hint">
-          Steam dedicated server (app {{ game.steamAppId }}). Anonymous login will be used.
+        <p v-if="game.installRecipe?.method === 'steam'" class="hint">
+          Steam dedicated server (app {{ game.installRecipe.steamAppId }}). Anonymous login will be used.
+        </p>
+        <p v-else-if="game.installRecipe?.method === 'downloadExtract'" class="hint">
+          Direct download: {{ game.installRecipe.url }}
         </p>
         <p v-else class="hint">
-          Pelican egg: {{ game.eggUrl }}
+          No install recipe for this game.
         </p>
         <p v-if="error" class="error">{{ error }}</p>
       </div>

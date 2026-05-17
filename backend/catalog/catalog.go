@@ -11,30 +11,32 @@ import (
 var raw []byte
 
 type Game struct {
-	ID          string         `json:"id"`
-	Name        string         `json:"name"`
-	Source      string         `json:"source"`
-	UpstreamRef string         `json:"upstreamRef,omitempty"`
-	Summary     string         `json:"summary"`
-	DefaultPort int            `json:"defaultPort"`
-	Protocols   []string       `json:"protocols"`
-	Tier        string         `json:"tier"`
-	TierReason  string         `json:"tierReason,omitempty"`
-	EggURL      string         `json:"eggUrl,omitempty"`
-	Egg         *EggInline     `json:"egg,omitempty"`
-	SteamAppID  int            `json:"steamAppId,omitempty"`
-	Variables   []EnvVariable  `json:"variables,omitempty"`
+	ID            string         `json:"id"`
+	Name          string         `json:"name"`
+	Source        string         `json:"source"`
+	UpstreamRef   string         `json:"upstreamRef,omitempty"`
+	Summary       string         `json:"summary"`
+	DefaultPort   int            `json:"defaultPort"`
+	Protocols     []string       `json:"protocols"`
+	Tier          string         `json:"tier"`
+	TierReason    string         `json:"tierReason,omitempty"`
+	SteamAppID    int            `json:"steamAppId,omitempty"`
+	InstallRecipe *InstallRecipe `json:"installRecipe,omitempty"`
+	Start         *StartRecipe   `json:"start,omitempty"`
 }
 
-type EggInline struct {
-	InstallScript     string `json:"installScript"`
-	InstallEntrypoint string `json:"installEntrypoint"`
-	Startup           string `json:"startup"`
+type InstallRecipe struct {
+	Method     string   `json:"method"`
+	URL        string   `json:"url,omitempty"`
+	SteamAppID int      `json:"steamAppId,omitempty"`
+	SteamArgs  []string `json:"steamArgs,omitempty"`
 }
 
-type EnvVariable struct {
-	Env     string `json:"env"`
-	Default string `json:"default"`
+type StartRecipe struct {
+	Binary    string   `json:"binary"`
+	Wrap      string   `json:"wrap,omitempty"`
+	ExtraLibs []string `json:"extraLibs,omitempty"`
+	Args      string   `json:"args,omitempty"`
 }
 
 type bundle struct {

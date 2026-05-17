@@ -19,28 +19,6 @@ var lgsmIDRemap = map[string]string{
 	"pz": "zomboid",
 }
 
-type lgsmOverride struct {
-	Tier        string
-	TierReason  string
-	Summary     string
-	Protocols   []string
-	DefaultPort int
-}
-
-var lgsmOverrides = map[string]lgsmOverride{
-	"hlds-cs": {
-		Tier:    "verified",
-		Summary: "Classic Half-Life dedicated server running CS 1.6 (~250MB). Smallest Source A2S-queryable Steam server, used as our CI Steam fixture.",
-	},
-	"cs2":     {Tier: "compatible", Summary: "Valve's tactical shooter dedicated server (~30GB)."},
-	"tf2":     {Tier: "compatible", Summary: "Class-based team shooter (~10GB)."},
-	"gmod":    {Tier: "compatible", Summary: "Sandbox modification of Source (~600MB)."},
-	"valheim": {Tier: "compatible", Summary: "Viking survival co-op (~2GB)."},
-	"zomboid": {Tier: "compatible", Summary: "Isometric zombie survival sandbox (~3GB).", DefaultPort: 16261},
-	"ark":     {Tier: "experimental", Summary: "Dinosaur survival multiplayer (~25GB)."},
-	"rust":    {Tier: "experimental", Summary: "Multiplayer survival. Requires paid Steam account.", TierReason: "Steam appid is not anonymous-loginnable"},
-}
-
 func walkLinuxGSM(root string, out map[string]CatalogGame) {
 	listPath := filepath.Join(root, "lgsm", "data", "serverlist.csv")
 	f, err := os.Open(listPath)
@@ -95,27 +73,11 @@ func walkLinuxGSM(root string, out map[string]CatalogGame) {
 			DefaultPort: port,
 			Protocols:   []string{"udp"},
 			Tier:        "experimental",
-			EggURL: fmt.Sprintf(
-				"https://github.com/GameServerManagers/LinuxGSM/blob/%s/lgsm/config-default/config-lgsm/%s/_default.cfg",
-				linuxgsmRef, serverName),
-			Summary: fmt.Sprintf("Steam dedicated server for %s (appid %d). Imported from LinuxGSM.", gameName, appid),
-		}
-		if ov, ok := lgsmOverrides[id]; ok {
-			if ov.Tier != "" {
-				g.Tier = ov.Tier
-			}
-			if ov.TierReason != "" {
-				g.TierReason = ov.TierReason
-			}
-			if ov.Summary != "" {
-				g.Summary = ov.Summary
-			}
-			if len(ov.Protocols) > 0 {
-				g.Protocols = ov.Protocols
-			}
-			if ov.DefaultPort != 0 && g.DefaultPort == 0 {
-				g.DefaultPort = ov.DefaultPort
-			}
+			Summary:     fmt.Sprintf("Steam dedicated server for %s (appid %d). Imported from LinuxGSM.", gameName, appid),
+			InstallRecipe: &InstallRecipe{
+				Method:     "steam",
+				SteamAppID: appid,
+			},
 		}
 		out[id] = g
 		imported++

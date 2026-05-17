@@ -11,7 +11,6 @@ const (
 	SteamCMDPath   = "/snap/games/current/bin/steamcmd.sh"
 	SteamLib32     = "/snap/games/current/steamcmd/lib32"
 	SteamLib64     = "/snap/games/current/steamcmd/lib64"
-	JREBinDir      = "/snap/games/current/jre/bin"
 	ServersBaseDir = "/data/games/servers"
 )
 
@@ -19,9 +18,23 @@ type Game struct {
 	ID          string
 	Name        string
 	Source      string
-	SteamAppID  int
-	EggURL      string
 	DefaultPort int
+	Recipe      *Recipe
+	Start       *Start
+}
+
+type Recipe struct {
+	Method     string
+	URL        string
+	SteamAppID int
+	SteamArgs  []string
+}
+
+type Start struct {
+	Binary    string
+	Wrap      string
+	ExtraLibs []string
+	Args      string
 }
 
 type Result struct {
@@ -31,12 +44,11 @@ type Result struct {
 
 type Installer struct {
 	serversDir string
-	steam      *SteamInstaller
-	egg        *EggInstaller
+	recipe     *RecipeInstaller
 }
 
-func New(serversDir string, steam *SteamInstaller, egg *EggInstaller) *Installer {
-	return &Installer{serversDir: serversDir, steam: steam, egg: egg}
+func New(serversDir string, recipe *RecipeInstaller) *Installer {
+	return &Installer{serversDir: serversDir, recipe: recipe}
 }
 
 func (i *Installer) Install(ctx context.Context, g Game, name string, port int, steamUser, steamPass string) (*Result, error) {
@@ -47,12 +59,5 @@ func (i *Installer) Install(ctx context.Context, g Game, name string, port int, 
 	if port > 0 {
 		g.DefaultPort = port
 	}
-	switch g.Source {
-	case "steam", "linuxgsm":
-		return i.steam.Install(ctx, g, installDir, steamUser, steamPass)
-	case "egg", "pelican", "parkervcp":
-		return i.egg.Install(ctx, g, installDir)
-	default:
-		return nil, fmt.Errorf("unknown source %q", g.Source)
-	}
+	return i.recipe.Install(ctx, g, installDir, steamUser, steamPass)
 }

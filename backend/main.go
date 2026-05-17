@@ -65,8 +65,7 @@ func main() {
 	run := runner.New(logger)
 	inst := installer.New(
 		installer.ServersBaseDir,
-		installer.NewSteamInstaller(installer.SteamCMDPath, installer.SteamLib32, installer.SteamLib64),
-		installer.NewEggInstaller(installer.JREBinDir),
+		installer.NewRecipeInstaller(installer.SteamCMDPath, installer.SteamLib32, installer.SteamLib64),
 	)
 
 	_ = os.Remove(socketPath)
@@ -435,14 +434,7 @@ func runInstall(logger *log.Logger, store *db.DB, inst *installer.Installer, id 
 	}
 	steamUser := steam.StoredUsername()
 	logger.Printf("install[%d] starting: game=%s source=%s appid=%d steamUser=%q", id, g.ID, g.Source, g.SteamAppID, steamUser)
-	result, err := inst.Install(ctx, installer.Game{
-		ID:          g.ID,
-		Name:        g.Name,
-		Source:      g.Source,
-		SteamAppID:  g.SteamAppID,
-		EggURL:      g.EggURL,
-		DefaultPort: g.DefaultPort,
-	}, s.Name, s.Port, steamUser, "")
+	result, err := inst.Install(ctx, toInstallerGame(g), s.Name, s.Port, steamUser, "")
 	if err != nil {
 		logger.Printf("install[%d] FAILED: %v", id, err)
 		_ = store.UpdateServerLastError(id, err.Error())
@@ -452,4 +444,30 @@ func runInstall(logger *log.Logger, store *db.DB, inst *installer.Installer, id 
 	logger.Printf("install[%d] OK: dir=%s start=%q", id, result.InstallDir, result.StartCmd)
 	_ = store.UpdateServerInstall(id, result.InstallDir, result.StartCmd)
 	_ = store.UpdateServerStatus(id, "stopped")
+}
+
+func toInstallerGame(g Game) installer.Game {
+	ig := installer.Game{
+		ID:          g.ID,
+		Name:        g.Name,
+		Source:      g.Source,
+		DefaultPort: g.DefaultPort,
+	}
+	if g.InstallRecipe != nil {
+		ig.Recipe = &installer.Recipe{
+			Method:     g.InstallRecipe.Method,
+			URL:        g.InstallRecipe.URL,
+			SteamAppID: g.InstallRecipe.SteamAppID,
+			SteamArgs:  g.InstallRecipe.SteamArgs,
+		}
+	}
+	if g.Start != nil {
+		ig.Start = &installer.Start{
+			Binary:    g.Start.Binary,
+			Wrap:      g.Start.Wrap,
+			ExtraLibs: g.Start.ExtraLibs,
+			Args:      g.Start.Args,
+		}
+	}
+	return ig
 }

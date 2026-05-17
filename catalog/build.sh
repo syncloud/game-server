@@ -39,6 +39,7 @@ ${WORK}/convert \
     --parkervcp ${WORK}/parkervcp/game_eggs \
     --pelican ${WORK}/pelican \
     --linuxgsm ${WORK}/linuxgsm \
+    --overrides ${DIR}/overrides.json \
     --parkervcp-version ${PARKERVCP_SHA} \
     --pelican-version ${PELICAN_GAMES_SHA} \
     --linuxgsm-version ${LINUXGSM_SHA} \

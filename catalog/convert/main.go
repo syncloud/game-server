@@ -35,30 +35,32 @@ type Egg struct {
 }
 
 type CatalogGame struct {
-	ID          string        `json:"id"`
-	Name        string        `json:"name"`
-	Source      string        `json:"source"`
-	UpstreamRef string        `json:"upstreamRef"`
-	Summary     string        `json:"summary"`
-	DefaultPort int           `json:"defaultPort"`
-	Protocols   []string      `json:"protocols"`
-	Tier        string        `json:"tier"`
-	TierReason  string        `json:"tierReason,omitempty"`
-	EggURL      string        `json:"eggUrl,omitempty"`
-	EggInline   *EggInline    `json:"egg,omitempty"`
-	SteamAppID  int           `json:"steamAppId,omitempty"`
-	Variables   []EnvVariable `json:"variables,omitempty"`
+	ID            string         `json:"id"`
+	Name          string         `json:"name"`
+	Source        string         `json:"source"`
+	UpstreamRef   string         `json:"upstreamRef,omitempty"`
+	Summary       string         `json:"summary"`
+	DefaultPort   int            `json:"defaultPort"`
+	Protocols     []string       `json:"protocols"`
+	Tier          string         `json:"tier"`
+	TierReason    string         `json:"tierReason,omitempty"`
+	SteamAppID    int            `json:"steamAppId,omitempty"`
+	InstallRecipe *InstallRecipe `json:"installRecipe,omitempty"`
+	Start         *StartRecipe   `json:"start,omitempty"`
 }
 
-type EggInline struct {
-	InstallScript     string `json:"installScript"`
-	InstallEntrypoint string `json:"installEntrypoint"`
-	Startup           string `json:"startup"`
+type InstallRecipe struct {
+	Method     string   `json:"method"`
+	URL        string   `json:"url,omitempty"`
+	SteamAppID int      `json:"steamAppId,omitempty"`
+	SteamArgs  []string `json:"steamArgs,omitempty"`
 }
 
-type EnvVariable struct {
-	Env     string `json:"env"`
-	Default string `json:"default"`
+type StartRecipe struct {
+	Binary    string   `json:"binary"`
+	Wrap      string   `json:"wrap,omitempty"`
+	ExtraLibs []string `json:"extraLibs,omitempty"`
+	Args      string   `json:"args,omitempty"`
 }
 
 type Catalog struct {
@@ -67,36 +69,25 @@ type Catalog struct {
 }
 
 var (
-	dockerContainerRE = regexp.MustCompile(`(?i)ghcr\.io/(parkervcp|pelican-eggs)/yolks`)
-	steamAppRE        = regexp.MustCompile(`\+app_update\s+(\d+)`)
-	portRE            = regexp.MustCompile(`\b([0-9]{4,5})\b`)
-	slugRE            = regexp.MustCompile(`[^a-z0-9]+`)
-)
-
-var (
-	parkervcpRoot string
-	pelicanRoot   string
-	linuxgsmRoot  string
-	parkervcpRef  string
-	pelicanRef    string
-	linuxgsmRef   string
+	steamAppRE   = regexp.MustCompile(`\+app_update\s+(\d+)`)
+	portRE       = regexp.MustCompile(`\b([0-9]{4,5})\b`)
+	slugRE       = regexp.MustCompile(`[^a-z0-9]+`)
+	literalURLRE = regexp.MustCompile(`https?://[^\s"'\\)]+`)
+	archiveExtRE = regexp.MustCompile(`\.(tar\.gz|tgz|tar\.xz|tar\.bz2|tar|zip)(?:[?#]|$)`)
 )
 
 func main() {
 	parkervcp := flag.String("parkervcp", "", "path to parkervcp game_eggs/")
 	pelican := flag.String("pelican", "", "path to pelican-eggs games/")
 	linuxgsm := flag.String("linuxgsm", "", "path to LinuxGSM checkout root")
+	overridesPath := flag.String("overrides", "", "path to overrides.json (hand-curated)")
 	parkervcpVer := flag.String("parkervcp-version", "", "")
 	pelicanVer := flag.String("pelican-version", "", "")
 	linuxgsmVer := flag.String("linuxgsm-version", "", "")
 	out := flag.String("out", "", "output catalog.json path")
 	flag.Parse()
-	parkervcpRoot = *parkervcp
-	pelicanRoot = *pelican
-	linuxgsmRoot = *linuxgsm
-	parkervcpRef = *parkervcpVer
-	pelicanRef = *pelicanVer
-	linuxgsmRef = *linuxgsmVer
+
+	overrides := loadOverrides(*overridesPath)
 
 	cat := Catalog{
 		Sources: map[string]string{
@@ -117,7 +108,23 @@ func main() {
 		walkLinuxGSM(*linuxgsm, games)
 	}
 
+	for id, ov := range overrides {
+		base, ok := games[id]
+		if !ok {
+			base = CatalogGame{ID: id}
+		}
+		games[id] = applyOverride(base, ov)
+	}
+
 	for _, g := range games {
+		if g.InstallRecipe == nil {
+			g.Tier = "unsupported"
+			if g.TierReason == "" {
+				g.TierReason = "no install recipe (egg uses apt/docker/non-bash entrypoint)"
+			}
+		} else if g.Tier == "" {
+			g.Tier = "compatible"
+		}
 		cat.Games = append(cat.Games, g)
 	}
 	sort.Slice(cat.Games, func(i, j int) bool { return cat.Games[i].ID < cat.Games[j].ID })
@@ -180,55 +187,40 @@ func convertEgg(egg Egg, source, path, root string) *CatalogGame {
 	if id == "" {
 		return nil
 	}
-
-	rel := relPath(path, root)
+	rel, _ := filepath.Rel(root, path)
 	g := CatalogGame{
 		ID:          id,
 		Name:        name,
 		Source:      source,
 		UpstreamRef: rel,
-		EggURL:      eggURL(source, rel),
 		Summary:     truncate(egg.Description, 200),
 		Protocols:   detectProtocols(egg.Startup),
 		DefaultPort: detectPort(egg),
-		EggInline: &EggInline{
-			InstallScript:     egg.Scripts.Installation.Script,
-			InstallEntrypoint: defaultStr(egg.Scripts.Installation.Entrypoint, "bash"),
-			Startup:           egg.Startup,
-		},
 	}
-	if m := steamAppRE.FindStringSubmatch(egg.Scripts.Installation.Script); len(m) == 2 {
-		if n, err := strconv.Atoi(m[1]); err == nil {
-			g.SteamAppID = n
-		}
+	g.InstallRecipe = deriveRecipe(egg)
+	if g.InstallRecipe != nil && g.InstallRecipe.Method == "steam" {
+		g.SteamAppID = g.InstallRecipe.SteamAppID
 	}
-	for _, v := range egg.Variables {
-		g.Variables = append(g.Variables, EnvVariable{Env: v.EnvVariable, Default: v.DefaultValue})
-	}
-
-	g.Tier, g.TierReason = classify(egg, g)
 	return &g
 }
 
-func classify(egg Egg, g CatalogGame) (string, string) {
+func deriveRecipe(egg Egg) *InstallRecipe {
+	script := egg.Scripts.Installation.Script
 	ep := strings.ToLower(strings.TrimSpace(egg.Scripts.Installation.Entrypoint))
-	if ep != "bash" && ep != "sh" && ep != "ash" && ep != "" {
-		return "experimental", "install entrypoint is " + ep + " (not bash/sh/ash)"
+	if ep != "" && ep != "bash" && ep != "sh" && ep != "ash" {
+		return nil
 	}
-	container := strings.ToLower(egg.Scripts.Installation.Container)
-	if !strings.Contains(container, "debian") &&
-		!strings.Contains(container, "ubuntu") &&
-		!strings.Contains(container, "alpine") {
-		return "experimental", "install container is " + egg.Scripts.Installation.Container + " (need debian/ubuntu/alpine)"
+	if m := steamAppRE.FindStringSubmatch(script); len(m) == 2 {
+		if appid, err := strconv.Atoi(m[1]); err == nil {
+			return &InstallRecipe{Method: "steam", SteamAppID: appid}
+		}
 	}
-	if dockerContainerRE.MatchString(egg.Image) && egg.Image != "" {
-		return "compatible", "runtime image is a Pterodactyl/Pelican yolk; install may need adaptation"
+	for _, u := range literalURLRE.FindAllString(script, -1) {
+		if archiveExtRE.MatchString(u) {
+			return &InstallRecipe{Method: "downloadExtract", URL: u}
+		}
 	}
-	if strings.Contains(egg.Scripts.Installation.Script, "apt update") ||
-		strings.Contains(egg.Scripts.Installation.Script, "apt-get update") {
-		return "compatible", "install script runs apt update (won't have apt at runtime)"
-	}
-	return "compatible", ""
+	return nil
 }
 
 func detectProtocols(startup string) []string {
@@ -257,31 +249,6 @@ func detectPort(egg Egg) int {
 		}
 	}
 	return 0
-}
-
-func eggURL(source, rel string) string {
-	switch source {
-	case "parkervcp":
-		return fmt.Sprintf("https://raw.githubusercontent.com/parkervcp/eggs/%s/game_eggs/%s", parkervcpRef, rel)
-	case "pelican":
-		return fmt.Sprintf("https://raw.githubusercontent.com/pelican-eggs/games/%s/%s", pelicanRef, rel)
-	}
-	return ""
-}
-
-func relPath(p, root string) string {
-	if r, err := filepath.Rel(root, p); err == nil {
-		return r
-	}
-	return p
-}
-
-func defaultStr(s, fallback string) string {
-	s = strings.TrimSpace(s)
-	if s == "" {
-		return fallback
-	}
-	return s
 }
 
 func truncate(s string, n int) string {
