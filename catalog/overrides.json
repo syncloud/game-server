@@ -3,7 +3,7 @@
     "source": "teeworlds",
     "name": "Teeworlds",
     "summary": "2D arena shooter; ~10MB native server. CI install fixture.",
-    "tier": "verified",
+    "tier": "compatible",
     "defaultPort": 8303,
     "protocols": ["udp"],
     "installRecipe": {
