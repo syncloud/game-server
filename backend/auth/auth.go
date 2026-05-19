@@ -58,14 +58,11 @@ type httpUnixRoundTripper struct {
 }
 
 func (rt *httpUnixRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	if req.URL.Scheme == "https" {
-		clone := req.Clone(req.Context())
-		clone.URL.Scheme = "http"
-		clone.Header.Set("X-Forwarded-Proto", "https")
-		clone.Header.Set("X-Forwarded-Host", req.URL.Host)
-		req = clone
-	}
-	return rt.base.RoundTrip(req)
+	clone := req.Clone(req.Context())
+	clone.URL.Scheme = "http"
+	clone.Header.Set("X-Forwarded-Proto", "https")
+	clone.Header.Set("X-Forwarded-Host", req.URL.Host)
+	return rt.base.RoundTrip(clone)
 }
 
 func newUnixAutheliaClient(socketPath string) *http.Client {
