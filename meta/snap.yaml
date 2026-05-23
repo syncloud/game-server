@@ -1,6 +1,6 @@
 name: games
 summary: Syncloud Game Hub
-description: Dedicated game server panel for Syncloud
+description: Dedicated game server panel for SteamCMD and Pelican-egg games
 grade: stable
 
 apps:
