@@ -1,0 +1,234 @@
+package installer
+
+import (
+	"fmt"
+	cp "github.com/otiai10/copy"
+	"github.com/syncloud/golib/config"
+	"github.com/syncloud/golib/linux"
+	"github.com/syncloud/golib/platform"
+	"go.uber.org/zap"
+	"os"
+	"path"
+	"strings"
+)
+
+const (
+	App             = "games"
+	AppDir          = "/snap/games/current"
+	DataDir         = "/var/snap/games/current"
+	CommonDir       = "/var/snap/games/common"
+	SteamcmdSrcDir  = AppDir + "/steamcmd"
+	SteamRuntimeDir = DataDir + "/.steam-runtime"
+)
+
+type Variables struct {
+	AuthUrl string
+}
+
+type Installer struct {
+	newVersionFile     string
+	currentVersionFile string
+	configDir          string
+	platformClient     *platform.Client
+	installFile        string
+	logger             *zap.Logger
+}
+
+func New(logger *zap.Logger) *Installer {
+	configDir := path.Join(DataDir, "config")
+	return &Installer{
+		newVersionFile:     path.Join(AppDir, "version"),
+		currentVersionFile: path.Join(DataDir, "version"),
+		configDir:          configDir,
+		platformClient:     platform.New(),
+		installFile:        path.Join(CommonDir, "installed"),
+		logger:             logger,
+	}
+}
+
+func (i *Installer) Install() error {
+	return i.UpdateConfigs()
+}
+
+func (i *Installer) Configure() error {
+	if i.IsInstalled() {
+		return i.Upgrade()
+	}
+	return i.Initialize()
+}
+
+func (i *Installer) IsInstalled() bool {
+	_, err := os.Stat(i.installFile)
+	return err == nil
+}
+
+func (i *Installer) Initialize() error {
+	if err := i.StorageChange(); err != nil {
+		return err
+	}
+	if err := os.WriteFile(i.installFile, []byte("installed"), 0644); err != nil {
+		return err
+	}
+	return i.UpdateVersion()
+}
+
+func (i *Installer) Upgrade() error {
+	if err := i.StorageChange(); err != nil {
+		return err
+	}
+	return i.UpdateVersion()
+}
+
+func (i *Installer) PreRefresh() error {
+	return nil
+}
+
+func (i *Installer) PostRefresh() error {
+	if err := i.UpdateConfigs(); err != nil {
+		return err
+	}
+	if err := i.ClearVersion(); err != nil {
+		return err
+	}
+	return i.FixPermissions()
+}
+
+func (i *Installer) AccessChange() error {
+	return i.UpdateConfigs()
+}
+
+func (i *Installer) StorageChange() error {
+	storageDir, err := i.platformClient.InitStorage(App, App)
+	if err != nil {
+		return err
+	}
+	if err := i.createMissingDirs(
+		path.Join(storageDir, "servers"),
+	); err != nil {
+		return err
+	}
+	return linux.Chown(storageDir, App)
+}
+
+func (i *Installer) ClearVersion() error {
+	return os.RemoveAll(i.currentVersionFile)
+}
+
+func (i *Installer) UpdateVersion() error {
+	return cp.Copy(i.newVersionFile, i.currentVersionFile)
+}
+
+func (i *Installer) UpdateConfigs() error {
+	if err := linux.CreateUser(App); err != nil {
+		return err
+	}
+	if err := i.StorageChange(); err != nil {
+		return err
+	}
+	if err := createMissingDir(path.Join(DataDir, "nginx")); err != nil {
+		return err
+	}
+
+	if err := i.SeedSteamRuntime(); err != nil {
+		return fmt.Errorf("steam runtime seed: %w", err)
+	}
+
+	authUrl, err := i.platformClient.GetAppUrl("auth")
+	if err != nil {
+		return err
+	}
+
+	if err := i.registerOIDC(); err != nil {
+		return fmt.Errorf("oidc register: %w", err)
+	}
+
+	variables := Variables{
+		AuthUrl: authUrl,
+	}
+
+	if err := config.Generate(
+		path.Join(AppDir, "config"),
+		path.Join(DataDir, "config"),
+		variables,
+	); err != nil {
+		return err
+	}
+
+	return i.FixPermissions()
+}
+
+func (i *Installer) SeedSteamRuntime() error {
+	if _, err := os.Stat(path.Join(SteamRuntimeDir, "linux32", "steamcmd")); os.IsNotExist(err) {
+		if err := os.MkdirAll(SteamRuntimeDir, 0755); err != nil {
+			return err
+		}
+		entries, err := os.ReadDir(SteamcmdSrcDir)
+		if err != nil {
+			return err
+		}
+		for _, e := range entries {
+			if e.Name() == "lib32" || e.Name() == "lib64" {
+				continue
+			}
+			if err := cp.Copy(path.Join(SteamcmdSrcDir, e.Name()), path.Join(SteamRuntimeDir, e.Name())); err != nil {
+				return err
+			}
+		}
+	}
+	ldDst := path.Join(SteamRuntimeDir, "linux32", "ld-linux.so.2")
+	if err := os.MkdirAll(path.Dir(ldDst), 0755); err != nil {
+		return err
+	}
+	return cp.Copy(path.Join(SteamcmdSrcDir, "lib32", "ld-linux.so.2"), ldDst)
+}
+
+func (i *Installer) registerOIDC() error {
+	password, err := i.platformClient.RegisterOIDCClient(App, "/auth/callback", true, "client_secret_basic")
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(path.Join(DataDir, "oidc.secret"), []byte(password), 0640); err != nil {
+		return err
+	}
+	authUrl, err := i.platformClient.GetAppUrl("auth")
+	if err != nil {
+		return err
+	}
+	appUrl, err := i.platformClient.GetAppUrl(App)
+	if err != nil {
+		return err
+	}
+	authSocket := strings.TrimSuffix(strings.TrimPrefix(i.platformClient.GetAuthLocalSocket(), "http://unix:"), ":")
+	cfg := fmt.Sprintf(`{"authUrl":%q,"authSocket":%q,"clientId":%q,"clientSecret":%q,"redirectUrl":%q}`,
+		authUrl, authSocket, App, password, appUrl+"/auth/callback")
+	return os.WriteFile(path.Join(DataDir, "oidc.json"), []byte(cfg), 0640)
+}
+
+func (i *Installer) FixPermissions() error {
+	if err := linux.Chown(DataDir, App); err != nil {
+		return err
+	}
+	return linux.Chown(CommonDir, App)
+}
+
+func (i *Installer) BackupPreStop() error  { return i.PreRefresh() }
+func (i *Installer) RestorePreStart() error { return i.PostRefresh() }
+func (i *Installer) RestorePostStart() error { return i.Configure() }
+
+func (i *Installer) createMissingDirs(dirs ...string) error {
+	for _, dir := range dirs {
+		if err := createMissingDir(dir); err != nil {
+			i.logger.Error("cannot create dir", zap.String("dir", dir), zap.Error(err))
+			return err
+		}
+	}
+	return nil
+}
+
+func createMissingDir(dir string) error {
+	_, err := os.Stat(dir)
+	if os.IsNotExist(err) {
+		return os.Mkdir(dir, 0755)
+	}
+	return nil
+}
