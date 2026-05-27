@@ -4,7 +4,7 @@ local nginx = '1.24.0';
 local node = '20';
 local platform = '26.04.10';
 local python = '3.12-slim-bookworm';
-local deployer = 'https://github.com/syncloud/store/releases/download/4/syncloud-release';
+local publisher_image = 'syncloud/store-publisher:stable-291';
 local distros = ['bookworm', 'buster'];
 local distro_default = 'bookworm';
 local arch = 'amd64';
@@ -147,41 +147,14 @@ local platform_image(distro, arch) =
     for projectName in ['desktop', 'mobile']
   ] + [
     {
-      name: 'upload',
-      image: 'debian:bookworm-slim',
+      name: 'publish',
+      image: publisher_image,
       environment: {
-        AWS_ACCESS_KEY_ID: { from_secret: 'AWS_ACCESS_KEY_ID' },
-        AWS_SECRET_ACCESS_KEY: { from_secret: 'AWS_SECRET_ACCESS_KEY' },
         SYNCLOUD_TOKEN: { from_secret: 'SYNCLOUD_TOKEN' },
       },
-      commands: [
-        'PACKAGE=$(cat package.name)',
-        'apt update && apt install -y wget',
-        'wget ' + deployer + '-' + arch + ' -O release --progress=dot:giga',
-        'chmod +x release',
-        './release publish -f $PACKAGE -b $DRONE_BRANCH',
-      ],
+      command: ['snap', '-c', '${DRONE_BRANCH}'],
       when: {
-        branch: ['stable', 'master'],
-        event: ['push'],
-      },
-    },
-    {
-      name: 'promote',
-      image: 'debian:bookworm-slim',
-      environment: {
-        AWS_ACCESS_KEY_ID: { from_secret: 'AWS_ACCESS_KEY_ID' },
-        AWS_SECRET_ACCESS_KEY: { from_secret: 'AWS_SECRET_ACCESS_KEY' },
-        SYNCLOUD_TOKEN: { from_secret: 'SYNCLOUD_TOKEN' },
-      },
-      commands: [
-        'apt update && apt install -y wget',
-        'wget ' + deployer + '-' + arch + ' -O release --progress=dot:giga',
-        'chmod +x release',
-        './release promote -n ' + name + ' -a $(dpkg --print-architecture)',
-      ],
-      when: {
-        branch: ['stable'],
+        branch: ['master', 'stable'],
         event: ['push'],
       },
     },
