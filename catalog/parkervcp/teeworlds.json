@@ -1,0 +1,20 @@
+{
+  "id": "teeworlds",
+  "name": "Teeworlds",
+  "summary": "2D arena shooter; ~10MB native server. CI install fixture.",
+  "tier": "supported",
+  "defaultPort": 8303,
+  "protocols": ["udp"],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "game_eggs/teeworlds/egg-teeworlds.json"
+  },
+  "installRecipe": {
+    "method": "downloadExtract",
+    "url": "https://github.com/teeworlds/teeworlds/releases/download/0.7.5/teeworlds-0.7.5-linux_x86_64.tar.gz"
+  },
+  "start": {
+    "binary": "teeworlds_srv",
+    "args": "\"sv_port {{port}}\""
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "tf2",
+  "name": "Team Fortress 2",
+  "summary": "Class-based team shooter (~10GB).",
+  "tier": "experimental",
+  "defaultPort": 27015,
+  "protocols": ["udp"],
+  "installRecipe": {"method": "steam", "steamAppId": 232250},
+  "start": {
+    "binary": "srcds_linux",
+    "wrap": "i386",
+    "extraLibs": [".", "bin"],
+    "args": "-game tf +map ctf_2fort +port {{port}}"
+  }
+}

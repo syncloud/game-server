@@ -11,7 +11,6 @@ type catalogEntry struct {
 	ID          string   `json:"id"`
 	Name        string   `json:"name"`
 	Source      string   `json:"source"`
-	UpstreamRef string   `json:"upstreamRef"`
 	Tier        string   `json:"tier"`
 	DefaultPort int      `json:"defaultPort"`
 	Protocols   []string `json:"protocols"`
@@ -46,18 +45,18 @@ func gamesCmd() *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "sources",
-		Short: "Pinned upstream egg-catalog SHAs",
+		Short: "Sources we ingest games from",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c := client.New()
-			var r map[string]string
+			var r []string
 			if err := c.Do("GET", "/api/v1/catalog/sources", nil, &r); err != nil {
 				return err
 			}
 			if jsonOut {
 				printJSON(r)
 			} else {
-				for k, v := range r {
-					fmt.Printf("%-24s  %s\n", k, v)
+				for _, s := range r {
+					fmt.Println(s)
 				}
 			}
 			return nil

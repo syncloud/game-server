@@ -1,0 +1,9 @@
+{
+  "id": "ark",
+  "name": "ARK: Survival Evolved",
+  "summary": "Dinosaur survival multiplayer (~25GB).",
+  "tier": "experimental",
+  "defaultPort": 7777,
+  "protocols": ["udp"],
+  "installRecipe": {"method": "steam", "steamAppId": 376030}
+}

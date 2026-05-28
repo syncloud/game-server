@@ -1,0 +1,19 @@
+{
+  "id": "hlds-cs",
+  "name": "Counter-Strike 1.6",
+  "summary": "Classic Half-Life dedicated server running CS 1.6 (~250MB). CI Steam fixture.",
+  "tier": "supported",
+  "defaultPort": 27015,
+  "protocols": ["udp"],
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 90,
+    "steamArgs": ["+app_set_config", "90", "mod", "cstrike", "+app_update", "90", "-beta", "steam_legacy", "validate"]
+  },
+  "start": {
+    "binary": "hlds_linux",
+    "wrap": "i386",
+    "extraLibs": [".", "cstrike"],
+    "args": "-game cstrike -insecure +sv_lan 1 +map de_dust2 +port {{port}} +maxplayers 8"
+  }
+}

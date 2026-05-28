@@ -1,0 +1,15 @@
+{
+  "id": "gmod",
+  "name": "Garry's Mod",
+  "summary": "Sandbox modification of Source (~600MB).",
+  "tier": "experimental",
+  "defaultPort": 27015,
+  "protocols": ["udp"],
+  "installRecipe": {"method": "steam", "steamAppId": 4020},
+  "start": {
+    "binary": "srcds_linux",
+    "wrap": "i386",
+    "extraLibs": [".", "bin"],
+    "args": "-game garrysmod +port {{port}}"
+  }
+}

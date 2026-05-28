@@ -1,0 +1,10 @@
+{
+  "id": "rust",
+  "name": "Rust",
+  "summary": "Multiplayer survival.",
+  "tier": "disabled",
+  "disabledReason": "Steam appid 258550 requires a paid Steam account; not anonymous-loginnable from SteamCMD. Promote when we have a paid-account install path.",
+  "defaultPort": 28015,
+  "protocols": ["udp"],
+  "installRecipe": {"method": "steam", "steamAppId": 258550}
+}

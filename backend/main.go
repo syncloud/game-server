@@ -319,6 +319,14 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, store *db.DB, ru
 			writeError(w, http.StatusBadRequest, "unknown gameId on server")
 			return
 		}
+		if game.Tier == "disabled" {
+			reason := game.DisabledReason
+			if reason == "" {
+				reason = "game is disabled"
+			}
+			writeError(w, http.StatusConflict, fmt.Sprintf("game %s is disabled: %s", game.ID, reason))
+			return
+		}
 		_ = store.UpdateServerStatus(id, "installing")
 		go runInstall(log.Default(), store, inst, id, *game)
 		s.Status = "installing"
@@ -433,7 +441,11 @@ func runInstall(logger *log.Logger, store *db.DB, inst *installer.Installer, id 
 		return
 	}
 	steamUser := steam.StoredUsername()
-	logger.Printf("install[%d] starting: game=%s source=%s appid=%d steamUser=%q", id, g.ID, g.Source, g.SteamAppID, steamUser)
+	appid := 0
+	if g.InstallRecipe != nil {
+		appid = g.InstallRecipe.SteamAppID
+	}
+	logger.Printf("install[%d] starting: game=%s source=%s appid=%d steamUser=%q", id, g.ID, g.Source, appid, steamUser)
 	result, err := inst.Install(ctx, toInstallerGame(g), s.Name, s.Port, steamUser, "")
 	if err != nil {
 		logger.Printf("install[%d] FAILED: %v", id, err)

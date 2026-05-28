@@ -10,19 +10,23 @@ import (
 //go:embed catalog.json
 var raw []byte
 
+type Upstream struct {
+	Commit string `json:"commit,omitempty"`
+	Path   string `json:"path,omitempty"`
+}
+
 type Game struct {
-	ID            string         `json:"id"`
-	Name          string         `json:"name"`
-	Source        string         `json:"source"`
-	UpstreamRef   string         `json:"upstreamRef,omitempty"`
-	Summary       string         `json:"summary"`
-	DefaultPort   int            `json:"defaultPort"`
-	Protocols     []string       `json:"protocols"`
-	Tier          string         `json:"tier"`
-	TierReason    string         `json:"tierReason,omitempty"`
-	SteamAppID    int            `json:"steamAppId,omitempty"`
-	InstallRecipe *InstallRecipe `json:"installRecipe,omitempty"`
-	Start         *StartRecipe   `json:"start,omitempty"`
+	ID             string         `json:"id"`
+	Name           string         `json:"name"`
+	Source         string         `json:"source"`
+	Summary        string         `json:"summary"`
+	Tier           string         `json:"tier"`
+	DisabledReason string         `json:"disabledReason,omitempty"`
+	DefaultPort    int            `json:"defaultPort"`
+	Protocols      []string       `json:"protocols"`
+	Upstream       *Upstream      `json:"upstream,omitempty"`
+	InstallRecipe  *InstallRecipe `json:"installRecipe,omitempty"`
+	Start          *StartRecipe   `json:"start,omitempty"`
 }
 
 type InstallRecipe struct {
@@ -40,12 +44,10 @@ type StartRecipe struct {
 }
 
 type bundle struct {
-	Sources map[string]string `json:"sources"`
-	Games   []Game            `json:"games"`
+	Games []Game `json:"games"`
 }
 
 var (
-	loaded  bundle
 	byID    map[string]Game
 	allList []Game
 )
@@ -66,7 +68,6 @@ func Start() error {
 		}
 		return list[i].Name < list[j].Name
 	})
-	loaded = b
 	byID = index
 	allList = list
 	return nil
@@ -74,20 +75,35 @@ func Start() error {
 
 func tierRank(t string) int {
 	switch t {
-	case "verified":
+	case "supported":
 		return 0
-	case "compatible":
-		return 1
 	case "experimental":
+		return 1
+	case "disabled":
 		return 2
 	default:
 		return 3
 	}
 }
 
-func All() []Game        { return allList }
-func Sources() map[string]string { return loaded.Sources }
+func All() []Game { return allList }
+
 func Get(id string) (Game, bool) {
 	g, ok := byID[id]
 	return g, ok
+}
+
+func Sources() []string {
+	seen := map[string]bool{}
+	for _, g := range allList {
+		if g.Source != "" {
+			seen[g.Source] = true
+		}
+	}
+	out := make([]string, 0, len(seen))
+	for s := range seen {
+		out = append(out, s)
+	}
+	sort.Strings(out)
+	return out
 }

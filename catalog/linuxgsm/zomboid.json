@@ -1,0 +1,13 @@
+{
+  "id": "zomboid",
+  "name": "Project Zomboid",
+  "summary": "Isometric zombie survival sandbox (~3GB).",
+  "tier": "experimental",
+  "defaultPort": 16261,
+  "protocols": ["udp"],
+  "installRecipe": {"method": "steam", "steamAppId": 380870},
+  "start": {
+    "binary": "start-server.sh",
+    "args": "-port {{port}}"
+  }
+}

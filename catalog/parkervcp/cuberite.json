@@ -1,0 +1,13 @@
+{
+  "id": "cuberite",
+  "name": "Cuberite",
+  "summary": "Lightweight C++ Minecraft Java-protocol server",
+  "tier": "disabled",
+  "disabledReason": "egg sets ARCH via uname -m -> x64|aarch64 and uses ${ARCH} in the download URL. Our installer does not evaluate the egg's bash script. Promote by adding installRecipe with the static linux-x64 URL.",
+  "defaultPort": 25565,
+  "protocols": ["tcp"],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "game_eggs/minecraft/java/cuberite/egg-cuberite.json"
+  }
+}

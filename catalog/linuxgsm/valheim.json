@@ -1,0 +1,15 @@
+{
+  "id": "valheim",
+  "name": "Valheim",
+  "summary": "Viking survival co-op (~2GB).",
+  "tier": "experimental",
+  "defaultPort": 2456,
+  "protocols": ["udp"],
+  "installRecipe": {"method": "steam", "steamAppId": 896660},
+  "start": {
+    "binary": "valheim_server.x86_64",
+    "wrap": "amd64",
+    "extraLibs": ["."],
+    "args": "-port {{port}} -world Dedicated -password changeme"
+  }
+}

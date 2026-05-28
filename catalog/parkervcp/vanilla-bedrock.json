@@ -1,0 +1,13 @@
+{
+  "id": "vanilla-bedrock",
+  "name": "Vanilla Bedrock",
+  "summary": "Mojang's official Bedrock dedicated server. Speaks UDP 19132 to the Play Store Minecraft app.",
+  "tier": "disabled",
+  "disabledReason": "egg curls minecraft.net + zgreps the HTML for the latest tarball URL at install time. Static URL pinning requires periodic refresh and Mojang EULA acceptance. Promote by adding installRecipe with a pinned bedrock-server-<ver>.zip URL and bumping it via a release-cadence task.",
+  "defaultPort": 19132,
+  "protocols": ["udp"],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "game_eggs/minecraft/bedrock/bedrock/egg-vanilla-bedrock.json"
+  }
+}

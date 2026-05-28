@@ -1,0 +1,15 @@
+{
+  "id": "cs2",
+  "name": "Counter-Strike 2",
+  "summary": "Valve's tactical shooter dedicated server (~30GB).",
+  "tier": "experimental",
+  "defaultPort": 27015,
+  "protocols": ["udp"],
+  "installRecipe": {"method": "steam", "steamAppId": 730},
+  "start": {
+    "binary": "game/bin/linuxsteamrt64/cs2",
+    "wrap": "amd64",
+    "extraLibs": ["game/bin/linuxsteamrt64"],
+    "args": "-dedicated +map de_dust2 +port {{port}}"
+  }
+}

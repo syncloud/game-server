@@ -64,17 +64,19 @@ def test_health(device):
 def test_games_catalog(device):
     games = cli_run(device, 'games', 'list')
     ids = {g['id'] for g in games}
-    assert 'teeworlds' in ids, 'teeworlds (smallest pelican egg, our CI fixture) must be in catalog'
-    assert 'cs2' in ids, 'cs2 anonymous-friendly steam server must be in catalog'
+    assert 'teeworlds' in ids, 'teeworlds (CI install fixture) must be in catalog'
+    assert 'cs2' in ids, 'cs2 (steam path) must be in catalog'
     assert 'hlds-cs' in ids, 'hlds-cs (CI Steam fixture) must be in catalog'
+    assert 'cuberite' in ids, 'cuberite must be in catalog (tier=disabled, exemplar)'
+    assert 'vanilla-bedrock' in ids, 'vanilla-bedrock must be in catalog (tier=disabled, exemplar)'
     for g in games:
-        assert g.get('tier') in ('verified', 'compatible', 'experimental'), \
-            'game {} has no tier: {}'.format(g.get('id'), g)
+        assert g.get('tier') in ('supported', 'experimental', 'disabled'), \
+            'game {} has invalid tier: {}'.format(g.get('id'), g)
 
 def test_catalog_sources(device):
     sources = cli_run(device, 'games', 'sources')
-    assert 'parkervcp/eggs' in sources
-    assert 'pelican-eggs/games' in sources
+    assert 'parkervcp' in sources
+    assert 'linuxgsm' in sources
 
 def test_servers_empty(device):
     assert cli_run(device, 'server', 'list') == []
@@ -111,6 +113,28 @@ def test_logs_endpoint(device):
     assert any('hello-from-runner' in l for l in lines), 'log buffer should capture stdout: ' + str(lines)
     cli_run(device, 'server', 'stop', 'log-stub')
     cli_run(device, 'server', 'delete', 'log-stub')
+
+def test_cuberite_disabled_install_refused(device):
+    """Disabled-tier game install must return a clean 409 with the
+    disabledReason from the catalog entry, not a download attempt."""
+    cli_run(device, 'server', 'create', 'cb-disabled', 'cuberite', '--port', '25565')
+    out = device.run_ssh(
+        '/snap/bin/games.cli server install cb-disabled 2>&1; echo EXIT=\$?',
+        throw=False)
+    assert 'disabled' in out.lower(), 'expected disabled message in: ' + out
+    assert 'EXIT=1' in out, 'install command should exit non-zero: ' + out
+    s = cli_run(device, 'server', 'show', 'cb-disabled')
+    assert s['status'] == 'stopped', 'status must not flip to installing: ' + str(s)
+    cli_run(device, 'server', 'delete', 'cb-disabled')
+
+def test_vanilla_bedrock_disabled_install_refused(device):
+    cli_run(device, 'server', 'create', 'bd-disabled', 'vanilla-bedrock', '--port', '19132')
+    out = device.run_ssh(
+        '/snap/bin/games.cli server install bd-disabled 2>&1; echo EXIT=\$?',
+        throw=False)
+    assert 'disabled' in out.lower(), 'expected disabled message in: ' + out
+    assert 'EXIT=1' in out, 'install command should exit non-zero: ' + out
+    cli_run(device, 'server', 'delete', 'bd-disabled')
 
 def test_teeworlds_real_install_and_play(device):
     cli_run(device, 'server', 'create', 'tw-real', 'teeworlds', '--port', '8313')

@@ -1,1 +1,238 @@
-{"sources":{},"games":[]}
+{
+  "games": [
+    {
+      "id": "ark",
+      "name": "ARK: Survival Evolved",
+      "source": "linuxgsm",
+      "summary": "Dinosaur survival multiplayer (~25GB).",
+      "tier": "experimental",
+      "defaultPort": 7777,
+      "protocols": [
+        "udp"
+      ],
+      "installRecipe": {
+        "method": "steam",
+        "steamAppId": 376030
+      }
+    },
+    {
+      "id": "cs2",
+      "name": "Counter-Strike 2",
+      "source": "linuxgsm",
+      "summary": "Valve's tactical shooter dedicated server (~30GB).",
+      "tier": "experimental",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "installRecipe": {
+        "method": "steam",
+        "steamAppId": 730
+      },
+      "start": {
+        "binary": "game/bin/linuxsteamrt64/cs2",
+        "wrap": "amd64",
+        "extraLibs": [
+          "game/bin/linuxsteamrt64"
+        ],
+        "args": "-dedicated +map de_dust2 +port {{port}}"
+      }
+    },
+    {
+      "id": "cuberite",
+      "name": "Cuberite",
+      "source": "parkervcp",
+      "summary": "Lightweight C++ Minecraft Java-protocol server",
+      "tier": "disabled",
+      "disabledReason": "egg sets ARCH via uname -m -\u003e x64|aarch64 and uses ${ARCH} in the download URL. Our installer does not evaluate the egg's bash script. Promote by adding installRecipe with the static linux-x64 URL.",
+      "defaultPort": 25565,
+      "protocols": [
+        "tcp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "game_eggs/minecraft/java/cuberite/egg-cuberite.json"
+      }
+    },
+    {
+      "id": "gmod",
+      "name": "Garry's Mod",
+      "source": "linuxgsm",
+      "summary": "Sandbox modification of Source (~600MB).",
+      "tier": "experimental",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "installRecipe": {
+        "method": "steam",
+        "steamAppId": 4020
+      },
+      "start": {
+        "binary": "srcds_linux",
+        "wrap": "i386",
+        "extraLibs": [
+          ".",
+          "bin"
+        ],
+        "args": "-game garrysmod +port {{port}}"
+      }
+    },
+    {
+      "id": "hlds-cs",
+      "name": "Counter-Strike 1.6",
+      "source": "linuxgsm",
+      "summary": "Classic Half-Life dedicated server running CS 1.6 (~250MB). CI Steam fixture.",
+      "tier": "supported",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "installRecipe": {
+        "method": "steam",
+        "steamAppId": 90,
+        "steamArgs": [
+          "+app_set_config",
+          "90",
+          "mod",
+          "cstrike",
+          "+app_update",
+          "90",
+          "-beta",
+          "steam_legacy",
+          "validate"
+        ]
+      },
+      "start": {
+        "binary": "hlds_linux",
+        "wrap": "i386",
+        "extraLibs": [
+          ".",
+          "cstrike"
+        ],
+        "args": "-game cstrike -insecure +sv_lan 1 +map de_dust2 +port {{port}} +maxplayers 8"
+      }
+    },
+    {
+      "id": "rust",
+      "name": "Rust",
+      "source": "linuxgsm",
+      "summary": "Multiplayer survival.",
+      "tier": "disabled",
+      "disabledReason": "Steam appid 258550 requires a paid Steam account; not anonymous-loginnable from SteamCMD. Promote when we have a paid-account install path.",
+      "defaultPort": 28015,
+      "protocols": [
+        "udp"
+      ],
+      "installRecipe": {
+        "method": "steam",
+        "steamAppId": 258550
+      }
+    },
+    {
+      "id": "teeworlds",
+      "name": "Teeworlds",
+      "source": "parkervcp",
+      "summary": "2D arena shooter; ~10MB native server. CI install fixture.",
+      "tier": "supported",
+      "defaultPort": 8303,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "game_eggs/teeworlds/egg-teeworlds.json"
+      },
+      "installRecipe": {
+        "method": "downloadExtract",
+        "url": "https://github.com/teeworlds/teeworlds/releases/download/0.7.5/teeworlds-0.7.5-linux_x86_64.tar.gz"
+      },
+      "start": {
+        "binary": "teeworlds_srv",
+        "args": "\"sv_port {{port}}\""
+      }
+    },
+    {
+      "id": "tf2",
+      "name": "Team Fortress 2",
+      "source": "linuxgsm",
+      "summary": "Class-based team shooter (~10GB).",
+      "tier": "experimental",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "installRecipe": {
+        "method": "steam",
+        "steamAppId": 232250
+      },
+      "start": {
+        "binary": "srcds_linux",
+        "wrap": "i386",
+        "extraLibs": [
+          ".",
+          "bin"
+        ],
+        "args": "-game tf +map ctf_2fort +port {{port}}"
+      }
+    },
+    {
+      "id": "valheim",
+      "name": "Valheim",
+      "source": "linuxgsm",
+      "summary": "Viking survival co-op (~2GB).",
+      "tier": "experimental",
+      "defaultPort": 2456,
+      "protocols": [
+        "udp"
+      ],
+      "installRecipe": {
+        "method": "steam",
+        "steamAppId": 896660
+      },
+      "start": {
+        "binary": "valheim_server.x86_64",
+        "wrap": "amd64",
+        "extraLibs": [
+          "."
+        ],
+        "args": "-port {{port}} -world Dedicated -password changeme"
+      }
+    },
+    {
+      "id": "vanilla-bedrock",
+      "name": "Vanilla Bedrock",
+      "source": "parkervcp",
+      "summary": "Mojang's official Bedrock dedicated server. Speaks UDP 19132 to the Play Store Minecraft app.",
+      "tier": "disabled",
+      "disabledReason": "egg curls minecraft.net + zgreps the HTML for the latest tarball URL at install time. Static URL pinning requires periodic refresh and Mojang EULA acceptance. Promote by adding installRecipe with a pinned bedrock-server-\u003cver\u003e.zip URL and bumping it via a release-cadence task.",
+      "defaultPort": 19132,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "game_eggs/minecraft/bedrock/bedrock/egg-vanilla-bedrock.json"
+      }
+    },
+    {
+      "id": "zomboid",
+      "name": "Project Zomboid",
+      "source": "linuxgsm",
+      "summary": "Isometric zombie survival sandbox (~3GB).",
+      "tier": "experimental",
+      "defaultPort": 16261,
+      "protocols": [
+        "udp"
+      ],
+      "installRecipe": {
+        "method": "steam",
+        "steamAppId": 380870
+      },
+      "start": {
+        "binary": "start-server.sh",
+        "args": "-port {{port}}"
+      }
+    }
+  ]
+}
