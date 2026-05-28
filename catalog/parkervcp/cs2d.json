@@ -1,15 +1,19 @@
 {
   "id": "cs2d",
   "name": "CS2D",
-  "summary": "Plant and defuse bombs, rescue hostages or accomplish new missions like capture the flag or domination! Use a huge arsenal of weapons and equipment including crazy stuff like portal guns, lasers, RPGs",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://www.unrealsoftware.de/get.php?get=cs2d_1013_linux.zip; promote after testing on device",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "2D Counter-Strike clone. Free, ~10MB native server.",
+  "tier": "experimental",
+  "defaultPort": 36963,
+  "protocols": ["udp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "cs2d/egg-c-s2-d.json"
+    "path": "game_eggs/cs2d/egg-c-s2-d.json"
+  },
+  "installRecipe": {
+    "method": "downloadExtract",
+    "url": "https://www.unrealsoftware.de/get.php?get=cs2d_1013_linux.zip"
+  },
+  "start": {
+    "binary": "cs2d_dedicated"
   }
 }

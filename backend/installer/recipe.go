@@ -137,6 +137,7 @@ func (r *RecipeInstaller) wrap(libBase, loader, installDir string, extras []stri
 
 func (r *RecipeInstaller) download(ctx context.Context, url, dst string) error {
 	req, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
+	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; syncloud-games)")
 	resp, err := r.httpClient.Do(req)
 	if err != nil {
 		return err

@@ -1,15 +1,20 @@
 {
   "id": "cube-2-sauerbraten",
   "name": "Cube 2: Sauerbraten",
-  "summary": "Cube 2: Sauerbraten is a free multiplayer & singleplayer first person shooter, the successor of the Cube FPS.\r\nMuch like the original Cube, the aim of this game is fun, old school deathmatch gameplay ",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://cfhcable.dl.sourceforge.net/project/sauerbraten/sauerbraten/2020_11_29/sauerbraten_2020_12_29_linux.tar.bz2; promote after testing on device",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Free multiplayer/singleplayer first-person shooter, the successor of the Cube FPS.",
+  "tier": "experimental",
+  "defaultPort": 28785,
+  "protocols": ["udp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "cubeengine/cube2/egg-cube2--sauerbraten.json"
+    "path": "game_eggs/cubeengine/cube2/egg-cube2--sauerbraten.json"
+  },
+  "installRecipe": {
+    "method": "downloadExtract",
+    "url": "https://cfhcable.dl.sourceforge.net/project/sauerbraten/sauerbraten/2020_12_29/sauerbraten_2020_12_29_loner_linux.tar.bz2"
+  },
+  "start": {
+    "binary": "bin_unix/linux_64_server",
+    "args": "-j{{port}}"
   }
 }
