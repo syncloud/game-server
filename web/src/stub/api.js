@@ -9,7 +9,7 @@ const games = [
     summary: 'Fast-paced 2D online shooter. Smallest dedicated server in the catalog (~10 MB).',
     defaultPort: 8303,
     protocols: ['udp'],
-    tier: 'compatible'
+    tier: 'experimental'
   },
   {
     id: 'hlds-cs',
@@ -19,7 +19,7 @@ const games = [
     summary: 'Classic GoldSrc CS 1.6 dedicated server (HLDS). Bundled mod = cstrike.',
     defaultPort: 27015,
     protocols: ['udp'],
-    tier: 'verified',
+    tier: 'supported',
     steamAppId: 90
   },
   {
@@ -30,7 +30,7 @@ const games = [
     summary: 'Source 2 successor to CS:GO. Anonymous-friendly install, ~30 GB.',
     defaultPort: 27015,
     protocols: ['udp'],
-    tier: 'verified',
+    tier: 'supported',
     steamAppId: 730
   },
   {
@@ -41,7 +41,7 @@ const games = [
     summary: 'Co-op Viking survival. Dedicated server bundled by the publisher.',
     defaultPort: 2456,
     protocols: ['udp'],
-    tier: 'verified',
+    tier: 'supported',
     steamAppId: 896660
   },
   {
@@ -52,7 +52,7 @@ const games = [
     summary: 'High-performance Minecraft Java server (Paper). Plugins compatible with Spigot.',
     defaultPort: 25565,
     protocols: ['tcp'],
-    tier: 'compatible'
+    tier: 'experimental'
   },
   {
     id: 'factorio',
@@ -62,7 +62,7 @@ const games = [
     summary: 'Build automated factories. Multiplayer dedicated server.',
     defaultPort: 34197,
     protocols: ['udp'],
-    tier: 'compatible',
+    tier: 'experimental',
     steamAppId: 427520
   },
   {
@@ -73,7 +73,7 @@ const games = [
     summary: 'Tower-defense factory game. Headless server bundles a single JAR.',
     defaultPort: 6567,
     protocols: ['tcp'],
-    tier: 'compatible'
+    tier: 'experimental'
   },
   {
     id: 'arma3',

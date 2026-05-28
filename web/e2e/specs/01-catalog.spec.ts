@@ -21,14 +21,15 @@ test('search filters games', async ({ page }, info) => {
 test('tier filter pills', async ({ page }, info) => {
   await page.goto('/#/catalog')
   await expect(page.getByTestId('tier-all')).toBeVisible()
-  await expect(page.getByTestId('tier-verified')).toBeVisible()
-  await expect(page.getByTestId('tier-compatible')).toBeVisible()
+  await expect(page.getByTestId('tier-supported')).toBeVisible()
   await expect(page.getByTestId('tier-experimental')).toBeVisible()
-  await page.getByTestId('tier-verified').click()
+  await expect(page.getByTestId('tier-disabled')).toBeVisible()
+  await page.getByTestId('tier-supported').click()
   await expect(page.getByTestId('game-hlds-cs')).toBeVisible()
-  await shoot(page, info, 'tier-verified')
-  await page.getByTestId('tier-compatible').click()
   await expect(page.getByTestId('game-teeworlds')).toBeVisible()
+  await shoot(page, info, 'tier-supported')
+  await page.getByTestId('tier-experimental').click()
+  await expect(page.getByTestId('game-cs2')).toBeVisible()
 })
 
 test('servers tab empty by default', async ({ page }, info) => {
