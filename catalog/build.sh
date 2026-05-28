@@ -1,22 +1,16 @@
 #!/bin/bash -ex
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+DATA=${DIR}/../backend/catalog/data
 
-cd ${DIR}/aggregate
-CGO_ENABLED=0 go build -buildvcs=false -o ${DIR}/aggregate.bin .
+rm -rf ${DATA}
+mkdir -p ${DATA}
+for src in parkervcp pelican-eggs linuxgsm; do
+    if compgen -G "${DIR}/${src}/*.json" > /dev/null; then
+        mkdir -p ${DATA}/${src}
+        cp ${DIR}/${src}/*.json ${DATA}/${src}/
+    fi
+done
 
-OUT=${DIR}/../backend/catalog/catalog.json
-${DIR}/aggregate.bin --root ${DIR} --out ${OUT}
-rm ${DIR}/aggregate.bin
-
-echo "catalog stats:"
-wc -c ${OUT}
-python3 -c "
-import json
-with open('${OUT}') as f: c=json.load(f)
-tiers={}
-for g in c['games']:
-    tiers[g['tier']] = tiers.get(g['tier'], 0) + 1
-print('total:', len(c['games']))
-print('by tier:', tiers)
-"
+echo "catalog data populated under ${DATA}:"
+find ${DATA} -name '*.json' | wc -l

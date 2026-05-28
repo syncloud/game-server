@@ -1,14 +1,17 @@
 package catalog
 
 import (
-	_ "embed"
+	"embed"
 	"encoding/json"
 	"fmt"
+	"io/fs"
+	"path"
 	"sort"
+	"strings"
 )
 
-//go:embed catalog.json
-var raw []byte
+//go:embed all:data
+var dataFS embed.FS
 
 type Upstream struct {
 	Commit string `json:"commit,omitempty"`
@@ -43,34 +46,66 @@ type StartRecipe struct {
 	Args      string   `json:"args,omitempty"`
 }
 
-type bundle struct {
-	Games []Game `json:"games"`
-}
-
 var (
 	byID    map[string]Game
 	allList []Game
 )
 
 func Start() error {
-	var b bundle
-	if err := json.Unmarshal(raw, &b); err != nil {
-		return fmt.Errorf("parse embedded catalog.json: %w", err)
+	games, err := loadFS(dataFS, "data")
+	if err != nil {
+		return err
 	}
-	index := make(map[string]Game, len(b.Games))
-	for _, g := range b.Games {
+	index := make(map[string]Game, len(games))
+	for _, g := range games {
 		index[g.ID] = g
 	}
-	list := append([]Game(nil), b.Games...)
-	sort.Slice(list, func(i, j int) bool {
-		if list[i].Tier != list[j].Tier {
-			return tierRank(list[i].Tier) < tierRank(list[j].Tier)
+	sort.Slice(games, func(i, j int) bool {
+		if games[i].Tier != games[j].Tier {
+			return tierRank(games[i].Tier) < tierRank(games[j].Tier)
 		}
-		return list[i].Name < list[j].Name
+		return games[i].Name < games[j].Name
 	})
 	byID = index
-	allList = list
+	allList = games
 	return nil
+}
+
+func loadFS(fsys fs.FS, root string) ([]Game, error) {
+	var games []Game
+	err := fs.WalkDir(fsys, root, func(p string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() || !strings.HasSuffix(p, ".json") {
+			return err
+		}
+		data, err := fs.ReadFile(fsys, p)
+		if err != nil {
+			return err
+		}
+		var g Game
+		if err := json.Unmarshal(data, &g); err != nil {
+			return fmt.Errorf("%s: %w", p, err)
+		}
+		rel, err := fs.Sub(fsys, root)
+		_ = rel
+		_ = err
+		// p is "<root>/<source>/<id>.json"
+		parts := strings.Split(p, "/")
+		if len(parts) >= 3 {
+			g.Source = parts[len(parts)-2]
+		}
+		if g.ID == "" {
+			return fmt.Errorf("%s: empty id", p)
+		}
+		if path.Base(p) != g.ID+".json" {
+			return fmt.Errorf("%s: id %q does not match filename", p, g.ID)
+		}
+		games = append(games, g)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return games, nil
 }
 
 func tierRank(t string) int {
