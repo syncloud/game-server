@@ -1,0 +1,15 @@
+{
+  "id": "fistful-of-frags",
+  "name": "Fistful of Frags",
+  "summary": "",
+  "tier": "disabled",
+  "disabledReason": "steam: appid 295230 (from LinuxGSM fofserver/_default.cfg) not yet validated for anonymous-loginnable install",
+  "defaultPort": 27015,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "d05992d7d2deb88ed0a0c9df5ffc423995947d11",
+    "path": "lgsm/config-default/config-lgsm/fofserver/_default.cfg"
+  }
+}

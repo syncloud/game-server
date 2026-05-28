@@ -1,0 +1,15 @@
+{
+  "id": "red-orchestra-ostfront-41-45",
+  "name": "Red Orchestra: Ostfront 41-45",
+  "summary": "",
+  "tier": "disabled",
+  "disabledReason": "steam: appid 223250 (from LinuxGSM roserver/_default.cfg) not yet validated for anonymous-loginnable install",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "d05992d7d2deb88ed0a0c9df5ffc423995947d11",
+    "path": "lgsm/config-default/config-lgsm/roserver/_default.cfg"
+  }
+}

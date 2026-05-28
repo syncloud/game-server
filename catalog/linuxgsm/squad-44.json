@@ -1,0 +1,15 @@
+{
+  "id": "squad-44",
+  "name": "Squad 44",
+  "summary": "",
+  "tier": "disabled",
+  "disabledReason": "steam: appid 746200 (from LinuxGSM squad44server/_default.cfg) not yet validated for anonymous-loginnable install",
+  "defaultPort": 10027,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "d05992d7d2deb88ed0a0c9df5ffc423995947d11",
+    "path": "lgsm/config-default/config-lgsm/squad44server/_default.cfg"
+  }
+}

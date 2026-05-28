@@ -1,0 +1,15 @@
+{
+  "id": "warfork",
+  "name": "Warfork",
+  "summary": "",
+  "tier": "disabled",
+  "disabledReason": "steam: appid 1136510 (from LinuxGSM wfserver/_default.cfg) not yet validated for anonymous-loginnable install",
+  "defaultPort": 44400,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "d05992d7d2deb88ed0a0c9df5ffc423995947d11",
+    "path": "lgsm/config-default/config-lgsm/wfserver/_default.cfg"
+  }
+}

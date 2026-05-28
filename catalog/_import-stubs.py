@@ -13,7 +13,7 @@ upstream SHAs:
 Existing files are never overwritten — promote/edit them by hand.
 """
 
-import argparse, json, os, re, sys
+import argparse, csv, json, os, re, sys
 from pathlib import Path
 
 URL_LITERAL_RE = re.compile(r'https?://[^\s"\'\\)]+')
@@ -117,12 +117,56 @@ def make_stub(egg, source: str, commit: str, rel_path: str) -> dict:
     }
     return stub
 
+CFG_KV_RE = re.compile(r'^\s*(appid|gamename|port|queryport|maxplayers)\s*=\s*"?([^"\n#]+?)"?\s*(?:#.*)?$')
+
+def lgsm_read_cfg(path: Path) -> dict:
+    out = {}
+    if not path.exists(): return out
+    for line in path.read_text(errors='replace').splitlines():
+        m = CFG_KV_RE.match(line)
+        if m: out[m.group(1)] = m.group(2).strip()
+    return out
+
+def lgsm_stubs(root: Path, sha: str):
+    csv_path = root / 'lgsm/data/serverlist.csv'
+    if not csv_path.exists(): return
+    with csv_path.open() as f:
+        for row in csv.DictReader(f):
+            shortname = row['shortname'].strip()
+            gameservername = row['gameservername'].strip()
+            name = row['gamename'].strip()
+            cfg = lgsm_read_cfg(root / 'lgsm/config-default/config-lgsm' / gameservername / '_default.cfg')
+            appid = cfg.get('appid', '').strip()
+            port = 0
+            try:
+                if cfg.get('port'):
+                    n = int(cfg['port']); port = n if 0 < n < 65536 else 0
+            except ValueError: pass
+
+            if appid and appid.isdigit():
+                reason = f'steam: appid {appid} (from LinuxGSM {gameservername}/_default.cfg) not yet validated for anonymous-loginnable install'
+            else:
+                reason = f'LinuxGSM-only entry without a Steam appid in {gameservername}/_default.cfg; needs manual install recipe'
+
+            yield {
+                'id': slugify(name),
+                'name': name,
+                'summary': '',
+                'tier': 'disabled',
+                'disabledReason': reason,
+                'defaultPort': port,
+                'protocols': ['udp'],
+                'upstream': {'commit': sha, 'path': f'lgsm/config-default/config-lgsm/{gameservername}/_default.cfg'},
+            }
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--parkervcp', type=Path)
     ap.add_argument('--parkervcp-sha', default='')
     ap.add_argument('--pelican',    type=Path)
     ap.add_argument('--pelican-sha', default='')
+    ap.add_argument('--linuxgsm',   type=Path)
+    ap.add_argument('--linuxgsm-sha', default='')
     ap.add_argument('--out', type=Path,
                     default=Path(__file__).resolve().parent)
     args = ap.parse_args()
@@ -144,6 +188,19 @@ def main():
                 skipped_unparseable += 1; continue
             stub = make_stub(egg, source, sha, str(egg_path.relative_to(root)))
             if stub is None:
+                skipped_unparseable += 1; continue
+            if stub['id'] in existing_ids:
+                skipped_existing += 1; continue
+            target = out_dir / f'{stub["id"]}.json'
+            target.write_text(json.dumps(stub, indent=2) + '\n')
+            existing_ids.add(stub['id'])
+            written += 1
+
+    if args.linuxgsm:
+        out_dir = args.out / 'linuxgsm'
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for stub in lgsm_stubs(args.linuxgsm, args.linuxgsm_sha):
+            if not stub['id']:
                 skipped_unparseable += 1; continue
             if stub['id'] in existing_ids:
                 skipped_existing += 1; continue

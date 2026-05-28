@@ -1,0 +1,15 @@
+{
+  "id": "half-life-2-deathmatch",
+  "name": "Half-Life 2: Deathmatch",
+  "summary": "",
+  "tier": "disabled",
+  "disabledReason": "steam: appid 232370 (from LinuxGSM hl2dmserver/_default.cfg) not yet validated for anonymous-loginnable install",
+  "defaultPort": 27015,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "d05992d7d2deb88ed0a0c9df5ffc423995947d11",
+    "path": "lgsm/config-default/config-lgsm/hl2dmserver/_default.cfg"
+  }
+}

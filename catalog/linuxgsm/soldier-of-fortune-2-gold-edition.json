@@ -1,0 +1,15 @@
+{
+  "id": "soldier-of-fortune-2-gold-edition",
+  "name": "Soldier Of Fortune 2: Gold Edition",
+  "summary": "",
+  "tier": "disabled",
+  "disabledReason": "LinuxGSM-only entry without a Steam appid in sof2server/_default.cfg; needs manual install recipe",
+  "defaultPort": 20100,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "d05992d7d2deb88ed0a0c9df5ffc423995947d11",
+    "path": "lgsm/config-default/config-lgsm/sof2server/_default.cfg"
+  }
+}

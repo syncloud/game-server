@@ -1,0 +1,15 @@
+{
+  "id": "just-cause-2",
+  "name": "Just Cause 2",
+  "summary": "",
+  "tier": "disabled",
+  "disabledReason": "steam: appid 261140 (from LinuxGSM jc2server/_default.cfg) not yet validated for anonymous-loginnable install",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "d05992d7d2deb88ed0a0c9df5ffc423995947d11",
+    "path": "lgsm/config-default/config-lgsm/jc2server/_default.cfg"
+  }
+}

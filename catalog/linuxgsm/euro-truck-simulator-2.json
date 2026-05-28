@@ -1,0 +1,15 @@
+{
+  "id": "euro-truck-simulator-2",
+  "name": "Euro Truck Simulator 2",
+  "summary": "",
+  "tier": "disabled",
+  "disabledReason": "steam: appid 1948160 (from LinuxGSM ets2server/_default.cfg) not yet validated for anonymous-loginnable install",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "d05992d7d2deb88ed0a0c9df5ffc423995947d11",
+    "path": "lgsm/config-default/config-lgsm/ets2server/_default.cfg"
+  }
+}
