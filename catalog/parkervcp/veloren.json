@@ -3,7 +3,6 @@
   "name": "Veloren",
   "summary": "Veloren is a multiplayer voxel RPG written in Rust. It is inspired by games such as Cube World, Legend of Zelda: Breath of the Wild, Dwarf Fortress and Minecraft.",
   "tier": "disabled",
-  "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
   "defaultPort": 14005,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "veloren/egg-veloren.json"
-  }
+  },
+  "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context"
 }

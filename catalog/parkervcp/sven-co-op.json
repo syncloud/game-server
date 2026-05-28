@@ -2,8 +2,7 @@
   "id": "sven-co-op",
   "name": "Sven Co-op",
   "summary": "Sven Co-op is a co-operative game originally based around Valve Software's Half-Life. In this game players must work together against computer controlled enemies and solve puzzles as a team.",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/svencoop/egg-sven-co-op.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 276060
+  },
+  "requiresAccount": true
 }

@@ -3,7 +3,6 @@
   "name": "Trackmania (2020)",
   "summary": "Trackmania is a free-to-play game that combines racing and creation. Compete on over 1000 community-made tracks, create your own with the editor, and join clubs and events online.",
   "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL http://files.v04.maniaplanet.com/server/TrackmaniaServer_Latest.zip; promote after testing on device",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
     "path": "trackmania2020/egg-trackmania2020.json"
-  }
+  },
+  "disabledReason": "candidate downloadExtract: static URL http://files.v04.maniaplanet.com/server/TrackmaniaServer_Latest.zip; promote after testing on device"
 }

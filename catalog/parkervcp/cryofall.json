@@ -2,8 +2,7 @@
   "id": "cryofall",
   "name": "CryoFall",
   "summary": "NOTE: For now you have to change SettingsServer.xml under CryoFall_Server_v(Version)_NetCore/Data/SettingsServer.xml\r\n\r\nCryoFall is a sci-fi multiplayer colony simulation survival game set on a forgot",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/cryofall/egg-cryo-fall.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 1061710
+  },
+  "requiresAccount": true
 }

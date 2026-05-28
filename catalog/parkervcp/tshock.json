@@ -3,7 +3,6 @@
   "name": "tshock",
   "summary": "The t-shock modded terraria server.\r\n\r\nhttps://tshock.co/",
   "tier": "disabled",
-  "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "terraria/tshock/egg-tshock.json"
-  }
+  },
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
 }

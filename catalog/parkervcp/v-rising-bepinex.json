@@ -2,8 +2,7 @@
   "id": "v-rising-bepinex",
   "name": "V Rising BepInEx",
   "summary": "Awaken as a vampire. Hunt for blood in nearby settlements to regain your strength and evade the scorching sun to survive. Raise your castle and thrive in an ever-changing open world full of mystery. G",
-  "tier": "disabled",
-  "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+  "tier": "experimental",
   "defaultPort": 9877,
   "protocols": [
     "udp"
@@ -11,5 +10,9 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/v_rising/v_rising_bepinex/egg-v-rising-bep-in-ex.json"
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 1829350
   }
 }

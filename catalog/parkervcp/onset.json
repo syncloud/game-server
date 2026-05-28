@@ -2,8 +2,7 @@
   "id": "onset",
   "name": "Onset",
   "summary": "Onset is an open world multiplayer sandbox without predefined goals. Create and host your very own experience in Onset using scripting functions. Whether that is Roleplay, Cops and Robbers or classic ",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/onset/egg-onset.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 1204170
+  },
+  "requiresAccount": true
 }

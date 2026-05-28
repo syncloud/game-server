@@ -3,7 +3,6 @@
   "name": "Tekkit",
   "summary": "Tekkit is set to reignite the same sort of wonder and awe that we all received from booting up Minecraft for the first time. With the skies open, the moon ready to be colonized (by force if need be) a",
   "tier": "disabled",
-  "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "minecraft/java/technic/Tekkit/egg-tekkit.json"
-  }
+  },
+  "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin"
 }

@@ -19,17 +19,18 @@ type Upstream struct {
 }
 
 type Game struct {
-	ID             string         `json:"id"`
-	Name           string         `json:"name"`
-	Source         string         `json:"source"`
-	Summary        string         `json:"summary"`
-	Tier           string         `json:"tier"`
-	DisabledReason string         `json:"disabledReason,omitempty"`
-	DefaultPort    int            `json:"defaultPort"`
-	Protocols      []string       `json:"protocols"`
-	Upstream       *Upstream      `json:"upstream,omitempty"`
-	InstallRecipe  *InstallRecipe `json:"installRecipe,omitempty"`
-	Start          *StartRecipe   `json:"start,omitempty"`
+	ID               string         `json:"id"`
+	Name             string         `json:"name"`
+	Source           string         `json:"source"`
+	Summary          string         `json:"summary"`
+	Tier             string         `json:"tier"`
+	DisabledReason   string         `json:"disabledReason,omitempty"`
+	RequiresAccount  bool           `json:"requiresAccount,omitempty"`
+	DefaultPort      int            `json:"defaultPort"`
+	Protocols        []string       `json:"protocols"`
+	Upstream         *Upstream      `json:"upstream,omitempty"`
+	InstallRecipe    *InstallRecipe `json:"installRecipe,omitempty"`
+	Start            *StartRecipe   `json:"start,omitempty"`
 }
 
 type InstallRecipe struct {

@@ -2,8 +2,7 @@
   "id": "custom-hlds-engine-game",
   "name": "Custom HLDS Engine Game",
   "summary": "This option allows modifying the startup arguments and other details to run a custom HLDS based game on the panel.",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 26900,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/hlds_server/vanilla/egg-custom-h-l-d-s-engine-game.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 90
+  },
+  "requiresAccount": true
 }

@@ -2,8 +2,7 @@
   "id": "stormworks-build-and-rescue",
   "name": "Stormworks: Build and Rescue",
   "summary": "Join a world where you design, create and pilot your own air sea rescue service. Release your inner hero as you battle fierce storms out at sea to rescue those in need.",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/stormworks/egg-stormworks--build-and-rescue.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 1247090
+  },
+  "requiresAccount": true
 }

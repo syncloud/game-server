@@ -2,8 +2,7 @@
   "id": "resonite",
   "name": "Resonite",
   "summary": "Enter a novel digital universe with infinite possibilities. Whether you resonate with people around the world in a casual conversation, playing games and socializing or you riff off each other when cr",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/resonite/egg-resonite.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 2519830
+  },
+  "requiresAccount": true
 }

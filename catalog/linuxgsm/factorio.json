@@ -1,0 +1,15 @@
+{
+  "id": "factorio",
+  "name": "Factorio",
+  "summary": "",
+  "tier": "disabled",
+  "disabledReason": "LinuxGSM-only entry without a Steam appid in fctrserver/_default.cfg; needs manual install recipe",
+  "defaultPort": 34197,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "d05992d7d2deb88ed0a0c9df5ffc423995947d11",
+    "path": "lgsm/config-default/config-lgsm/fctrserver/_default.cfg"
+  }
+}

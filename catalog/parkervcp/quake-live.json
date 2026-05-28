@@ -2,8 +2,7 @@
   "id": "quake-live",
   "name": "Quake Live",
   "summary": "Quake Live is a first-person shooter video game by id Software. It is an updated version of Quake III Arena that was originally designed as a free-to-play game launched via a web browser plug-in. On S",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/quake_live/egg-quake-live.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 349090
+  },
+  "requiresAccount": true
 }

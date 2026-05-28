@@ -3,13 +3,13 @@
   "name": "Stay In Tarkov",
   "summary": "The Stay in Tarkov project was born due to Battlestate Games' (BSG) reluctance to create the pure PvE version of Escape from Tarkov. The project's aim is simple, create a Cooperation PvE experience th",
   "tier": "disabled",
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
   "defaultPort": 0,
   "protocols": [
     "udp"
   ],
   "upstream": {
     "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
-    "path": "eft/egg-pterodactyl-stay-in-tarkov.json"
-  }
+    "path": "eft/egg-stay-in-tarkov.json"
+  },
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
 }

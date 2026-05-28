@@ -3,7 +3,6 @@
   "name": "FiveM",
   "summary": "A new FiveM egg for the latest builds due to recent changes in FiveM",
   "tier": "disabled",
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
   "defaultPort": 40120,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "gta/fivem/egg-five-m.json"
-  }
+  },
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
 }

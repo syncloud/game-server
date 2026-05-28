@@ -3,7 +3,6 @@
   "name": "Spacestation 14",
   "summary": "Space Station 14 tells the story of an ordinary shift on a space station gone wrong. Immerse yourself into your role, tinker with detailed systems, and survive the chaos in this round-based multiplaye",
   "tier": "disabled",
-  "disabledReason": "egg install URL contains unsubstituted shell variable ${V}; needs a static URL pin",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "spacestation_14/egg-spacestation14.json"
-  }
+  },
+  "disabledReason": "egg install URL contains unsubstituted shell variable ${V}; needs a static URL pin"
 }

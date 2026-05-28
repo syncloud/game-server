@@ -3,7 +3,6 @@
   "name": "Assetto Corsa (Freeroam + AI)",
   "summary": "Custom Assetto Corsa server with focus on freeroam",
   "tier": "disabled",
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/assetto_corsa/egg-assetto-corsa--freeroam--a-i.json"
-  }
+  },
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
 }

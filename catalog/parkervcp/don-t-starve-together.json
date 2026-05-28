@@ -2,8 +2,7 @@
   "id": "don-t-starve-together",
   "name": "Don't Starve Together",
   "summary": "Don\u2019t Starve Together is an uncompromising wilderness survival game full of science and magic.",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 11000,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/dont_starve/egg-don-t-starve-together.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 343050
+  },
+  "requiresAccount": true
 }

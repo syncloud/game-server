@@ -3,7 +3,6 @@
   "name": "Tekkit Legends",
   "summary": "The ancient power of Tekkits past return in this legendary pack! Wield the philosopher's stone, ride the rails, breed the bees, and much, much more! This pack will remind you of what you've always lov",
   "tier": "disabled",
-  "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "minecraft/java/technic/tekkit-legends/egg-tekkit-legends.json"
-  }
+  },
+  "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin"
 }

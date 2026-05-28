@@ -2,8 +2,7 @@
   "id": "sons-of-the-forest",
   "name": "Sons Of The Forest",
   "summary": "Sons of the Forest is a horror survival game and sequel to The Forest by Endnight Games, Ltd.. Sent to find a missing billionaire on a remote island, you find yourself in a cannibal-infested hellscape",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 27016,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/sonsoftheforest/egg-sons-of-the-forest.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 2465200
+  },
+  "requiresAccount": true
 }

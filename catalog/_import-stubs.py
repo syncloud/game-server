@@ -19,6 +19,8 @@ from pathlib import Path
 URL_LITERAL_RE = re.compile(r'https?://[^\s"\'\\)]+')
 ARCHIVE_RE     = re.compile(r'\.(tar\.gz|tgz|tar\.xz|tar\.bz2|tar|zip)(?:[?#]|$)')
 APPID_RE       = re.compile(r'\+app_update\s+(\d+)')
+APPID_VAR_RE   = re.compile(r'\+app_update\s+\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?')
+LOGIN_RE       = re.compile(r'\+login\s+(\S+)')
 BASH_VAR_RE    = re.compile(r'\$\{[A-Za-z_][A-Za-z0-9_]*\}|\$[A-Z_][A-Z0-9_]+')
 PORT_RE        = re.compile(r'\b([0-9]{4,5})\b')
 SLUG_RE        = re.compile(r'[^a-z0-9]+')
@@ -68,53 +70,93 @@ def detect_protocols(egg) -> list[str]:
     if 'tcp' in s: return ['tcp']
     return ['udp']
 
-def classify(egg) -> str:
-    """Return a short disabledReason describing why we can't ship a working
-    recipe today. Picked on first match — order matters."""
+def egg_var_value(egg, name: str) -> str | None:
+    for v in egg.get('variables') or []:
+        if (v.get('env_variable') or '').strip() == name:
+            return (v.get('default_value') or '').strip()
+    return None
+
+def detect_steam_appid(egg, script: str) -> int | None:
+    m = APPID_RE.search(script)
+    if m:
+        return int(m.group(1))
+    m = APPID_VAR_RE.search(script)
+    if m:
+        val = egg_var_value(egg, m.group(1)) or ''
+        if val.isdigit():
+            return int(val)
+    return None
+
+def detect_login_clause(script: str) -> str:
+    m = LOGIN_RE.search(script)
+    return (m.group(1).strip() if m else '').lower()
+
+def classify(egg) -> dict:
+    """Return either {'tier':'experimental', 'installRecipe':..., 'requiresAccount': bool}
+    or {'tier':'disabled', 'disabledReason': str}. Picked on first match — order matters."""
     script = (egg.get('scripts', {}).get('installation', {}) or {}).get('script') or ''
     entry  = (egg.get('scripts', {}).get('installation', {}) or {}).get('entrypoint', '').lower()
 
     if not script.strip():
-        return 'no install script in egg'
+        return {'tier': 'disabled', 'disabledReason': 'no install script in egg'}
 
-    if entry and entry not in ('bash', 'sh', 'ash'):
-        return f'install entrypoint is {entry!r}, not a POSIX shell our installer can ignore'
+    if entry and entry not in ('bash', 'sh', 'ash', '/bin/bash', '/bin/sh', '/bin/ash'):
+        return {'tier': 'disabled', 'disabledReason':
+                f'install entrypoint is {entry!r}, not a POSIX shell our installer can ignore'}
 
-    appid = APPID_RE.search(script)
-    if appid:
-        return f'steam: appid {appid.group(1)} not yet validated for anonymous-loginnable install'
+    appid = detect_steam_appid(egg, script)
+    if appid is not None:
+        login = detect_login_clause(script)
+        stub = {
+            'tier': 'experimental',
+            'installRecipe': {'method': 'steam', 'steamAppId': appid},
+        }
+        if login and login != 'anonymous':
+            stub['requiresAccount'] = True
+        return stub
 
     urls = [u for u in URL_LITERAL_RE.findall(script) if ARCHIVE_RE.search(u)]
     bash_var_urls = [u for u in urls if BASH_VAR_RE.search(u)]
 
     if any(tok in script for tok in BUILDS):
-        return 'egg builds from source (BuildTools/gradle/maven/cmake); needs a pre-built binary URL'
+        return {'tier': 'disabled', 'disabledReason':
+                'egg builds from source (BuildTools/gradle/maven/cmake); needs a pre-built binary URL'}
     if any(tok in script for tok in DYNAMIC):
-        return 'egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin'
+        return {'tier': 'disabled', 'disabledReason':
+                'egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin'}
     if any(tok in script for tok in NEEDS_TOOLS):
-        return 'egg installs build tools via apt/apk/yum; not supported in our snap install context'
+        return {'tier': 'disabled', 'disabledReason':
+                'egg installs build tools via apt/apk/yum; not supported in our snap install context'}
     if bash_var_urls:
         ex = bash_var_urls[0]
         var = (BASH_VAR_RE.search(ex) or [''])[0]
-        return f'egg install URL contains unsubstituted shell variable {var}; needs a static URL pin'
+        return {'tier': 'disabled', 'disabledReason':
+                f'egg install URL contains unsubstituted shell variable {var}; needs a static URL pin'}
     if urls:
-        return f'candidate downloadExtract: static URL {urls[0]}; promote after testing on device'
-    return 'no extractable install URL; manual recipe required'
+        return {'tier': 'disabled', 'disabledReason':
+                f'candidate downloadExtract: static URL {urls[0]}; promote after testing on device'}
+    return {'tier': 'disabled', 'disabledReason': 'no extractable install URL; manual recipe required'}
 
 def make_stub(egg, source: str, commit: str, rel_path: str) -> dict:
     name = (egg.get('name') or '').strip()
     if not name:
         return None
+    cls = classify(egg)
     stub = {
         'id': slugify(name),
         'name': name,
         'summary': (egg.get('description') or '').strip()[:200],
-        'tier': 'disabled',
-        'disabledReason': classify(egg),
+        'tier': cls['tier'],
         'defaultPort': detect_port(egg),
         'protocols': detect_protocols(egg),
         'upstream': {'commit': commit, 'path': rel_path},
     }
+    if cls['tier'] == 'disabled':
+        stub['disabledReason'] = cls['disabledReason']
+    else:
+        stub['installRecipe'] = cls['installRecipe']
+        if cls.get('requiresAccount'):
+            stub['requiresAccount'] = True
     return stub
 
 CFG_KV_RE = re.compile(r'^\s*(appid|gamename|port|queryport|maxplayers)\s*=\s*"?([^"\n#]+?)"?\s*(?:#.*)?$')
@@ -167,6 +209,8 @@ def main():
     ap.add_argument('--pelican-sha', default='')
     ap.add_argument('--linuxgsm',   type=Path)
     ap.add_argument('--linuxgsm-sha', default='')
+    ap.add_argument('--rewrite-disabled', action='store_true',
+                    help='overwrite existing files whose tier is currently "disabled"')
     ap.add_argument('--out', type=Path,
                     default=Path(__file__).resolve().parent)
     args = ap.parse_args()
@@ -175,10 +219,43 @@ def main():
     if args.parkervcp: sources.append(('parkervcp', args.parkervcp, args.parkervcp_sha))
     if args.pelican:   sources.append(('pelican-eggs', args.pelican, args.pelican_sha))
 
-    existing_ids = {p.stem for p in args.out.glob('*/*.json')}
+    # Map existing id -> (path, tier). Lets --rewrite-disabled selectively
+    # overwrite catalog entries that are still in their auto-generated form.
+    existing = {}
+    for p in args.out.glob('*/*.json'):
+        try:
+            t = json.loads(p.read_text()).get('tier', '')
+            existing[p.stem] = (p, t)
+        except Exception:
+            existing[p.stem] = (p, '')
+
+    def should_write(stub, target_dir: Path) -> bool:
+        prev = existing.get(stub['id'])
+        if prev is None:
+            return True
+        prev_path, prev_tier = prev
+        if prev_path.parent != target_dir:
+            # already lives in a different source dir; never cross-write a dup
+            return False
+        if args.rewrite_disabled and prev_tier == 'disabled':
+            return True
+        return False
+
     written = 0
     skipped_existing = 0
     skipped_unparseable = 0
+    promoted_to_experimental = 0
+
+    def write_stub(out_dir: Path, stub: dict):
+        nonlocal written, promoted_to_experimental
+        target = out_dir / f'{stub["id"]}.json'
+        prev = existing.get(stub['id'])
+        if prev and prev[1] == 'disabled' and stub['tier'] == 'experimental':
+            promoted_to_experimental += 1
+        target.write_text(json.dumps(stub, indent=2) + '\n')
+        existing[stub['id']] = (target, stub['tier'])
+        written += 1
+
     for source, root, sha in sources:
         out_dir = args.out / source
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -189,12 +266,9 @@ def main():
             stub = make_stub(egg, source, sha, str(egg_path.relative_to(root)))
             if stub is None:
                 skipped_unparseable += 1; continue
-            if stub['id'] in existing_ids:
+            if not should_write(stub, out_dir):
                 skipped_existing += 1; continue
-            target = out_dir / f'{stub["id"]}.json'
-            target.write_text(json.dumps(stub, indent=2) + '\n')
-            existing_ids.add(stub['id'])
-            written += 1
+            write_stub(out_dir, stub)
 
     if args.linuxgsm:
         out_dir = args.out / 'linuxgsm'
@@ -202,14 +276,12 @@ def main():
         for stub in lgsm_stubs(args.linuxgsm, args.linuxgsm_sha):
             if not stub['id']:
                 skipped_unparseable += 1; continue
-            if stub['id'] in existing_ids:
+            if not should_write(stub, out_dir):
                 skipped_existing += 1; continue
-            target = out_dir / f'{stub["id"]}.json'
-            target.write_text(json.dumps(stub, indent=2) + '\n')
-            existing_ids.add(stub['id'])
-            written += 1
+            write_stub(out_dir, stub)
 
-    print(f'wrote {written}, skipped existing {skipped_existing}, '
+    print(f'wrote {written} (of which {promoted_to_experimental} disabled->experimental), '
+          f'skipped existing {skipped_existing}, '
           f'skipped unparseable {skipped_unparseable}')
 
 if __name__ == '__main__':

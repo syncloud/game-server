@@ -2,8 +2,7 @@
   "id": "scp-sl",
   "name": "SCP:SL",
   "summary": "Egg for SCP: Secret Laboratory Dedicated Linux Server",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/scpsl/dedicated/egg-scpsl.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 996560
+  },
+  "requiresAccount": true
 }

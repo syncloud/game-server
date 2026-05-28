@@ -2,8 +2,7 @@
   "id": "the-isle",
   "name": "The Isle",
   "summary": "The Isle is an open beta with an open-world survival game where players choose from three factions in an attempt to survive a fierce island. Hunt. Prey. Survive.",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 44000,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/the_isle/evrima/egg-the-isle.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 412680
+  },
+  "requiresAccount": true
 }

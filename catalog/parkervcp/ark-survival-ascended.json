@@ -2,8 +2,7 @@
   "id": "ark-survival-ascended",
   "name": "ARK: Survival Ascended",
   "summary": "ARK is reimagined from the ground-up into the next-generation of video game technology with Unreal Engine 5! Form a tribe, tame & breed hundreds of unique dinosaurs and primeval creatures, explore, cr",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 27015,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/ark_survival_ascended/egg-ark--survival-ascended.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 2430930
+  },
+  "requiresAccount": true
 }

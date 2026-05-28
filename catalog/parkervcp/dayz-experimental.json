@@ -2,8 +2,7 @@
   "id": "dayz-experimental",
   "name": "DayZ (Experimental)",
   "summary": "How long can you survive a post-apocalyptic world? A land overrun with an infected \"zombie\" population, where you compete with other survivors for limited resources. Will you team up with strangers an",
-  "tier": "disabled",
-  "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/dayz-experimental/egg-dayz-experimental.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 1042420
+  },
+  "requiresAccount": true
 }

@@ -3,7 +3,6 @@
   "name": "Foundry VTT",
   "summary": "Foundry VTT is a standalone application built for experiencing multiplayer tabletop RPGs using a feature-rich and modern self-hosted application where your players connect directly through the browser",
   "tier": "disabled",
-  "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "FoundryVTT/egg-FoundryVTT.json"
-  }
+  },
+  "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context"
 }

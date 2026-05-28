@@ -2,8 +2,7 @@
   "id": "the-front",
   "name": "The Front",
   "summary": "The Front is a survival open-world crafting shooter. You play the role of a resistance fighter sent back in time to stop the rise of a tyrannical empire.",
-  "tier": "disabled",
-  "disabledReason": "steam: appid 1007 not yet validated for anonymous-loginnable install",
+  "tier": "experimental",
   "defaultPort": 27016,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/thefront/egg-the-front.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 1007
+  },
+  "requiresAccount": true
 }

@@ -2,8 +2,7 @@
   "id": "satisfactory",
   "name": "Satisfactory",
   "summary": "Satisfactory is a first-person open-world factory building game with a dash of exploration and combat. Play alone or with friends, explore an alien planet, create multi-story factories, and enter conv",
-  "tier": "disabled",
-  "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+  "tier": "experimental",
   "defaultPort": 15777,
   "protocols": [
     "udp"
@@ -11,5 +10,9 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/satisfactory/egg-satisfactory.json"
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 1690800
   }
 }

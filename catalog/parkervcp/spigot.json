@@ -3,7 +3,6 @@
   "name": "Spigot",
   "summary": "Spigot is the most widely-used modded Minecraft server software in the world. It powers many of the top Minecraft server networks around to ensure they can cope with their huge player base and ensure ",
   "tier": "disabled",
-  "disabledReason": "egg builds from source (BuildTools/gradle/maven/cmake); needs a pre-built binary URL",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "minecraft/java/spigot/egg-spigot.json"
-  }
+  },
+  "disabledReason": "egg builds from source (BuildTools/gradle/maven/cmake); needs a pre-built binary URL"
 }

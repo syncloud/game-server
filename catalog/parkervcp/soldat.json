@@ -2,8 +2,7 @@
   "id": "soldat",
   "name": "Soldat",
   "summary": "Soldat is a unique 2D (side-view) multiplayer action game. It has been influenced by the best of games such as Liero, Worms, Quake, and Counter-Strike and provides a fast-paced gaming experience with ",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/soldat/egg-soldat.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 638500
+  },
+  "requiresAccount": true
 }

@@ -3,13 +3,13 @@
   "name": "OpenTTD",
   "summary": "OpenTTD is an open source simulation game based upon the popular Microprose game \"Transport Tycoon Deluxe\", written by Chris Sawyer. It attempts to mimic the original game as closely as possible while",
   "tier": "disabled",
-  "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
   "defaultPort": 0,
   "protocols": [
     "udp"
   ],
   "upstream": {
     "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
-    "path": "openttd/egg-open-t-t-d-server.json"
-  }
+    "path": "openttd/egg-pterodactyl-open-t-t-d-server.json"
+  },
+  "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context"
 }

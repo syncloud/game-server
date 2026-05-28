@@ -2,8 +2,7 @@
   "id": "open-fortress",
   "name": "Open Fortress",
   "summary": "Open Fortress is a free Team Fortress 2 mod that introduces new gamemodes, weapons, characters, maps, and more to the world of TF2.",
-  "tier": "disabled",
-  "disabledReason": "steam: appid 232250 not yet validated for anonymous-loginnable install",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/open_fortress/egg-open-fortress.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 232250
+  },
+  "requiresAccount": true
 }

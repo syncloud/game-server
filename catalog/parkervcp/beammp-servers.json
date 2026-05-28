@@ -3,7 +3,6 @@
   "name": "BeamMP Servers",
   "summary": "This is the server for the multiplayer mod BeamMP for the game BeamNG.drive. The server is the point through which all clients communicate. You can write lua mods for the server, detailed instructions",
   "tier": "disabled",
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "beamng/beammp/egg-beam-m-p-server.json"
-  }
+  },
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
 }

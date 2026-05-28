@@ -3,7 +3,6 @@
   "name": "Among Us - Impostor Server",
   "summary": "Impostor is one of the first Among Us private servers, written in C#.\r\n\r\nThere are no special features at this moment, the goal is aiming to be as close as possible to the real server, for now. In a l",
   "tier": "disabled",
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "among_us/impostor_server/egg-among-us--impostor-server.json"
-  }
+  },
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
 }

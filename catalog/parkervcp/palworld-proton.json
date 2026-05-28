@@ -2,8 +2,7 @@
   "id": "palworld-proton",
   "name": "Palworld Proton",
   "summary": "Fight, farm, build and work alongside mysterious creatures called \"Pals\" in this completely new multiplayer, open world survival and crafting game!",
-  "tier": "disabled",
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "tier": "experimental",
   "defaultPort": 25575,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/palworld/egg-palworld-proton.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 2394010
+  },
+  "requiresAccount": true
 }

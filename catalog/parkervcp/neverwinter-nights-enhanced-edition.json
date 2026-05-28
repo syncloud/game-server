@@ -3,7 +3,6 @@
   "name": "Neverwinter Nights: Enhanced Edition",
   "summary": "Return to the Forgotten Realms in this bestselling Dungeons & Dragons roleplaying game. Combines all the content of Neverwinter Nights Diamond Edition with all-new enhanced features. Includes 100+ hou",
   "tier": "disabled",
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "neverwinter_nights_ee/egg-neverwinter-nights--enhanced-edition.json"
-  }
+  },
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
 }

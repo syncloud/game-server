@@ -2,8 +2,7 @@
   "id": "astroneer-dedicated-server",
   "name": "Astroneer Dedicated Server",
   "summary": "A game of aerospace industry and interplanetary exploration.",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/astroneer/egg-astroneer-dedicated-server.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 728470
+  },
+  "requiresAccount": true
 }

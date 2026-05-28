@@ -2,8 +2,7 @@
   "id": "ground-branch",
   "name": "Ground Branch",
   "summary": "From one of the developers behind the original Rainbow Six\u00ae and Ghost Recon\u00ae games, comes a thinking-man's first-person shooter featuring in-depth character and weapon customization. Take your time. T",
-  "tier": "disabled",
-  "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+  "tier": "experimental",
   "defaultPort": 27015,
   "protocols": [
     "udp"
@@ -11,5 +10,9 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/ground_branch/egg-ground-branch.json"
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 476400
   }
 }

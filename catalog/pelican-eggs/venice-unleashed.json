@@ -3,7 +3,6 @@
   "name": "Venice Unleashed",
   "summary": "Venice Unleashed (VU) is a community-oriented Battlefield 3 custom server & modding platform that gives you back control of your gaming experience. This Egg requires a valid VU `server.key` file, and ",
   "tier": "disabled",
-  "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
     "path": "venice_unleashed/egg-pterodactyl-venice-unleashed.json"
-  }
+  },
+  "disabledReason": "no extractable install URL; manual recipe required"
 }

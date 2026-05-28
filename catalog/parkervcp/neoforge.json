@@ -3,7 +3,6 @@
   "name": "NeoForge",
   "summary": "NeoForge Server. NeoForge is a modding API (Application Programming Interface), which makes it easier to create mods, and also make sure mods are compatible with each other. NeoForge is a fork of Mine",
   "tier": "disabled",
-  "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "minecraft/java/neoforge/egg-neo-forge.json"
-  }
+  },
+  "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context"
 }

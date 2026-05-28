@@ -2,8 +2,7 @@
   "id": "project-zomboid",
   "name": "Project Zomboid",
   "summary": "Project Zomboid is an open world survival horror video game in alpha stage development by British and Canadian independent developer, The Indie Stone. The game is set in a post apocalyptic, zombie inf",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 16262,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/project_zomboid/egg-project-zomboid.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 380870
+  },
+  "requiresAccount": true
 }

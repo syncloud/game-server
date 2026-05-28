@@ -2,8 +2,7 @@
   "id": "no-love-lost",
   "name": "No Love Lost",
   "summary": "Grab your ragtag crew & take up the Nectar Raiding trade on a dangerous planet that\u2019s become all the rage! In this PvPvE extraction game for 1-10 players, compete against enemy crews to harvest as muc",
-  "tier": "disabled",
-  "disabledReason": "steam: appid 1007 not yet validated for anonymous-loginnable install",
+  "tier": "experimental",
   "defaultPort": 27016,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/no_love_lost/egg-no-love-lost.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 1007
+  },
+  "requiresAccount": true
 }

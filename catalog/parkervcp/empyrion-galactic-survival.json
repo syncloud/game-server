@@ -2,8 +2,7 @@
   "id": "empyrion-galactic-survival",
   "name": "Empyrion: Galactic Survival",
   "summary": "Empyrion: Galactic Survival dedicated server",
-  "tier": "disabled",
-  "disabledReason": "steam: appid 530870 not yet validated for anonymous-loginnable install",
+  "tier": "experimental",
   "defaultPort": 30004,
   "protocols": [
     "udp"
@@ -11,5 +10,9 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/empyrion/egg-empyrion--galactic-survival.json"
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 530870
   }
 }

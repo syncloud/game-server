@@ -5,9 +5,7 @@
   "tier": "disabled",
   "disabledReason": "candidate URL http://linuxgsm.download/MedalofHonorAlliedAssault/moh_revival_v1.12_RC3.5.1.tar.xz returns 404 as of 2026-05-28; needs replacement source",
   "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "protocols": ["udp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "mohaa/egg-mohaa.json"

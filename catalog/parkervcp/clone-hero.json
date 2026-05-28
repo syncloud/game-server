@@ -3,7 +3,6 @@
   "name": "Clone Hero",
   "summary": "Clone Hero is a classic instrument based rhythm game for Windows, Mac, Linux, and Android. It's playable with any 5 or 6 fret guitar controller, any midi drum kit, any game controller and even your ke",
   "tier": "disabled",
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "clone_hero/egg-clone-hero.json"
-  }
+  },
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
 }

@@ -2,9 +2,13 @@
   "id": "rust",
   "name": "Rust",
   "summary": "Multiplayer survival.",
-  "tier": "disabled",
-  "disabledReason": "Steam appid 258550 requires a paid Steam account; not anonymous-loginnable from SteamCMD. Promote when we have a paid-account install path.",
+  "tier": "experimental",
   "defaultPort": 28015,
   "protocols": ["udp"],
+  "requiresAccount": true,
+  "upstream": {
+    "commit": "d05992d7d2deb88ed0a0c9df5ffc423995947d11",
+    "path": "lgsm/config-default/config-lgsm/rustserver/_default.cfg"
+  },
   "installRecipe": {"method": "steam", "steamAppId": 258550}
 }

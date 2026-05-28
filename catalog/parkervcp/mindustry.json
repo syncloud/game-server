@@ -3,7 +3,6 @@
   "name": "Mindustry",
   "summary": "Mindustry is a hybrid tower-defense sandbox factory game. Create elaborate supply chains of conveyor belts to feed ammo into your turrets, produce materials to use for building, and defend your struct",
   "tier": "disabled",
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,6 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "mindustry/egg-mindustry.json"
-  }
+  },
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
 }

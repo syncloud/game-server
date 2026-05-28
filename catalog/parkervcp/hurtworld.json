@@ -2,8 +2,7 @@
   "id": "hurtworld",
   "name": "Hurtworld",
   "summary": "Hurtworld is a hardcore multiplayer survival FPS with a focus on deep survival progression that doesn't become trivial once you establish some basic needs. Built for hardcore gamers, Hurtworld aims to",
-  "tier": "disabled",
-  "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+  "tier": "experimental",
   "defaultPort": 13871,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/hurtworld/egg-hurtworld.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 405100
+  },
+  "requiresAccount": true
 }

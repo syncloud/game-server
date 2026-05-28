@@ -2,8 +2,7 @@
   "id": "operation-harsh-doorstop",
   "name": "Operation Harsh Doorstop",
   "summary": "Operation: Harsh Doorstop is an Unreal Engine powered shooter sandbox similar to mod-friendly games like Ravenfield and Garry's Mod but with roots in tactical shooters like Squad and Arma III. Our gam",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 27005,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/operation_harsh_doorstop/egg-operation-harsh-doorstop.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 950900
+  },
+  "requiresAccount": true
 }

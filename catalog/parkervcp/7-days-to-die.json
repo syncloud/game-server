@@ -2,8 +2,7 @@
   "id": "7-days-to-die",
   "name": "7 Days To Die",
   "summary": "7 days to die server",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 8081,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/7_days_to_die/egg-7-days-to-die.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 294420
+  },
+  "requiresAccount": true
 }

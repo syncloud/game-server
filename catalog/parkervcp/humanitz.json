@@ -2,8 +2,7 @@
   "id": "humanitz",
   "name": "HumanitZ",
   "summary": "HumanitZ is a co-op, isometric, open world survival game in a world ended by the zombie outbreak. As one of the few human survivors, try to last as long as \u201chumanly\u201d possible. The past can\u2019t be change",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 27015,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/humanitz/egg-humanit-z.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 2728330
+  },
+  "requiresAccount": true
 }

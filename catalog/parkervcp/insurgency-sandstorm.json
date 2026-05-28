@@ -2,8 +2,7 @@
   "id": "insurgency-sandstorm",
   "name": "Insurgency: Sandstorm",
   "summary": "Insurgency: Sandstorm is a team-based, tactical FPS based on lethal close quarters combat and objective-oriented multiplayer gameplay. Experience the intensity of modern combat where skill is rewarded",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 27131,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/insurgency_sandstorm/egg-insurgency--sandstorm.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 581330
+  },
+  "requiresAccount": true
 }

@@ -2,8 +2,7 @@
   "id": "unturned",
   "name": "Unturned",
   "summary": "Vanilla Unturned with the included RockerMod.",
-  "tier": "disabled",
-  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/unturned/egg-unturned.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 1110390
+  },
+  "requiresAccount": true
 }

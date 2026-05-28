@@ -3,13 +3,13 @@
   "name": "Space Station 14",
   "summary": "Space Station 14 tells the story of an ordinary shift on a space station gone wrong. Immerse yourself into your role, tinker with detailed systems, and survive the chaos in this round-based multiplaye",
   "tier": "disabled",
-  "disabledReason": "no extractable install URL; manual recipe required",
   "defaultPort": 0,
   "protocols": [
     "udp"
   ],
   "upstream": {
     "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
-    "path": "spacestation_14/egg-pterodactyl-spacestation14.json"
-  }
+    "path": "spacestation_14/egg-spacestation14.json"
+  },
+  "disabledReason": "no extractable install URL; manual recipe required"
 }

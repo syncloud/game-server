@@ -2,8 +2,7 @@
   "id": "nova-life-amboise",
   "name": "Nova-Life: Amboise",
   "summary": "Nova-Life: Amboise is a multiplayer role-play simulation video game. Create your character and start your second life!",
-  "tier": "disabled",
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "tier": "experimental",
   "defaultPort": 0,
   "protocols": [
     "udp"
@@ -11,5 +10,10 @@
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "steamcmd_servers/novalife_amboise/egg-nova--life--amboise.json"
-  }
+  },
+  "installRecipe": {
+    "method": "steam",
+    "steamAppId": 1665030
+  },
+  "requiresAccount": true
 }
