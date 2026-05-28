@@ -1,15 +1,19 @@
 {
   "id": "velocity",
   "name": "Velocity",
-  "summary": "Velocity is a Minecraft server proxy with unparalleled server support, scalability, and flexibility.",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Minecraft server proxy. Pinned to 3.4.0-SNAPSHOT build 559.",
+  "tier": "experimental",
+  "defaultPort": 25577,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "minecraft/proxy/java/velocity/egg-velocity.json"
+    "path": "game_eggs/minecraft/proxy/java/velocity/egg-velocity.json"
   },
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
+  "installRecipe": {
+    "method": "downloadFile",
+    "url": "https://api.papermc.io/v2/projects/velocity/versions/3.4.0-SNAPSHOT/builds/559/downloads/velocity-3.4.0-SNAPSHOT-559.jar"
+  },
+  "start": {
+    "command": "/snap/games/current/jre/bin/java -Xms128M -Xmx512M -jar velocity-3.4.0-SNAPSHOT-559.jar"
+  }
 }

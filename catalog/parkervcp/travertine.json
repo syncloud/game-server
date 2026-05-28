@@ -1,15 +1,19 @@
 {
   "id": "travertine",
   "name": "Travertine",
-  "summary": "Travertine is a fork of Waterfall with 1.7 protocol support. Waterfall is a fork of the well-known BungeeCord server teleportation suite.",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Waterfall fork with 1.7 protocol support. Pinned to 1.16 build 191.",
+  "tier": "experimental",
+  "defaultPort": 25577,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "minecraft/proxy/java/travertine/egg-travertine.json"
+    "path": "game_eggs/minecraft/proxy/java/travertine/egg-travertine.json"
   },
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
+  "installRecipe": {
+    "method": "downloadFile",
+    "url": "https://api.papermc.io/v2/projects/travertine/versions/1.16/builds/191/downloads/travertine-1.16-191.jar"
+  },
+  "start": {
+    "command": "/snap/games/current/jre/bin/java -Xms128M -Xmx512M -jar travertine-1.16-191.jar"
+  }
 }

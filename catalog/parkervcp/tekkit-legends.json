@@ -1,15 +1,28 @@
 {
   "id": "tekkit-legends",
   "name": "Tekkit Legends",
-  "summary": "The ancient power of Tekkits past return in this legendary pack! Wield the philosopher's stone, ride the rails, breed the bees, and much, much more! This pack will remind you of what you've always lov",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Modern revival of classic Tekkit nostalgia from Technic. Pinned to 1.1.1.",
+  "tier": "experimental",
+  "defaultPort": 25565,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "minecraft/java/technic/tekkit-legends/egg-tekkit-legends.json"
+    "path": "game_eggs/minecraft/java/technic/tekkit-legends/egg-tekkit-legends.json"
   },
-  "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin"
+  "installRecipe": {
+    "method": "downloadExtract",
+    "url": "https://servers.technicpack.net/Technic/servers/tekkit-legends/Tekkit_Legends_Server_v1.1.1.zip",
+    "additionalUrls": [
+      {
+        "url": "https://raw.githubusercontent.com/parkervcp/eggs/fcfd5a3549769ade15127a7577d6d3c397e83b05/game_eggs/minecraft/java/server.properties",
+        "dest": "server.properties"
+      }
+    ],
+    "postInstallFiles": [
+      {"path": "eula.txt", "content": "eula=true\n"}
+    ]
+  },
+  "start": {
+    "command": "/snap/games/current/jre/bin/java -Xms128M -Xmx2048M -jar TekkitLegends.jar nogui"
+  }
 }

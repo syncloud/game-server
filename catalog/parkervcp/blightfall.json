@@ -1,15 +1,28 @@
 {
   "id": "blightfall",
   "name": "Blightfall",
-  "summary": "Blightfall is a combination modpack and adventure map about surviving on an alien planet. It uses magic mods and tech mods to create a novel gameplay experience. Can you survive on a world completely ",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Magic+tech alien-survival modpack from Technic. Pinned to 3.1.1-CE.",
+  "tier": "experimental",
+  "defaultPort": 25565,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "minecraft/java/technic/blightfall/egg-blightfall.json"
+    "path": "game_eggs/minecraft/java/technic/blightfall/egg-blightfall.json"
   },
-  "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin"
+  "installRecipe": {
+    "method": "downloadExtract",
+    "url": "https://servers.technicpack.net/Technic/servers/blightfall/Blightfall_Server_3.1.1-CE.zip",
+    "additionalUrls": [
+      {
+        "url": "https://raw.githubusercontent.com/parkervcp/eggs/fcfd5a3549769ade15127a7577d6d3c397e83b05/game_eggs/minecraft/java/server.properties",
+        "dest": "server.properties"
+      }
+    ],
+    "postInstallFiles": [
+      {"path": "eula.txt", "content": "eula=true\n"}
+    ]
+  },
+  "start": {
+    "command": "/snap/games/current/jre/bin/java -Xms128M -Xmx2048M -jar Blightfall.jar nogui"
+  }
 }

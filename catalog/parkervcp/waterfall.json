@@ -1,15 +1,19 @@
 {
   "id": "waterfall",
   "name": "Waterfall",
-  "summary": "Waterfall is a fork of the well-known BungeeCord server teleportation suite.",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "BungeeCord-style Minecraft proxy. Pinned to 1.21 build 600.",
+  "tier": "experimental",
+  "defaultPort": 25577,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "minecraft/proxy/java/waterfall/egg-waterfall.json"
+    "path": "game_eggs/minecraft/proxy/java/waterfall/egg-waterfall.json"
   },
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
+  "installRecipe": {
+    "method": "downloadFile",
+    "url": "https://api.papermc.io/v2/projects/waterfall/versions/1.21/builds/600/downloads/waterfall-1.21-600.jar"
+  },
+  "start": {
+    "command": "/snap/games/current/jre/bin/java -Xms128M -Xmx512M -jar waterfall-1.21-600.jar"
+  }
 }

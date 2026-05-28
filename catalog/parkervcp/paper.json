@@ -1,15 +1,22 @@
 {
   "id": "paper",
   "name": "Paper",
-  "summary": "High performance Spigot fork that aims to fix gameplay and mechanics inconsistencies.",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "High-performance Spigot fork. Plugin-compatible. Pinned to 1.21.11 build 69.",
+  "tier": "experimental",
+  "defaultPort": 25565,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "minecraft/java/paper/egg-paper.json"
+    "path": "game_eggs/minecraft/java/paper/egg-paper.json"
   },
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
+  "installRecipe": {
+    "method": "downloadFile",
+    "url": "https://api.papermc.io/v2/projects/paper/versions/1.21.11/builds/69/downloads/paper-1.21.11-69.jar",
+    "postInstallFiles": [
+      {"path": "eula.txt", "content": "eula=true\n"}
+    ]
+  },
+  "start": {
+    "command": "/snap/games/current/jre/bin/java -Xms128M -Xmx2048M -jar paper-1.21.11-69.jar nogui"
+  }
 }
