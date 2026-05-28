@@ -1,10 +1,6 @@
 package installer
 
 import (
-	"archive/tar"
-	"archive/zip"
-	"compress/bzip2"
-	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
@@ -15,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/ulikunitz/xz"
 )
+
+const archiversDir = "/snap/games/current/archivers"
 
 type RecipeInstaller struct {
 	steamCMDPath string
@@ -158,108 +154,25 @@ func (r *RecipeInstaller) download(ctx context.Context, url, dst string) error {
 }
 
 func extractArchive(archivePath, dst string) error {
-	if strings.HasSuffix(archivePath, ".zip") {
-		return unzip(archivePath, dst)
-	}
-	f, err := os.Open(archivePath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	var r io.Reader
+	var cmd *exec.Cmd
 	switch {
-	case strings.HasSuffix(archivePath, ".tar.xz") || strings.HasSuffix(archivePath, ".txz"):
-		xzr, err := xz.NewReader(f)
-		if err != nil {
-			return fmt.Errorf("xz: %w", err)
-		}
-		r = xzr
-	case strings.HasSuffix(archivePath, ".tar.gz") || strings.HasSuffix(archivePath, ".tgz"):
-		gzr, err := gzip.NewReader(f)
-		if err != nil {
-			return fmt.Errorf("gzip: %w", err)
-		}
-		defer gzr.Close()
-		r = gzr
-	case strings.HasSuffix(archivePath, ".tar.bz2") || strings.HasSuffix(archivePath, ".tbz2"):
-		r = bzip2.NewReader(f)
-	case strings.HasSuffix(archivePath, ".tar"):
-		r = f
+	case strings.HasSuffix(archivePath, ".zip"):
+		cmd = exec.Command(archiversDir+"/bin/unzip", "-qq", "-o", archivePath, "-d", dst)
+	case strings.HasSuffix(archivePath, ".tar.xz"), strings.HasSuffix(archivePath, ".txz"),
+		strings.HasSuffix(archivePath, ".tar.gz"), strings.HasSuffix(archivePath, ".tgz"),
+		strings.HasSuffix(archivePath, ".tar.bz2"), strings.HasSuffix(archivePath, ".tbz2"),
+		strings.HasSuffix(archivePath, ".tar"):
+		cmd = exec.Command(archiversDir+"/bin/tar", "-xf", archivePath, "-C", dst)
 	default:
 		return fmt.Errorf("unsupported archive: %s", filepath.Base(archivePath))
 	}
-	tr := tar.NewReader(r)
-	for {
-		hdr, err := tr.Next()
-		if err == io.EOF {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		target := filepath.Join(dst, hdr.Name)
-		if !strings.HasPrefix(target, filepath.Clean(dst)+string(os.PathSeparator)) {
-			return fmt.Errorf("tar entry escapes destination: %s", hdr.Name)
-		}
-		switch hdr.Typeflag {
-		case tar.TypeDir:
-			if err := os.MkdirAll(target, 0755); err != nil {
-				return err
-			}
-		case tar.TypeReg:
-			if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
-				return err
-			}
-			out, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(hdr.Mode))
-			if err != nil {
-				return err
-			}
-			if _, err := io.Copy(out, tr); err != nil {
-				out.Close()
-				return err
-			}
-			out.Close()
-		}
-	}
-}
-
-func unzip(archivePath, dst string) error {
-	zr, err := zip.OpenReader(archivePath)
+	cmd.Env = append(os.Environ(),
+		"LD_LIBRARY_PATH="+archiversDir+"/lib",
+		"PATH="+archiversDir+"/bin:"+os.Getenv("PATH"))
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("zip: %w", err)
-	}
-	defer zr.Close()
-	cleanDst := filepath.Clean(dst) + string(os.PathSeparator)
-	for _, f := range zr.File {
-		target := filepath.Join(dst, f.Name)
-		if !strings.HasPrefix(target, cleanDst) {
-			return fmt.Errorf("zip entry escapes destination: %s", f.Name)
-		}
-		if f.FileInfo().IsDir() {
-			if err := os.MkdirAll(target, 0755); err != nil {
-				return err
-			}
-			continue
-		}
-		if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
-			return err
-		}
-		rc, err := f.Open()
-		if err != nil {
-			return err
-		}
-		out, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-		if err != nil {
-			rc.Close()
-			return err
-		}
-		if _, err := io.Copy(out, rc); err != nil {
-			rc.Close()
-			out.Close()
-			return err
-		}
-		rc.Close()
-		out.Close()
+		return fmt.Errorf("%s: %v: %s",
+			filepath.Base(cmd.Path), err, strings.TrimSpace(string(out)))
 	}
 	return nil
 }

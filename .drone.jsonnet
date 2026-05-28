@@ -88,6 +88,21 @@ local platform_image(distro, arch) =
     for distro in distros
   ] + [
     {
+      name: 'archivers',
+      image: 'debian:bookworm-slim',
+      commands: [
+        './archivers/build.sh',
+      ],
+    },
+  ] + [
+    {
+      name: 'archivers test ' + distro,
+      image: platform_image(distro, arch),
+      commands: ['./archivers/test.sh'],
+    }
+    for distro in distros
+  ] + [
+    {
       name: 'backend',
       image: 'golang:' + go,
       commands: [
