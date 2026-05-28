@@ -1,15 +1,28 @@
 {
   "id": "tekkit",
   "name": "Tekkit",
-  "summary": "Tekkit is set to reignite the same sort of wonder and awe that we all received from booting up Minecraft for the first time. With the skies open, the moon ready to be colonized (by force if need be) a",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Classic Minecraft Java modpack from Technic. Pinned to v1.2.9g-2 (~85MB).",
+  "tier": "experimental",
+  "defaultPort": 25565,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "minecraft/java/technic/Tekkit/egg-tekkit.json"
+    "path": "game_eggs/minecraft/java/technic/Tekkit/egg-tekkit.json"
   },
-  "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin"
+  "installRecipe": {
+    "method": "downloadExtract",
+    "url": "https://servers.technicpack.net/Technic/servers/tekkitmain/Tekkit_Server_v1.2.9g-2.zip",
+    "additionalUrls": [
+      {
+        "url": "https://raw.githubusercontent.com/parkervcp/eggs/fcfd5a3549769ade15127a7577d6d3c397e83b05/game_eggs/minecraft/java/server.properties",
+        "dest": "server.properties"
+      }
+    ],
+    "postInstallFiles": [
+      {"path": "eula.txt", "content": "eula=true\n"}
+    ]
+  },
+  "start": {
+    "command": "/snap/games/current/jre/bin/java -Xms128M -Xmx2048M -jar Tekkit.jar nogui"
+  }
 }
