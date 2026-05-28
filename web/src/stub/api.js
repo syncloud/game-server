@@ -84,7 +84,8 @@ const games = [
     defaultPort: 2302,
     protocols: ['udp'],
     tier: 'experimental',
-    steamAppId: 233780
+    steamAppId: 233780,
+    requiresAccount: true
   }
 ]
 

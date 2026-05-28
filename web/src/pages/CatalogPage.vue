@@ -13,6 +13,8 @@ const query = ref('')
 const tierFilter = ref('all')
 const sourceFilter = ref('all')
 const installing = ref(null)
+const accountGate = ref(null)
+const steamLinked = ref(false)
 
 const TIERS = [
   { id: 'all', label: 'All' },
@@ -23,9 +25,23 @@ const TIERS = [
 
 async function load () {
   loading.value = true; error.value = null
-  try { games.value = await api.games() }
+  try {
+    games.value = await api.games()
+    try {
+      const s = await fetch('/api/v1/steam/status').then(r => r.json())
+      steamLinked.value = !!s.linked
+    } catch (_) { steamLinked.value = false }
+  }
   catch (e) { error.value = e.message }
   finally { loading.value = false }
+}
+
+function startInstall (g) {
+  if (g.requiresAccount && !steamLinked.value) {
+    accountGate.value = g
+    return
+  }
+  installing.value = g
 }
 
 const sourceOptions = computed(() => {
@@ -102,7 +118,7 @@ onMounted(load)
       v-for="g in filtered"
       :key="g.id"
       :game="g"
-      @install="installing = g"
+      @install="startInstall"
     />
   </div>
 
@@ -112,6 +128,20 @@ onMounted(load)
     @close="installing = null"
     @submit="createServer"
   />
+
+  <div v-if="accountGate" class="modal-backdrop" data-testid="account-gate" @click="accountGate = null">
+    <div class="modal" @click.stop>
+      <h3>Steam account required</h3>
+      <p>
+        <strong>{{ accountGate.name }}</strong> needs a Steam account that owns the game.
+        Link your account in Settings, then come back to install.
+      </p>
+      <div class="modal-actions">
+        <button class="btn ghost" data-testid="account-gate-cancel" @click="accountGate = null">Cancel</button>
+        <button class="btn" data-testid="account-gate-settings" @click="router.push('/settings'); accountGate = null">Go to Settings</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -156,4 +186,21 @@ onMounted(load)
   background: var(--bg);
   color: var(--text-muted);
 }
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+.modal {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 420px;
+  margin: 16px;
+}
+.modal h3 { margin: 0 0 12px 0; font-size: 16px; font-weight: 600; }
+.modal p { margin: 0 0 18px 0; color: var(--text-muted); font-size: 14px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
 </style>
