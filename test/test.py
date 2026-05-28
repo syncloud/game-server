@@ -114,18 +114,46 @@ def test_logs_endpoint(device):
     cli_run(device, 'server', 'stop', 'log-stub')
     cli_run(device, 'server', 'delete', 'log-stub')
 
-def test_cuberite_disabled_install_refused(device):
+def test_disabled_install_refused(device):
     """Disabled-tier game install must return a clean 409 with the
-    disabledReason from the catalog entry, not a download attempt."""
-    cli_run(device, 'server', 'create', 'cb-disabled', 'cuberite', '--port', '25565')
+    disabledReason from the catalog entry, not a download attempt.
+    Uses mohaa (URL 404, disabled) as the fixture since cuberite was
+    promoted to experimental."""
+    cli_run(device, 'server', 'create', 'disabled-stub', 'mohaa', '--port', '12203')
     out = device.run_ssh(
-        '/snap/bin/games.cli server install cb-disabled 2>&1; echo EXIT=\$?',
+        '/snap/bin/games.cli server install disabled-stub 2>&1; echo EXIT=\$?',
         throw=False)
     assert 'disabled' in out.lower(), 'expected disabled message in: ' + out
     assert 'EXIT=1' in out, 'install command should exit non-zero: ' + out
-    s = cli_run(device, 'server', 'show', 'cb-disabled')
+    s = cli_run(device, 'server', 'show', 'disabled-stub')
     assert s['status'] == 'stopped', 'status must not flip to installing: ' + str(s)
-    cli_run(device, 'server', 'delete', 'cb-disabled')
+    cli_run(device, 'server', 'delete', 'disabled-stub')
+
+def test_cuberite_real_install_and_play(device):
+    """Cuberite (~5MB C++ Minecraft Java-protocol server). Proves the
+    bash-var URL substitution class of recipe and TCP 25565 bind."""
+    cli_run(device, 'server', 'create', 'cb-real', 'cuberite', '--port', '25565')
+    cli_run(device, 'server', 'install', 'cb-real')
+    wait_status(device, 'cb-real', 'stopped', timeout=180)
+
+    install_dir = '/data/games/servers/cb-real'
+    out = device.run_ssh('ls {0} 2>&1'.format(install_dir))
+    assert 'Cuberite' in out, 'Cuberite binary missing post-install: ' + out
+
+    s = cli_run(device, 'server', 'start', 'cb-real')
+    assert s['status'] == 'running'
+
+    deadline = time.time() + 60
+    bound = ''
+    while time.time() < deadline:
+        bound = device.run_ssh('ss -tlnp 2>/dev/null | grep 25565 || true')
+        if '25565' in bound:
+            break
+        time.sleep(3)
+    assert '25565' in bound, 'Cuberite should be bound on tcp:25565 — ss output: {0!r}'.format(bound)
+
+    cli_run(device, 'server', 'stop', 'cb-real')
+    cli_run(device, 'server', 'delete', 'cb-real')
 
 def test_vanilla_bedrock_real_install_and_play(device):
     """Mojang's official Bedrock dedicated server (~50MB zip). Proves
