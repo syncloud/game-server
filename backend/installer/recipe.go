@@ -2,6 +2,8 @@ package installer
 
 import (
 	"archive/tar"
+	"archive/zip"
+	"compress/bzip2"
 	"compress/gzip"
 	"context"
 	"fmt"
@@ -156,6 +158,9 @@ func (r *RecipeInstaller) download(ctx context.Context, url, dst string) error {
 }
 
 func extractArchive(archivePath, dst string) error {
+	if strings.HasSuffix(archivePath, ".zip") {
+		return unzip(archivePath, dst)
+	}
 	f, err := os.Open(archivePath)
 	if err != nil {
 		return err
@@ -176,6 +181,8 @@ func extractArchive(archivePath, dst string) error {
 		}
 		defer gzr.Close()
 		r = gzr
+	case strings.HasSuffix(archivePath, ".tar.bz2") || strings.HasSuffix(archivePath, ".tbz2"):
+		r = bzip2.NewReader(f)
 	case strings.HasSuffix(archivePath, ".tar"):
 		r = f
 	default:
@@ -214,6 +221,47 @@ func extractArchive(archivePath, dst string) error {
 			out.Close()
 		}
 	}
+}
+
+func unzip(archivePath, dst string) error {
+	zr, err := zip.OpenReader(archivePath)
+	if err != nil {
+		return fmt.Errorf("zip: %w", err)
+	}
+	defer zr.Close()
+	cleanDst := filepath.Clean(dst) + string(os.PathSeparator)
+	for _, f := range zr.File {
+		target := filepath.Join(dst, f.Name)
+		if !strings.HasPrefix(target, cleanDst) {
+			return fmt.Errorf("zip entry escapes destination: %s", f.Name)
+		}
+		if f.FileInfo().IsDir() {
+			if err := os.MkdirAll(target, 0755); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
+			return err
+		}
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		out, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+		if err != nil {
+			rc.Close()
+			return err
+		}
+		if _, err := io.Copy(out, rc); err != nil {
+			rc.Close()
+			out.Close()
+			return err
+		}
+		rc.Close()
+		out.Close()
+	}
+	return nil
 }
 
 func findFile(root, name string) (string, error) {

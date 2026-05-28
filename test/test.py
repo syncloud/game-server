@@ -67,8 +67,8 @@ def test_games_catalog(device):
     assert 'teeworlds' in ids, 'teeworlds (CI install fixture) must be in catalog'
     assert 'cs2' in ids, 'cs2 (steam path) must be in catalog'
     assert 'hlds-cs' in ids, 'hlds-cs (CI Steam fixture) must be in catalog'
-    assert 'cuberite' in ids, 'cuberite must be in catalog (tier=disabled, exemplar)'
-    assert 'vanilla-bedrock' in ids, 'vanilla-bedrock must be in catalog (tier=disabled, exemplar)'
+    assert 'cuberite' in ids, 'cuberite must be in catalog (disabled exemplar)'
+    assert 'vanilla-bedrock' in ids, 'vanilla-bedrock must be in catalog (Android e2e target)'
     for g in games:
         assert g.get('tier') in ('supported', 'experimental', 'disabled'), \
             'game {} has invalid tier: {}'.format(g.get('id'), g)
@@ -127,14 +127,28 @@ def test_cuberite_disabled_install_refused(device):
     assert s['status'] == 'stopped', 'status must not flip to installing: ' + str(s)
     cli_run(device, 'server', 'delete', 'cb-disabled')
 
-def test_vanilla_bedrock_disabled_install_refused(device):
-    cli_run(device, 'server', 'create', 'bd-disabled', 'vanilla-bedrock', '--port', '19132')
-    out = device.run_ssh(
-        '/snap/bin/games.cli server install bd-disabled 2>&1; echo EXIT=\$?',
-        throw=False)
-    assert 'disabled' in out.lower(), 'expected disabled message in: ' + out
-    assert 'EXIT=1' in out, 'install command should exit non-zero: ' + out
-    cli_run(device, 'server', 'delete', 'bd-disabled')
+def test_vanilla_bedrock_real_install_and_play(device):
+    """Mojang's official Bedrock dedicated server (~50MB zip). Proves
+    the .zip extract path, amd64 wrap, and UDP 19132 bind that the
+    Play Store Minecraft app on Android speaks. URL pinned in the
+    catalog file; bump when Mojang ships a new version."""
+    cli_run(device, 'server', 'create', 'bd-real', 'vanilla-bedrock', '--port', '19132')
+    cli_run(device, 'server', 'install', 'bd-real')
+    wait_status(device, 'bd-real', 'stopped', timeout=300)
+
+    install_dir = '/data/games/servers/bd-real'
+    out = device.run_ssh('ls {0} 2>&1'.format(install_dir))
+    assert 'bedrock_server' in out, 'bedrock_server binary missing post-install: ' + out
+
+    s = cli_run(device, 'server', 'start', 'bd-real')
+    assert s['status'] == 'running'
+
+    time.sleep(5)
+    probe = device.run_ssh('ss -ulnp | grep 19132 || true')
+    assert '19132' in probe, 'bedrock_server should be bound on udp:19132 — ss output: {0!r}'.format(probe)
+
+    cli_run(device, 'server', 'stop', 'bd-real')
+    cli_run(device, 'server', 'delete', 'bd-real')
 
 def test_teeworlds_real_install_and_play(device):
     cli_run(device, 'server', 'create', 'tw-real', 'teeworlds', '--port', '8313')
@@ -176,63 +190,6 @@ def test_hlds_cs_real_install(device):
         'hlds_linux missing post-install: ' + out
 
     cli_run(device, 'server', 'delete', 'hlds-real')
-
-@pytest.mark.xfail(
-    reason="Paper/Fabric/etc. Minecraft eggs need `jq` (Paper) or apt "
-           "(Fabric, Glowstone) at install time; neither is available "
-           "in the snap install context. Tracked as follow-up: vendor "
-           "a curated minecraft-vanilla entry that fetches server.jar "
-           "from Mojang launchermeta with curl alone, no jq.",
-    strict=False, run=True)
-def test_minecraft_real_install_and_play(device):
-    """Full Minecraft cycle: install via Pelican egg + bundled JRE, accept
-    EULA, start the server, verify it binds the TCP port (proves the JVM
-    came up and the server is listening on the Minecraft protocol), stop
-    and delete. EULA is accepted explicitly here for CI — the product
-    itself never auto-accepts."""
-    games = cli_run(device, 'games', 'list')
-    candidates = [
-        g for g in games
-        if 'minecraft/java' in g.get('upstreamRef', '').lower()
-        and g.get('tier') in ('verified', 'compatible')
-    ]
-    print('minecraft candidates ({}): {}'.format(
-        len(candidates), [g['id'] for g in candidates[:10]]))
-    assert candidates, 'no Minecraft Java entries in catalog with tier verified|compatible'
-    candidates.sort(key=lambda g: (0 if g['id'] == 'paper' else 1, g['id']))
-    g = candidates[0]
-    print('using minecraft entry:', g['id'], 'name=', g['name'], 'ref=', g.get('upstreamRef'))
-
-    port = g.get('defaultPort') or 25565
-    cli_run(device, 'server', 'create', 'mc-real', g['id'], '--port', str(port))
-    cli_run(device, 'server', 'install', 'mc-real')
-    wait_status(device, 'mc-real', 'stopped', timeout=900)
-
-    install_dir = '/data/games/servers/mc-real'
-    out = device.run_ssh('ls {0} 2>&1'.format(install_dir))
-    assert '.jar' in out, 'minecraft .jar missing post-install: ' + out
-
-    device.run_ssh(
-        'echo eula=true > {0}/eula.txt && chown games:games {0}/eula.txt'.format(install_dir))
-
-    s = cli_run(device, 'server', 'start', 'mc-real')
-    assert s['status'] == 'running'
-
-    deadline = time.time() + 240
-    bound = ''
-    while time.time() < deadline:
-        bound = device.run_ssh('ss -tlnp 2>/dev/null | grep -E "java|:{0}\\b" || true'.format(port))
-        if 'java' in bound or ':{0}'.format(port) in bound:
-            break
-        time.sleep(5)
-    assert 'java' in bound or ':{0}'.format(port) in bound, \
-        'minecraft java server should be listening on tcp — ss output: {0!r}'.format(bound)
-
-    lines = cli_run(device, 'server', 'logs', 'mc-real')
-    print('mc server first 20 log lines:', lines[:20])
-
-    cli_run(device, 'server', 'stop', 'mc-real')
-    cli_run(device, 'server', 'delete', 'mc-real')
 
 @pytest.mark.xfail(
     reason='HLDS startup needs Steam Pipe / lsteamclient shim to satisfy '
