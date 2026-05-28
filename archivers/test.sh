@@ -1,18 +1,12 @@
 #!/bin/bash -ex
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-BUILD_DIR=${DIR}/../build/snap/archivers
-LD=${BUILD_DIR}/lib/ld-linux-x86-64.so.2
-LIB=${BUILD_DIR}/lib
+BIN=${DIR}/../build/snap/archivers/bin
 
-run() {
-    "${LD}" --library-path "${LIB}" "${BUILD_DIR}/bin/$1" "${@:2}"
-}
-
-run tar --version | head -1
-run unzip -v | head -1
-run bzip2 --version 2>&1 | head -1
-run xz --version | head -1
-run gzip --version | head -1
+${BIN}/tar.sh --version | head -1
+${BIN}/unzip.sh -v | head -1
+${BIN}/bzip2.sh --version 2>&1 | head -1
+${BIN}/xz.sh --version | head -1
+${BIN}/gzip.sh --version | head -1
 
 echo "archivers smoke test ok"

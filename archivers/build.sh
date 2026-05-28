@@ -19,6 +19,9 @@ for bin in tar unzip bzip2 xz gzip; do
     cp -L "${src}" ${OUT}/bin/${bin}
 done
 
+cp ${DIR}/bin/*.sh ${OUT}/bin/
+chmod +x ${OUT}/bin/*.sh
+
 for bin in ${OUT}/bin/*; do
     ldd "${bin}" 2>/dev/null \
         | awk '/=> \//{print $3} /ld-linux/{print $1}' \

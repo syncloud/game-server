@@ -154,29 +154,24 @@ func (r *RecipeInstaller) download(ctx context.Context, url, dst string) error {
 }
 
 func extractArchive(archivePath, dst string) error {
-	var bin string
-	var extra []string
+	var cmd *exec.Cmd
 	switch {
 	case strings.HasSuffix(archivePath, ".zip"):
-		bin = archiversDir + "/bin/unzip"
-		extra = []string{"-qq", "-o", archivePath, "-d", dst}
+		cmd = exec.Command(archiversDir+"/bin/unzip.sh", "-qq", "-o", archivePath, "-d", dst)
 	case strings.HasSuffix(archivePath, ".tar.xz"), strings.HasSuffix(archivePath, ".txz"),
 		strings.HasSuffix(archivePath, ".tar.gz"), strings.HasSuffix(archivePath, ".tgz"),
 		strings.HasSuffix(archivePath, ".tar.bz2"), strings.HasSuffix(archivePath, ".tbz2"),
 		strings.HasSuffix(archivePath, ".tar"):
-		bin = archiversDir + "/bin/tar"
-		extra = []string{"-xf", archivePath, "-C", dst}
+		cmd = exec.Command(archiversDir+"/bin/tar.sh", "-xf", archivePath, "-C", dst)
 	default:
 		return fmt.Errorf("unsupported archive: %s", filepath.Base(archivePath))
 	}
-	args := append([]string{"--library-path", archiversDir + "/lib", bin}, extra...)
-	cmd := exec.Command(archiversDir+"/lib/ld-linux-x86-64.so.2", args...)
 	cmd.Env = append(os.Environ(),
 		"PATH="+archiversDir+"/bin:"+os.Getenv("PATH"))
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("%s: %v: %s",
-			filepath.Base(bin), err, strings.TrimSpace(string(out)))
+			filepath.Base(cmd.Path), err, strings.TrimSpace(string(out)))
 	}
 	return nil
 }
