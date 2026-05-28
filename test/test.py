@@ -112,6 +112,25 @@ def test_logs_endpoint(device):
     cli_run(device, 'server', 'stop', 'log-stub')
     cli_run(device, 'server', 'delete', 'log-stub')
 
+def test_cuberite_real_install(device):
+    """Repro for the converter ${ARCH} substitution bug.
+
+    Cuberite's parkervcp egg downloads:
+      https://download.cuberite.org/linux-${ARCH}/Cuberite.tar.gz
+    deriveRecipe() in catalog/convert/main.go grabs the URL verbatim
+    via literalURLRE; ${ARCH} is never expanded, so the runtime download
+    returns 404. Expected failure on this branch — once the converter
+    learns ${ARCH} -> x86_64 (we are amd64-only), this test should pass."""
+    cli_run(device, 'server', 'create', 'cuberite-real', 'cuberite', '--port', '25565')
+    cli_run(device, 'server', 'install', 'cuberite-real')
+    wait_status(device, 'cuberite-real', 'stopped', timeout=300)
+
+    install_dir = '/data/games/servers/cuberite-real'
+    out = device.run_ssh('ls {0} 2>&1'.format(install_dir))
+    assert 'Cuberite' in out, 'cuberite binary missing post-install: ' + out
+
+    cli_run(device, 'server', 'delete', 'cuberite-real')
+
 def test_teeworlds_real_install_and_play(device):
     cli_run(device, 'server', 'create', 'tw-real', 'teeworlds', '--port', '8313')
     cli_run(device, 'server', 'install', 'tw-real')
