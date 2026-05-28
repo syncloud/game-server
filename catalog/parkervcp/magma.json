@@ -1,0 +1,15 @@
+{
+  "id": "magma",
+  "name": "Magma",
+  "summary": "Magma is most powerful Forge server providing you with Forge mods and Bukkit Plugins using Spigot and Paper for Performance Optimization and Stability. Using: https://github.com/magmamaintained",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "minecraft/java/magma/egg-magma.json"
+  }
+}

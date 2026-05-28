@@ -1,0 +1,15 @@
+{
+  "id": "pocketminemp",
+  "name": "PocketmineMP",
+  "summary": "Pocketmine Egg\r\nby onekintaro from swisscrafting.ch\r\nwith the nice help from #eggs Channel on Pterodactyl-Discord :)",
+  "tier": "disabled",
+  "disabledReason": "egg builds from source (BuildTools/gradle/maven/cmake); needs a pre-built binary URL",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "minecraft/bedrock/pocketmine_mp/egg-pocketmine-m-p.json"
+  }
+}

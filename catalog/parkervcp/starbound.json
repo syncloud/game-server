@@ -1,0 +1,15 @@
+{
+  "id": "starbound",
+  "name": "Starbound",
+  "summary": "Starbound takes place in a two-dimensional, procedurally generated universe which the player is able to explore in order to obtain new weapons, armor, and items, and to visit towns and villages inhabi",
+  "tier": "disabled",
+  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/starbound/egg-starbound.json"
+  }
+}

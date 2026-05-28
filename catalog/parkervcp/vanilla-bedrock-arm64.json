@@ -1,0 +1,15 @@
+{
+  "id": "vanilla-bedrock-arm64",
+  "name": "Vanilla Bedrock ARM64",
+  "summary": "Bedrock Edition (also known as the Bedrock Version, Bedrock Codebase, Bedrock Engine or just Bedrock) refers to the multi-platform family of editions of Minecraft developed by Mojang AB, Microsoft Stu",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "minecraft/bedrock/bedrock/egg-vanilla-bedrock-ARM64.json"
+  }
+}

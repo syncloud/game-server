@@ -1,0 +1,15 @@
+{
+  "id": "enshrouded",
+  "name": "Enshrouded",
+  "summary": "Enshrouded is a game of survival, crafting, and Action RPG combat, set within a sprawling voxel-based continent. As you journey across the mountains and deserts of an open world, you are free to choos",
+  "tier": "disabled",
+  "disabledReason": "steam: appid 1007 not yet validated for anonymous-loginnable install",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/enshrouded/egg-enshrouded.json"
+  }
+}

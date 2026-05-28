@@ -1,0 +1,15 @@
+{
+  "id": "mount-blade-ii-bannerlord",
+  "name": "Mount & Blade II: Bannerlord",
+  "summary": "A strategy/action RPG. Create a character, engage in diplomacy, craft, trade and conquer new lands in a vast medieval sandbox. Raise armies to lead into battle and command and fight alongside your tro",
+  "tier": "disabled",
+  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/mount_blade_II_bannerlord/egg-mount--blade-i-i--bannerlord.json"
+  }
+}

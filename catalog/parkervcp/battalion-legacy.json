@@ -1,0 +1,15 @@
+{
+  "id": "battalion-legacy",
+  "name": "BATTALION: Legacy",
+  "summary": "BATTALION: Legacy recaptures the core of classic shooters in the final iteration of Battalion 1944. Return to the simple days of playing first person shooters with your friends. Grab your bolt action ",
+  "tier": "disabled",
+  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "defaultPort": 27016,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/battalion_legacy/egg-b-a-t-t-a-l-i-o-n--legacy.json"
+  }
+}

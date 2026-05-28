@@ -1,0 +1,15 @@
+{
+  "id": "hogwarp",
+  "name": "Hogwarp",
+  "summary": "A Pterodactyl egg for the Hogwarts Legacy mod Hogwarp - For more info see their Nexus: https://www.nexusmods.com/hogwartslegacy/mods/1378",
+  "tier": "disabled",
+  "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "hogwarp/egg-hogwarp.json"
+  }
+}

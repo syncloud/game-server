@@ -1,0 +1,15 @@
+{
+  "id": "mordhau",
+  "name": "Mordhau",
+  "summary": "Mordhau is a multiplayer medieval hack 'n slash video game, developed by Slovenian independent studio Triternion, with a prominent aspect of skill-based competitive play and customization.",
+  "tier": "disabled",
+  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "defaultPort": 27015,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/mordhau/egg-mordhau.json"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "swords-n-magic-and-stuff",
+  "name": "Swords 'n Magic and Stuff",
+  "summary": "Grab your friends and set out for adventure in a world of swords, magic, and stuff. Discover tons of cool loot, uncover hidden secrets, and meet new friends and foes along the way. Make your mark and ",
+  "tier": "disabled",
+  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "defaultPort": 27015,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/swords_'n_Magic_and_Stuff/egg-swords-n-magic-and-stuff.json"
+  }
+}

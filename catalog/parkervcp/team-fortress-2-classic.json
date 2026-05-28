@@ -1,0 +1,15 @@
+{
+  "id": "team-fortress-2-classic",
+  "name": "Team Fortress 2 Classic",
+  "summary": "Team Fortress 2 Classic is a free mod of the 2007 game Team Fortress 2, developed by Eminoma and utilizing the Source engine.",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/team_fortress_2_classic/egg-team-fortress-2-classic.json"
+  }
+}

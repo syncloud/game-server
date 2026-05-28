@@ -1,0 +1,15 @@
+{
+  "id": "valheim-plus-mod",
+  "name": "Valheim Plus Mod",
+  "summary": "A brutal exploration and survival game for 1-10 players, set in a procedurally-generated purgatory inspired by viking culture.",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/valheim/valheim_plus/egg-valheim-plus-mod.json"
+  }
+}

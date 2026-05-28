@@ -9,3 +9,4 @@ catalog/work/
 # backend/catalog/catalog.json is committed as a stub so 'go build' works
 # locally without running catalog/build.sh; CI regenerates it.
 .claude/
+catalog/__pycache__/

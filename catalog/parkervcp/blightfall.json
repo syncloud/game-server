@@ -1,0 +1,15 @@
+{
+  "id": "blightfall",
+  "name": "Blightfall",
+  "summary": "Blightfall is a combination modpack and adventure map about surviving on an alien planet. It uses magic mods and tech mods to create a novel gameplay experience. Can you survive on a world completely ",
+  "tier": "disabled",
+  "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "minecraft/java/technic/blightfall/egg-blightfall.json"
+  }
+}

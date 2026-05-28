@@ -1,0 +1,15 @@
+{
+  "id": "hexxit",
+  "name": "Hexxit",
+  "summary": "Gear up and set forth on a campaign worthy of legend, for Hexxit has been unearthed! Dark dungeons, towering spires, weathered ruins and musty tomes lay before you. Lay claim to riches or create your ",
+  "tier": "disabled",
+  "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "minecraft/java/technic/hexxit/egg-hexxit.json"
+  }
+}

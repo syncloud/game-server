@@ -1,0 +1,15 @@
+{
+  "id": "ftb-modpacks-ch-server",
+  "name": "FTB-modpacks.ch Server",
+  "summary": "Since the release of the FTB APP, FTB modpacks are now distributed through modpacks.ch. This egg was developed for support for modpacks that are distributed through this.",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "minecraft/java/ftb/egg-ftb-modpacksch-server.json"
+  }
+}

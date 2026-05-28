@@ -1,0 +1,15 @@
+{
+  "id": "curseforge-generic",
+  "name": "CurseForge Generic",
+  "summary": "A generic egg for a CurseForge modpack.",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "minecraft/java/curseforge/egg-curse-forge-generic.json"
+  }
+}

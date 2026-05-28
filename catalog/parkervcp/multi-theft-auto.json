@@ -1,0 +1,15 @@
+{
+  "id": "multi-theft-auto",
+  "name": "Multi Theft Auto",
+  "summary": "What more could you want? Multi Theft Auto provides the best online Grand Theft Auto experience there is. Read on to find out more.",
+  "tier": "disabled",
+  "disabledReason": "candidate downloadExtract: static URL https://linux.multitheftauto.com/dl/multitheftauto_linux_x64.tar.gz; promote after testing on device",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "gta/mtasa/egg-multi-theft-auto.json"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "the-battle-for-wesnoth",
+  "name": "The Battle for Wesnoth",
+  "summary": "Egg for hosting a Battle for Wesnoth Server.",
+  "tier": "disabled",
+  "disabledReason": "egg builds from source (BuildTools/gradle/maven/cmake); needs a pre-built binary URL",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+    "path": "thebattleforwesnoth/egg-pterodactyl-the-battle-for-wesnoth.json"
+  }
+}

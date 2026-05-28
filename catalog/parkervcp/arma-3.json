@@ -1,0 +1,15 @@
+{
+  "id": "arma-3",
+  "name": "Arma 3",
+  "summary": "Experience true combat gameplay in a massive military sandbox. Deploying a wide variety of single and multiplayer content, over 20 vehicles and 40 weapons, and limitless opportunities for content crea",
+  "tier": "disabled",
+  "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/arma/arma3/egg-arma3.json"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "alt-v",
+  "name": "alt:V",
+  "summary": "alt:V Multiplayer a third-party multiplayer modification for Grand Theft Auto: V",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "gta/altv/egg-alt--v.json"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "liteloader-bedrock-dedicated-server",
+  "name": "Liteloader Bedrock Dedicated Server",
+  "summary": "LiteLoaderBDS - Epoch-making & Cross-language Bedrock Dedicated Servers Plugin Loader\r\n\r\nLiteLoaderBDS is an unofficial plugin loader that provides basic API support for Bedrock Dedicated Server, with",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "minecraft/bedrock/LiteLoader-bedrock/egg-LiteLoader-bedrock.json"
+  }
+}

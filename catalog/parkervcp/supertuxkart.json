@@ -1,0 +1,15 @@
+{
+  "id": "supertuxkart",
+  "name": "SuperTuxKart",
+  "summary": "Egg for hosting a SuperTuxKart Server.",
+  "tier": "disabled",
+  "disabledReason": "egg builds from source (BuildTools/gradle/maven/cmake); needs a pre-built binary URL",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "SuperTuxKart/egg-super-tux-kart.json"
+  }
+}

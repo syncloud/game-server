@@ -1,0 +1,15 @@
+{
+  "id": "leaguesandbox",
+  "name": "LeagueSandbox",
+  "summary": "A simple egg to run LeagueSandbox server in pterodactyl",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+    "path": "leaguesandbox/egg-league-sandbox.json"
+  }
+}

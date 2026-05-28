@@ -1,0 +1,15 @@
+{
+  "id": "american-truck-simulator-dedicated-server",
+  "name": "American Truck Simulator Dedicated Server",
+  "summary": "This will set up SteamCMD and all the required files for the newly released American Truck Simulator Dedicated server.  Simply placed the exported server config from your ATS instance to the .local/sh",
+  "tier": "disabled",
+  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "defaultPort": 27016,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/truck-simulator/american-truck-simulator/egg-american-truck-simulator-dedicated-server.json"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "tekkit-2",
+  "name": "Tekkit 2",
+  "summary": "Those of you who are nostalgic for the early days of Tekkit (now known as Tekkit Classic), will love what awaits you in Tekkit 2!\r\n\r\nWith a collection of nostalgic mods and plenty of new improvements,",
+  "tier": "disabled",
+  "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "minecraft/java/technic/Tekkit-2/egg-tekkit-2.json"
+  }
+}

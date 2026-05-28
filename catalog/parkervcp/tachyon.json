@@ -1,0 +1,15 @@
+{
+  "id": "tachyon",
+  "name": "Tachyon",
+  "summary": "A multiplayer version of FTL.",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "ftl/tachyon/egg-tachyon.json"
+  }
+}

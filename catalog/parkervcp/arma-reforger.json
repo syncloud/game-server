@@ -1,0 +1,15 @@
+{
+  "id": "arma-reforger",
+  "name": "Arma Reforger",
+  "summary": "Experience authentic Cold War combat and join friends in the struggle for a sprawling, 51 km\u00b2 mid-Atlantic island \u2014 or take on the role of Game Master and create your very own scenarios for others to ",
+  "tier": "disabled",
+  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/arma/arma_reforger/egg-arma-reforger.json"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "minetest",
+  "name": "Minetest",
+  "summary": "An open source voxel game engine. Play one of our many games, mod a game to your liking, make your own game, or play on a multiplayer server.",
+  "tier": "disabled",
+  "disabledReason": "no extractable install URL; manual recipe required",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "minetest/egg-minetest.json"
+  }
+}

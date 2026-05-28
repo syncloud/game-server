@@ -1,0 +1,15 @@
+{
+  "id": "tekkit-classic",
+  "name": "Tekkit Classic",
+  "summary": "Created by the Technic team, Tekkit Classic is a modpack for the record breaking sandbox construction game Minecraft. \r\nIt brings together some of the best mods from the Minecraft community for automa",
+  "tier": "disabled",
+  "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "minecraft/java/technic/tekkit-classic/egg-tekkit-classic.json"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "nazi-zombies-portable",
+  "name": "Nazi Zombies: Portable",
+  "summary": "NZ:P (Nazi Zombies: Portable) is based off of the FTEQW (Fore Thought Engine Quake World). This egg is specifically made for use with NZ:P (just downloads assets and QuakeC from NZ:P repositories) but",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "tcp"
+  ],
+  "upstream": {
+    "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+    "path": "nazi_zombies_portable/egg-nazi-zombies-portable.json"
+  }
+}

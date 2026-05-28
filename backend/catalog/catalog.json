@@ -1,6 +1,86 @@
 {
   "games": [
     {
+      "id": "7-days-to-die",
+      "name": "7 Days To Die",
+      "source": "parkervcp",
+      "summary": "7 days to die server",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 8081,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/7_days_to_die/egg-7-days-to-die.json"
+      }
+    },
+    {
+      "id": "alt-v",
+      "name": "alt:V",
+      "source": "parkervcp",
+      "summary": "alt:V Multiplayer a third-party multiplayer modification for Grand Theft Auto: V",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "gta/altv/egg-alt--v.json"
+      }
+    },
+    {
+      "id": "american-truck-simulator-dedicated-server",
+      "name": "American Truck Simulator Dedicated Server",
+      "source": "parkervcp",
+      "summary": "This will set up SteamCMD and all the required files for the newly released American Truck Simulator Dedicated server.  Simply placed the exported server config from your ATS instance to the .local/sh",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27016,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/truck-simulator/american-truck-simulator/egg-american-truck-simulator-dedicated-server.json"
+      }
+    },
+    {
+      "id": "among-us-impostor-server",
+      "name": "Among Us - Impostor Server",
+      "source": "parkervcp",
+      "summary": "Impostor is one of the first Among Us private servers, written in C#.\r\n\r\nThere are no special features at this moment, the goal is aiming to be as close as possible to the real server, for now. In a l",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "among_us/impostor_server/egg-among-us--impostor-server.json"
+      }
+    },
+    {
+      "id": "archean",
+      "name": "Archean",
+      "source": "pelican-eggs",
+      "summary": "Archean invites you to unleash your creativity alone or with friends in a creative sandbox mode.Design and build vehicles, bases, rockets, space stations and much more using customizable modular block",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+        "path": "archean/egg-archean.json"
+      }
+    },
+    {
       "id": "ark",
       "name": "ARK: Survival Evolved",
       "source": "linuxgsm",
@@ -13,6 +93,486 @@
       "installRecipe": {
         "method": "steam",
         "steamAppId": 376030
+      }
+    },
+    {
+      "id": "ark-survival-ascended",
+      "name": "ARK: Survival Ascended",
+      "source": "parkervcp",
+      "summary": "ARK is reimagined from the ground-up into the next-generation of video game technology with Unreal Engine 5! Form a tribe, tame \u0026 breed hundreds of unique dinosaurs and primeval creatures, explore, cr",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/ark_survival_ascended/egg-ark--survival-ascended.json"
+      }
+    },
+    {
+      "id": "ark-survival-evolved",
+      "name": "Ark: Survival Evolved",
+      "source": "parkervcp",
+      "summary": "As a man or woman stranded, naked, freezing, and starving on the unforgiving shores of a mysterious island called ARK, use your skill and cunning to kill or tame and ride the plethora of leviathan din",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27020,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/ark_survival_evolved/egg-ark--survival-evolved.json"
+      }
+    },
+    {
+      "id": "arma-3",
+      "name": "Arma 3",
+      "source": "parkervcp",
+      "summary": "Experience true combat gameplay in a massive military sandbox. Deploying a wide variety of single and multiplayer content, over 20 vehicles and 40 weapons, and limitless opportunities for content crea",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/arma/arma3/egg-arma3.json"
+      }
+    },
+    {
+      "id": "arma-reforger",
+      "name": "Arma Reforger",
+      "source": "parkervcp",
+      "summary": "Experience authentic Cold War combat and join friends in the struggle for a sprawling, 51 km² mid-Atlantic island — or take on the role of Game Master and create your very own scenarios for others to ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/arma/arma_reforger/egg-arma-reforger.json"
+      }
+    },
+    {
+      "id": "assaultcube",
+      "name": "AssaultCube",
+      "source": "parkervcp",
+      "summary": "AssaultCube is a FREE, multiplayer, first-person shooter game, based on the CUBE engine.\r\n\r\nTaking place in realistic environments, with fast, arcade gameplay, it's addictive and fun!",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "cubeengine/assaultcube/egg-assault-cube.json"
+      }
+    },
+    {
+      "id": "assetto-corsa",
+      "name": "Assetto Corsa",
+      "source": "parkervcp",
+      "summary": "Assetto Corsa (Italian for \"Race Setup\") is a sim racing video game developed by the Italian video game developer Kunos Simulazioni. It is designed with an emphasis on a realistic racing experience wi",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/assetto_corsa/egg-assetto-corsa.json"
+      }
+    },
+    {
+      "id": "assetto-corsa-freeroam-ai",
+      "name": "Assetto Corsa (Freeroam + AI)",
+      "source": "parkervcp",
+      "summary": "Custom Assetto Corsa server with focus on freeroam",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/assetto_corsa/egg-assetto-corsa--freeroam--a-i.json"
+      }
+    },
+    {
+      "id": "astro-colony",
+      "name": "Astro Colony",
+      "source": "parkervcp",
+      "summary": "Explore endless Universe and create the most efficient constellation of colonies. Build conveyor systems to automate production. Take care of Astronauts and their needs! Establish new colonies as part",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/astro_colony/egg-astro-colony.json"
+      }
+    },
+    {
+      "id": "astro-colony-wine",
+      "name": "Astro Colony [wine]",
+      "source": "parkervcp",
+      "summary": "Explore endless Universe and create the most efficient constellation of colonies. Build conveyor systems to automate production. Take care of Astronauts and their needs! Establish new colonies as part",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/astro_colony/egg-astro-colony-wine.json"
+      }
+    },
+    {
+      "id": "astroneer-dedicated-server",
+      "name": "Astroneer Dedicated Server",
+      "source": "parkervcp",
+      "summary": "A game of aerospace industry and interplanetary exploration.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/astroneer/egg-astroneer-dedicated-server.json"
+      }
+    },
+    {
+      "id": "attack-of-the-b-team",
+      "name": "Attack of the B-Team",
+      "source": "parkervcp",
+      "summary": "This modpack was designed with one thing in mind, crazy mad science! With the help of the B-Team we hand picked the wackiest mods we could find and shoved them all in a modpack for you guys. The resul",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/technic/attack-of-the-bteam/egg-attack-of-the-b--team.json"
+      }
+    },
+    {
+      "id": "avorion",
+      "name": "Avorion",
+      "source": "parkervcp",
+      "summary": "A procedural co-op space sandbox where players can build their own space ships out of dynamically scalable blocks. Fight epic space battles, explore, mine, trade, wage wars and build your own empire t",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27021,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/avorion/egg-avorion.json"
+      }
+    },
+    {
+      "id": "barotrauma",
+      "name": "Barotrauma",
+      "source": "parkervcp",
+      "summary": "Barotrauma is a 2D co-op survival horror submarine simulator, inspired by games like FTL: Faster Than Light, Rimworld, Dwarf Fortress and Space Station 13. It’s a Sci-Fi game that combines ragdoll phy",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/barotrauma/egg-barotrauma.json"
+      }
+    },
+    {
+      "id": "battalion-legacy",
+      "name": "BATTALION: Legacy",
+      "source": "parkervcp",
+      "summary": "BATTALION: Legacy recaptures the core of classic shooters in the final iteration of Battalion 1944. Return to the simple days of playing first person shooters with your friends. Grab your bolt action ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27016,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/battalion_legacy/egg-b-a-t-t-a-l-i-o-n--legacy.json"
+      }
+    },
+    {
+      "id": "beammp-servers",
+      "name": "BeamMP Servers",
+      "source": "parkervcp",
+      "summary": "This is the server for the multiplayer mod BeamMP for the game BeamNG.drive. The server is the point through which all clients communicate. You can write lua mods for the server, detailed instructions",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "beamng/beammp/egg-beam-m-p-server.json"
+      }
+    },
+    {
+      "id": "bettercrewlink-server",
+      "name": "BetterCrewlink Server",
+      "source": "parkervcp",
+      "summary": "An egg designed to allow support for Proximity Chat in Among Us using BetterCrewLink Server",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "among_us/bettercrewlink_server/egg-better-crewlink-server.json"
+      }
+    },
+    {
+      "id": "black-mesa",
+      "name": "Black Mesa",
+      "source": "parkervcp",
+      "summary": "Black Mesa is a 2020 first-person shooter game. It is a third-party remake of Half-Life (1998) made in the Source game engine.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/black_mesa/egg-black-mesa.json"
+      }
+    },
+    {
+      "id": "blightfall",
+      "name": "Blightfall",
+      "source": "parkervcp",
+      "summary": "Blightfall is a combination modpack and adventure map about surviving on an alien planet. It uses magic mods and tech mods to create a novel gameplay experience. Can you survive on a world completely ",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/technic/blightfall/egg-blightfall.json"
+      }
+    },
+    {
+      "id": "citadel-forged-with-fire",
+      "name": "Citadel: Forged with Fire",
+      "source": "parkervcp",
+      "summary": "Citadel: Forged With Fire is a massive online sandbox RPG set in the mystical world of Ignus. Featuring magic, spellcasting, building, exploring and crafting as you fight to make a name for yourself a",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/citadel/egg-citadel-forged-with-fire.json"
+      }
+    },
+    {
+      "id": "classicube-mgc",
+      "name": "ClassiCube(MGC)",
+      "source": "parkervcp",
+      "summary": "Debian based MCGalaxy Egg.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "classicube/mcgalaxy/egg-classi-cube--m-g-c.json"
+      }
+    },
+    {
+      "id": "clone-hero",
+      "name": "Clone Hero",
+      "source": "parkervcp",
+      "summary": "Clone Hero is a classic instrument based rhythm game for Windows, Mac, Linux, and Android. It's playable with any 5 or 6 fret guitar controller, any midi drum kit, any game controller and even your ke",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "clone_hero/egg-clone-hero.json"
+      }
+    },
+    {
+      "id": "clusterio",
+      "name": "Clusterio",
+      "source": "parkervcp",
+      "summary": "Clusterio is a clustered Factorio server manager that provides the tooling for implementing cross server interactions in Factorio. It was previously best known for implementing cross server transfer a",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "factorio/clusterio/egg-clusterio.json"
+      }
+    },
+    {
+      "id": "colony-survival",
+      "name": "Colony Survival",
+      "source": "parkervcp",
+      "summary": "Colony Survival is a unique first-person strategy game developed by a two-man team. Build your own colony in a voxel world. Command guards, farmers, miners and other colonists. Defend your colony agai",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/colony_survival/egg-colony-survival.json"
+      }
+    },
+    {
+      "id": "conan-exiles",
+      "name": "Conan Exiles",
+      "source": "parkervcp",
+      "summary": "Conan Exiles is an open-world survival game set in the brutal lands of Conan the Barbarian. Survive in a savage world, build your kingdom, and dominate your enemies in brutal combat and epic warfare.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/conan_exiles/egg-conan-exiles.json"
+      }
+    },
+    {
+      "id": "core-keeper",
+      "name": "Core Keeper",
+      "source": "parkervcp",
+      "summary": "Core Keeper is a survival sandbox game for single or multiplayers.\r\n\r\n--- Drawn towards a mysterious relic, you are an explorer who awakens in an ancient cavern of creatures, resources and trinkets. T",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "tcp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/core_keeper/egg-core-keeper.json"
+      }
+    },
+    {
+      "id": "counter-strike-2",
+      "name": "Counter-Strike 2",
+      "source": "parkervcp",
+      "summary": "For over two decades, Counter-Strike has offered an elite competitive experience, one shaped by millions of players from across the globe. And now the next chapter in the CS story is about to begin. T",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27020,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/counter_strike/counter_strike_2/egg-counter--strike2.json"
+      }
+    },
+    {
+      "id": "counter-strike-source",
+      "name": "Counter-Strike: Source",
+      "source": "parkervcp",
+      "summary": "Counter-Strike: Source blends Counter-Strike's award-winning teamplay action with the advanced technology of Source™ technology.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/counter_strike/counter_strike_source/egg-counter--strike--source.json"
+      }
+    },
+    {
+      "id": "craftopia",
+      "name": "Craftopia",
+      "source": "parkervcp",
+      "summary": "Craftopia is the brand new multiplayer survival action game made in Japan. We combined many features we find enjoyable, such as hunting, farming, hack-and-slash, building, automation to develop this g",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/craftopia/egg-craftopia.json"
+      }
+    },
+    {
+      "id": "crewlink-server",
+      "name": "Crewlink server",
+      "source": "parkervcp",
+      "summary": "An egg designed to allow support for Proximity Chat in Among Us using CrewLink Server",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "among_us/crewlink_server/egg-crewlink-server.json"
+      }
+    },
+    {
+      "id": "cryofall",
+      "name": "CryoFall",
+      "source": "parkervcp",
+      "summary": "NOTE: For now you have to change SettingsServer.xml under CryoFall_Server_v(Version)_NetCore/Data/SettingsServer.xml\r\n\r\nCryoFall is a sci-fi multiplayer colony simulation survival game set on a forgot",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/cryofall/egg-cryo-fall.json"
       }
     },
     {
@@ -39,6 +599,38 @@
       }
     },
     {
+      "id": "cs2d",
+      "name": "CS2D",
+      "source": "parkervcp",
+      "summary": "Plant and defuse bombs, rescue hostages or accomplish new missions like capture the flag or domination! Use a huge arsenal of weapons and equipment including crazy stuff like portal guns, lasers, RPGs",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://www.unrealsoftware.de/get.php?get=cs2d_1013_linux.zip; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "cs2d/egg-c-s2-d.json"
+      }
+    },
+    {
+      "id": "cube-2-sauerbraten",
+      "name": "Cube 2: Sauerbraten",
+      "source": "parkervcp",
+      "summary": "Cube 2: Sauerbraten is a free multiplayer \u0026 singleplayer first person shooter, the successor of the Cube FPS.\r\nMuch like the original Cube, the aim of this game is fun, old school deathmatch gameplay ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://cfhcable.dl.sourceforge.net/project/sauerbraten/sauerbraten/2020_11_29/sauerbraten_2020_12_29_linux.tar.bz2; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "cubeengine/cube2/egg-cube2--sauerbraten.json"
+      }
+    },
+    {
       "id": "cuberite",
       "name": "Cuberite",
       "source": "parkervcp",
@@ -52,6 +644,454 @@
       "upstream": {
         "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
         "path": "game_eggs/minecraft/java/cuberite/egg-cuberite.json"
+      }
+    },
+    {
+      "id": "curseforge-generic",
+      "name": "CurseForge Generic",
+      "source": "parkervcp",
+      "summary": "A generic egg for a CurseForge modpack.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/curseforge/egg-curse-forge-generic.json"
+      }
+    },
+    {
+      "id": "custom-hlds-engine-game",
+      "name": "Custom HLDS Engine Game",
+      "source": "parkervcp",
+      "summary": "This option allows modifying the startup arguments and other details to run a custom HLDS based game on the panel.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 26900,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/hlds_server/vanilla/egg-custom-h-l-d-s-engine-game.json"
+      }
+    },
+    {
+      "id": "custom-rehlds-engine-game",
+      "name": "Custom ReHLDS Engine Game",
+      "source": "parkervcp",
+      "summary": "This option allows modifying the startup arguments and other details to run a custom HLDS based game on the panel, substituting the official Valve engine binaries with the ReHLDS binaries.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 26900,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/hlds_server/rehlds/egg-custom-re-h-l-d-s-engine-game.json"
+      }
+    },
+    {
+      "id": "dayz-experimental",
+      "name": "DayZ (Experimental)",
+      "source": "parkervcp",
+      "summary": "How long can you survive a post-apocalyptic world? A land overrun with an infected \"zombie\" population, where you compete with other survivors for limited resources. Will you team up with strangers an",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/dayz-experimental/egg-dayz-experimental.json"
+      }
+    },
+    {
+      "id": "ddnet",
+      "name": "DDNet",
+      "source": "parkervcp",
+      "summary": "Want to play the hardest cooperative 2D platformer ever? Want to finish no map ever? Want to be in pain for hours and cry, getting nothing in return? Come play DDNet with a large community of other su",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/ddnet/egg-d-d-net.json"
+      }
+    },
+    {
+      "id": "ddracenetwork",
+      "name": "DDRaceNetwork",
+      "source": "parkervcp",
+      "summary": "DDraceNetwork (DDNet) is an actively maintained version of DDRace, a Teeworlds modification with a unique cooperative gameplay.",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "ddracenetwork/egg-d-d-race-network.json"
+      }
+    },
+    {
+      "id": "dead-matter",
+      "name": "Dead Matter",
+      "source": "parkervcp",
+      "summary": "After a rampant viral outbreak causes global society to collapse, you must survive the harsh wilderness of the Canadian Rockies amidst vast hordes of Infected and rival survivors.",
+      "tier": "disabled",
+      "disabledReason": "steam: appid 1007 not yet validated for anonymous-loginnable install",
+      "defaultPort": 7002,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/dead_matter/egg-dead-matter.json"
+      }
+    },
+    {
+      "id": "don-t-starve-together",
+      "name": "Don't Starve Together",
+      "source": "parkervcp",
+      "summary": "Don’t Starve Together is an uncompromising wilderness survival game full of science and magic.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 11000,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/dont_starve/egg-don-t-starve-together.json"
+      }
+    },
+    {
+      "id": "eco",
+      "name": "Eco",
+      "source": "parkervcp",
+      "summary": "Eco is an online world from Strange Loop Games where players must build civilization using resources from an ecosystem that can be damaged and destroyed. The world of Eco is an incredibly reactive one",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/eco/egg-eco.json"
+      }
+    },
+    {
+      "id": "empyrion-galactic-survival",
+      "name": "Empyrion: Galactic Survival",
+      "source": "parkervcp",
+      "summary": "Empyrion: Galactic Survival dedicated server",
+      "tier": "disabled",
+      "disabledReason": "steam: appid 530870 not yet validated for anonymous-loginnable install",
+      "defaultPort": 30004,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/empyrion/egg-empyrion--galactic-survival.json"
+      }
+    },
+    {
+      "id": "enshrouded",
+      "name": "Enshrouded",
+      "source": "parkervcp",
+      "summary": "Enshrouded is a game of survival, crafting, and Action RPG combat, set within a sprawling voxel-based continent. As you journey across the mountains and deserts of an open world, you are free to choos",
+      "tier": "disabled",
+      "disabledReason": "steam: appid 1007 not yet validated for anonymous-loginnable install",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/enshrouded/egg-enshrouded.json"
+      }
+    },
+    {
+      "id": "et-legacy",
+      "name": "ET Legacy",
+      "source": "parkervcp",
+      "summary": "Welcome to Enemy Territory: Legacy, an open source project that aims to create a fully compatible client and server for the popular online FPS game Wolfenstein: Enemy Territory - whose gameplay is sti",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "enemy_territory/etlegacy/egg-e-t-legacy.json"
+      }
+    },
+    {
+      "id": "euro-truck-simulator-2-dedicated-server",
+      "name": "Euro Truck Simulator 2 Dedicated server",
+      "source": "parkervcp",
+      "summary": "Travel across Europe as king of the road, a trucker who delivers important cargo across impressive distances! With dozens of cities to explore, your endurance, skill and speed will all be pushed to th",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27016,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/truck-simulator/euro-truck-simulator2/egg-euro-truck-simulator2-dedicated-server.json"
+      }
+    },
+    {
+      "id": "fabric",
+      "name": "Fabric",
+      "source": "parkervcp",
+      "summary": "Fabric is a modular modding toolchain targeting Minecraft 1.14 and above, including snapshots.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/fabric/egg-fabric.json"
+      }
+    },
+    {
+      "id": "factorio",
+      "name": "Factorio",
+      "source": "parkervcp",
+      "summary": "The vanilla Factorio server.\r\n\r\nhttps://www.factorio.com/",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "factorio/factorio/egg-factorio.json"
+      }
+    },
+    {
+      "id": "factorio-arm64",
+      "name": "Factorio ARM64",
+      "source": "parkervcp",
+      "summary": "The vanilla Factorio server.\r\n\r\nhttps://www.factorio.com/",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "factorio/factorio/egg-factorio-a-r-m64.json"
+      }
+    },
+    {
+      "id": "factorio-modupdate",
+      "name": "Factorio-ModUpdate",
+      "source": "parkervcp",
+      "summary": "The vanilla Factorio server. With automatic Mod Updates after ReInstall.\r\n\r\nhttps://www.factorio.com/",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "factorio/factorio-modupdate/egg-factorio-modupdate.json"
+      }
+    },
+    {
+      "id": "feather",
+      "name": "Feather",
+      "source": "parkervcp",
+      "summary": "An experimental Minecraft server implementation written in Rust.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/feather/egg-feather.json"
+      }
+    },
+    {
+      "id": "feed-the-beast",
+      "name": "Feed the Beast",
+      "source": "parkervcp",
+      "summary": "Egg to handle all official FTB Modpacks",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/ftb/outdated/egg-feed-the-beast.json"
+      }
+    },
+    {
+      "id": "fivem",
+      "name": "FiveM",
+      "source": "parkervcp",
+      "summary": "A new FiveM egg for the latest builds due to recent changes in FiveM",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 40120,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "gta/fivem/egg-five-m.json"
+      }
+    },
+    {
+      "id": "fof",
+      "name": "Fof",
+      "source": "parkervcp",
+      "summary": "Fistful of Frags",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/fof/egg-fof.json"
+      }
+    },
+    {
+      "id": "folia",
+      "name": "Folia",
+      "source": "parkervcp",
+      "summary": "Fork of Paper which adds regionised multithreading to the dedicated server.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/folia/egg-folia.json"
+      }
+    },
+    {
+      "id": "forge-enhanced",
+      "name": "Forge Enhanced",
+      "source": "parkervcp",
+      "summary": "Minecraft Forge Server. Minecraft Forge is a modding API (Application Programming Interface), which makes it easier to create mods, and also make sure mods are compatible with each other.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/forge/forge/egg-forge-enhanced.json"
+      }
+    },
+    {
+      "id": "foundry-vtt",
+      "name": "Foundry VTT",
+      "source": "parkervcp",
+      "summary": "Foundry VTT is a standalone application built for experiencing multiplayer tabletop RPGs using a feature-rich and modern self-hosted application where your players connect directly through the browser",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "FoundryVTT/egg-FoundryVTT.json"
+      }
+    },
+    {
+      "id": "frozen-flame",
+      "name": "Frozen Flame",
+      "source": "parkervcp",
+      "summary": "Frozen Flame Dedicated Server",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 25575,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/frozen_flame/egg-frozen-flame.json"
+      }
+    },
+    {
+      "id": "ftb-modpacks-ch-server",
+      "name": "FTB-modpacks.ch Server",
+      "source": "parkervcp",
+      "summary": "Since the release of the FTB APP, FTB modpacks are now distributed through modpacks.ch. This egg was developed for support for modpacks that are distributed through this.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/ftb/egg-ftb-modpacksch-server.json"
+      }
+    },
+    {
+      "id": "ftb-revelation",
+      "name": "FTB Revelation",
+      "source": "parkervcp",
+      "summary": "Revelation is a general all-purpose pack that is designed for solo play as well as small and medium population servers. This pack contains a mix of magic, tech and exploration mods, and is the largest",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/ftb/outdated/egg-f-t-b-revelation.json"
+      }
+    },
+    {
+      "id": "glowstone",
+      "name": "Glowstone",
+      "source": "parkervcp",
+      "summary": "Glowstone is an open-source server implementation for Minecraft: Java Edition 1.12.2 and up.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/glowstone/egg-glowstone.json"
       }
     },
     {
@@ -76,6 +1116,70 @@
           "bin"
         ],
         "args": "-game garrysmod +port {{port}}"
+      }
+    },
+    {
+      "id": "gomint",
+      "name": "GoMint",
+      "source": "parkervcp",
+      "summary": "A performant and stable Minecraft server software for the Bedrock Edition that comes with a modern API and support for Java 11 LTS.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/bedrock/gomint/egg-go-mint.json"
+      }
+    },
+    {
+      "id": "grand-theft-auto-connected",
+      "name": "Grand Theft Auto Connected",
+      "source": "parkervcp",
+      "summary": "Grand Theft Auto Connected is a custom scriptable multiplayer modification for multiple Grand Theft Auto games.",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable ${DL_VERSION}; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "gta/gtac/egg-grand-theft-auto-connected.json"
+      }
+    },
+    {
+      "id": "ground-branch",
+      "name": "Ground Branch",
+      "source": "parkervcp",
+      "summary": "From one of the developers behind the original Rainbow Six® and Ghost Recon® games, comes a thinking-man's first-person shooter featuring in-depth character and weapon customization. Take your time. T",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/ground_branch/egg-ground-branch.json"
+      }
+    },
+    {
+      "id": "hexxit",
+      "name": "Hexxit",
+      "source": "parkervcp",
+      "summary": "Gear up and set forth on a campaign worthy of legend, for Hexxit has been unearthed! Dark dungeons, towering spires, weathered ruins and musty tomes lay before you. Lay claim to riches or create your ",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/technic/hexxit/egg-hexxit.json"
       }
     },
     {
@@ -114,6 +1218,1206 @@
       }
     },
     {
+      "id": "hogwarp",
+      "name": "Hogwarp",
+      "source": "parkervcp",
+      "summary": "A Pterodactyl egg for the Hogwarts Legacy mod Hogwarp - For more info see their Nexus: https://www.nexusmods.com/hogwartslegacy/mods/1378",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "hogwarp/egg-hogwarp.json"
+      }
+    },
+    {
+      "id": "holdfast-naw",
+      "name": "Holdfast NaW",
+      "source": "parkervcp",
+      "summary": "Holdfast: Nations at War",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 7101,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/holdfast/egg-holdfast-na-w.json"
+      }
+    },
+    {
+      "id": "humanitz",
+      "name": "HumanitZ",
+      "source": "parkervcp",
+      "summary": "HumanitZ is a co-op, isometric, open world survival game in a world ended by the zombie outbreak. As one of the few human survivors, try to last as long as “humanly” possible. The past can’t be change",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/humanitz/egg-humanit-z.json"
+      }
+    },
+    {
+      "id": "hurtworld",
+      "name": "Hurtworld",
+      "source": "parkervcp",
+      "summary": "Hurtworld is a hardcore multiplayer survival FPS with a focus on deep survival progression that doesn't become trivial once you establish some basic needs. Built for hardcore gamers, Hurtworld aims to",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 13871,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/hurtworld/egg-hurtworld.json"
+      }
+    },
+    {
+      "id": "icarus-dedicated",
+      "name": "Icarus-Dedicated",
+      "source": "parkervcp",
+      "summary": "Icarus is a survival game that with dedicated servers as a public beta",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/icarus/egg-icarus--dedicated.json"
+      }
+    },
+    {
+      "id": "insurgency-sandstorm",
+      "name": "Insurgency: Sandstorm",
+      "source": "parkervcp",
+      "summary": "Insurgency: Sandstorm is a team-based, tactical FPS based on lethal close quarters combat and objective-oriented multiplayer gameplay. Experience the intensity of modern combat where skill is rewarded",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27131,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/insurgency_sandstorm/egg-insurgency--sandstorm.json"
+      }
+    },
+    {
+      "id": "killing-floor-2",
+      "name": "Killing Floor 2",
+      "source": "parkervcp",
+      "summary": "In KILLING FLOOR 2, players descend into continental Europe after it has been overrun by horrific, murderous clones called Zeds that were created by the corporation Horzine. The Zed outbreak caused by",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/killing_floor_2/egg-killing-floor2.json"
+      }
+    },
+    {
+      "id": "kissmp-server",
+      "name": "KissMP Server",
+      "source": "parkervcp",
+      "summary": "Server for the KISS Multiplayer BeamNG.drive mod",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "beamng/kissmp/egg-kissmp.json"
+      }
+    },
+    {
+      "id": "krypton",
+      "name": "Krypton",
+      "source": "parkervcp",
+      "summary": "A fast, lightweight Minecraft server written in Kotlin",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/krypton/egg-krypton.json"
+      }
+    },
+    {
+      "id": "ksp-dmp",
+      "name": "KSP DMP",
+      "source": "parkervcp",
+      "summary": "Dark Multiplayer mod server for Kerbal Space Program",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "ksp/egg-k-s-p-d-m-p.json"
+      }
+    },
+    {
+      "id": "lac-online-public-server",
+      "name": "LAC-Online Public Server",
+      "source": "parkervcp",
+      "summary": "To make the Los Angeles Crimes public server. Los Angeles Crimes lets you play, create, and discover a variety of immersive worlds created by a global community!",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable ${VER}; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "losangelescrimes/egg-l-a-c--online-public-server.json"
+      }
+    },
+    {
+      "id": "leaguesandbox",
+      "name": "LeagueSandbox",
+      "source": "pelican-eggs",
+      "summary": "A simple egg to run LeagueSandbox server in pterodactyl",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+        "path": "leaguesandbox/egg-league-sandbox.json"
+      }
+    },
+    {
+      "id": "left-4-dead",
+      "name": "Left 4 Dead",
+      "source": "parkervcp",
+      "summary": "An outbreak of a highly contagious pathogen nicknamed the \"Green Flu\" begins in Pennsylvania. Two weeks after the first infection, four immune survivors, Bill, Zoey, Louis, and Francis make their way ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/left4dead/egg-left4dead.json"
+      }
+    },
+    {
+      "id": "left-4-dead-2",
+      "name": "Left 4 Dead 2",
+      "source": "parkervcp",
+      "summary": "Left 4 Dead 2 is set in the aftermath of a worldwide pandemic of a disease nicknamed the \"Green Flu\", which rapidly transforms humans into zombie-like creatures and mutated forms that demonstrate extr",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/left4dead_2/egg-left4dead_2.json"
+      }
+    },
+    {
+      "id": "limbo",
+      "name": "Limbo",
+      "source": "parkervcp",
+      "summary": "Standalone server program Limbo.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/limbo/egg-limbo.json"
+      }
+    },
+    {
+      "id": "liteloader-bedrock-dedicated-server",
+      "name": "Liteloader Bedrock Dedicated Server",
+      "source": "parkervcp",
+      "summary": "LiteLoaderBDS - Epoch-making \u0026 Cross-language Bedrock Dedicated Servers Plugin Loader\r\n\r\nLiteLoaderBDS is an unofficial plugin loader that provides basic API support for Bedrock Dedicated Server, with",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/bedrock/LiteLoader-bedrock/egg-LiteLoader-bedrock.json"
+      }
+    },
+    {
+      "id": "longvinter",
+      "name": "Longvinter",
+      "source": "parkervcp",
+      "summary": "Longvinter is a multiplayer, third-person sandbox game that implements Crafting, Farming, Building, Trading, and PVP.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/longvinter/egg-longvinter.json"
+      }
+    },
+    {
+      "id": "magma",
+      "name": "Magma",
+      "source": "parkervcp",
+      "summary": "Magma is most powerful Forge server providing you with Forge mods and Bukkit Plugins using Spigot and Paper for Performance Optimization and Stability. Using: https://github.com/magmamaintained",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/magma/egg-magma.json"
+      }
+    },
+    {
+      "id": "mindustry",
+      "name": "Mindustry",
+      "source": "parkervcp",
+      "summary": "Mindustry is a hybrid tower-defense sandbox factory game. Create elaborate supply chains of conveyor belts to feed ammo into your turrets, produce materials to use for building, and defend your struct",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "mindustry/egg-mindustry.json"
+      }
+    },
+    {
+      "id": "minetest",
+      "name": "Minetest",
+      "source": "parkervcp",
+      "summary": "An open source voxel game engine. Play one of our many games, mod a game to your liking, make your own game, or play on a multiplayer server.",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minetest/egg-minetest.json"
+      }
+    },
+    {
+      "id": "modiverse",
+      "name": "Modiverse",
+      "source": "parkervcp",
+      "summary": "Modiverse provides a sandbox environment with the ability to create and play mods such as TTT, Deathrun, FortWars, RP, and more! Use the many sandbox tools to build complex worlds with props, lights, ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/modiverse/egg-modiverse.json"
+      }
+    },
+    {
+      "id": "modrinth-generic",
+      "name": "Modrinth Generic",
+      "source": "parkervcp",
+      "summary": "A generic egg for a Modrinth modpack.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/modrinth/egg-modrinth-generic.json"
+      }
+    },
+    {
+      "id": "mohaa",
+      "name": "mohaa",
+      "source": "parkervcp",
+      "summary": "Medal of Honor: Allied Assault",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL http://linuxgsm.download/MedalofHonorAlliedAssault/moh_revival_v1.12_RC3.5.1.tar.xz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "mohaa/egg-mohaa.json"
+      }
+    },
+    {
+      "id": "mohist",
+      "name": "Mohist",
+      "source": "parkervcp",
+      "summary": "Spigot fork with performance optimizations.",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/mohist/egg-mohist.json"
+      }
+    },
+    {
+      "id": "mordhau",
+      "name": "Mordhau",
+      "source": "parkervcp",
+      "summary": "Mordhau is a multiplayer medieval hack 'n slash video game, developed by Slovenian independent studio Triternion, with a prominent aspect of skill-based competitive play and customization.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/mordhau/egg-mordhau.json"
+      }
+    },
+    {
+      "id": "mordhau-wine",
+      "name": "Mordhau Wine",
+      "source": "parkervcp",
+      "summary": "Mordhau is a multiplayer medieval hack 'n slash video game, developed by Slovenian independent studio Triternion, with a prominent aspect of skill-based competitive play and customization.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/mordhau/egg-mordhau-wine.json"
+      }
+    },
+    {
+      "id": "mount-blade-ii-bannerlord",
+      "name": "Mount \u0026 Blade II: Bannerlord",
+      "source": "parkervcp",
+      "summary": "A strategy/action RPG. Create a character, engage in diplomacy, craft, trade and conquer new lands in a vast medieval sandbox. Raise armies to lead into battle and command and fight alongside your tro",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/mount_blade_II_bannerlord/egg-mount--blade-i-i--bannerlord.json"
+      }
+    },
+    {
+      "id": "multi-theft-auto",
+      "name": "Multi Theft Auto",
+      "source": "parkervcp",
+      "summary": "What more could you want? Multi Theft Auto provides the best online Grand Theft Auto experience there is. Read on to find out more.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://linux.multitheftauto.com/dl/multitheftauto_linux_x64.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "gta/mtasa/egg-multi-theft-auto.json"
+      }
+    },
+    {
+      "id": "myth-of-empires",
+      "name": "Myth of Empires",
+      "source": "parkervcp",
+      "summary": "Myth of Empires is a multiplayer war sandbox game featuring a high degree of freedom. Players must survive, craft, create, and lead troops in their quest to conquer territory and build their own empir",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 12888,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/myth_of_empires/egg-myth-of-empires.json"
+      }
+    },
+    {
+      "id": "nanolimbo",
+      "name": "NanoLimbo",
+      "source": "parkervcp",
+      "summary": "This is lightweight minecraft limbo server, written on Java with Netty. The main goal of the project is maximum simplicity with a minimum number of sent and processed packets. This limbo is empty, the",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/nanolimbo/egg-nano-limbo.json"
+      }
+    },
+    {
+      "id": "nazi-zombies-portable",
+      "name": "Nazi Zombies: Portable",
+      "source": "pelican-eggs",
+      "summary": "NZ:P (Nazi Zombies: Portable) is based off of the FTEQW (Fore Thought Engine Quake World). This egg is specifically made for use with NZ:P (just downloads assets and QuakeC from NZ:P repositories) but",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "tcp"
+      ],
+      "upstream": {
+        "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+        "path": "nazi_zombies_portable/egg-nazi-zombies-portable.json"
+      }
+    },
+    {
+      "id": "necesse",
+      "name": "Necesse",
+      "source": "parkervcp",
+      "summary": "Build, quest, and conquer across an infinite procedurally generated world. Play alone or with friends as you establish a settlement and explore deep dungeons, fight monsters and bosses, mine rare ores",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/necesse/egg-necesse.json"
+      }
+    },
+    {
+      "id": "neoforge",
+      "name": "NeoForge",
+      "source": "parkervcp",
+      "summary": "NeoForge Server. NeoForge is a modding API (Application Programming Interface), which makes it easier to create mods, and also make sure mods are compatible with each other. NeoForge is a fork of Mine",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/neoforge/egg-neo-forge.json"
+      }
+    },
+    {
+      "id": "neosvr",
+      "name": "NeosVR",
+      "source": "parkervcp",
+      "summary": "Neos VR is a metaverse engineered for the unknown! It’s one of the most versatile and feature rich metaverses for virtual reality, designed so everybody can find something interesting or useful to do ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/neosvr/egg-neos-v-r.json"
+      }
+    },
+    {
+      "id": "neverwinter-nights-enhanced-edition",
+      "name": "Neverwinter Nights: Enhanced Edition",
+      "source": "parkervcp",
+      "summary": "Return to the Forgotten Realms in this bestselling Dungeons \u0026 Dragons roleplaying game. Combines all the content of Neverwinter Nights Diamond Edition with all-new enhanced features. Includes 100+ hou",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "neverwinter_nights_ee/egg-neverwinter-nights--enhanced-edition.json"
+      }
+    },
+    {
+      "id": "nmrih",
+      "name": "nmrih",
+      "source": "parkervcp",
+      "summary": "No More Room In Hell",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/nmrih/egg-nmrih.json"
+      }
+    },
+    {
+      "id": "no-love-lost",
+      "name": "No Love Lost",
+      "source": "parkervcp",
+      "summary": "Grab your ragtag crew \u0026 take up the Nectar Raiding trade on a dangerous planet that’s become all the rage! In this PvPvE extraction game for 1-10 players, compete against enemy crews to harvest as muc",
+      "tier": "disabled",
+      "disabledReason": "steam: appid 1007 not yet validated for anonymous-loginnable install",
+      "defaultPort": 27016,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/no_love_lost/egg-no-love-lost.json"
+      }
+    },
+    {
+      "id": "no-one-survived",
+      "name": "No One Survived",
+      "source": "parkervcp",
+      "summary": "This is a multiplayer cooperative open world construction survival sandbox game, where you and your friends must find supplies and build shelters in this world. You have to keep an eye on your charact",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/no_one_survived/egg-no-one-survived.json"
+      }
+    },
+    {
+      "id": "nova-life-amboise",
+      "name": "Nova-Life: Amboise",
+      "source": "parkervcp",
+      "summary": "Nova-Life: Amboise is a multiplayer role-play simulation video game. Create your character and start your second life!",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/novalife_amboise/egg-nova--life--amboise.json"
+      }
+    },
+    {
+      "id": "nukkit",
+      "name": "Nukkit",
+      "source": "parkervcp",
+      "summary": "Nukkit is a Nuclear-Powered Server Software For Minecraft: Pocket Edition\r\n\r\nhttps://cloudburstmc.org",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/bedrock/nukkit/egg-nukkit.json"
+      }
+    },
+    {
+      "id": "onset",
+      "name": "Onset",
+      "source": "parkervcp",
+      "summary": "Onset is an open world multiplayer sandbox without predefined goals. Create and host your very own experience in Onset using scripting functions. Whether that is Roleplay, Cops and Robbers or classic ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/onset/egg-onset.json"
+      }
+    },
+    {
+      "id": "open-fortress",
+      "name": "Open Fortress",
+      "source": "parkervcp",
+      "summary": "Open Fortress is a free Team Fortress 2 mod that introduces new gamemodes, weapons, characters, maps, and more to the world of TF2.",
+      "tier": "disabled",
+      "disabledReason": "steam: appid 232250 not yet validated for anonymous-loginnable install",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/open_fortress/egg-open-fortress.json"
+      }
+    },
+    {
+      "id": "openarena",
+      "name": "OpenArena",
+      "source": "parkervcp",
+      "summary": "OpenArena is a community-produced deathmatch FPS based on GPL idTech3 technology.\r\n\r\nhttp://www.openarena.ws/",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "openarena/egg-open-arena.json"
+      }
+    },
+    {
+      "id": "openmp",
+      "name": "OpenMP",
+      "source": "parkervcp",
+      "summary": "A multiplayer mod for Grand Theft Auto: San Andreas that is fully backwards compatible with San Andreas Multiplayer.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "gta/openmp/egg-open-m-p.json"
+      }
+    },
+    {
+      "id": "openra",
+      "name": "OpenRA",
+      "source": "parkervcp",
+      "summary": "OpenRA is a project that recreates and modernizes the classic Command \u0026 Conquer real time strategy games. We have developed a flexible open source game engine (the OpenRA engine) that provides a commo",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "openra/openra_red_alert/egg-open-r-a.json"
+      }
+    },
+    {
+      "id": "openra-dune2000",
+      "name": "OpenRA - Dune2000",
+      "source": "parkervcp",
+      "summary": "OpenRA is a project that recreates and modernizes the classic Command \u0026 Conquer real time strategy games. We have developed a flexible open source game engine (the OpenRA engine) that provides a commo",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "openra/openra_dune2000/egg-open-r-a--dune2000.json"
+      }
+    },
+    {
+      "id": "openra-tiberian-dawn",
+      "name": "OpenRA - Tiberian Dawn",
+      "source": "parkervcp",
+      "summary": "OpenRA is a project that recreates and modernizes the classic Command \u0026 Conquer real time strategy games. We have developed a flexible open source game engine (the OpenRA engine) that provides a commo",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "openra/openra_tiberian_dawn/egg-open-r-a--tiberian-dawn.json"
+      }
+    },
+    {
+      "id": "openrct2",
+      "name": "OpenRCT2",
+      "source": "parkervcp",
+      "summary": "OpenRCT2 is an open-source re-implementation of RollerCoaster Tycoon 2 (RCT2), expanding the game with new features, fixing bugs and raising game limits.",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "tycoon_games/openrct2/egg-openrct2.json"
+      }
+    },
+    {
+      "id": "openttd",
+      "name": "OpenTTD",
+      "source": "pelican-eggs",
+      "summary": "OpenTTD is an open source simulation game based upon the popular Microprose game \"Transport Tycoon Deluxe\", written by Chris Sawyer. It attempts to mimic the original game as closely as possible while",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+        "path": "openttd/egg-open-t-t-d-server.json"
+      }
+    },
+    {
+      "id": "openttd-server",
+      "name": "OpenTTD Server",
+      "source": "parkervcp",
+      "summary": "OpenTTD is an open source simulation game based upon the popular Microprose game \"Transport Tycoon Deluxe\", written by Chris Sawyer. It attempts to mimic the original game as closely as possible while",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "tycoon_games/openttd/egg-open-t-t-d-server.json"
+      }
+    },
+    {
+      "id": "operation-harsh-doorstop",
+      "name": "Operation Harsh Doorstop",
+      "source": "parkervcp",
+      "summary": "Operation: Harsh Doorstop is an Unreal Engine powered shooter sandbox similar to mod-friendly games like Ravenfield and Garry's Mod but with roots in tactical shooters like Squad and Arma III. Our gam",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27005,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/operation_harsh_doorstop/egg-operation-harsh-doorstop.json"
+      }
+    },
+    {
+      "id": "palworld",
+      "name": "Palworld",
+      "source": "parkervcp",
+      "summary": "Fight, farm, build and work alongside mysterious creatures called \"Pals\" in this completely new multiplayer, open world survival and crafting game!",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 25575,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/palworld/egg-palworld.json"
+      }
+    },
+    {
+      "id": "palworld-proton",
+      "name": "Palworld Proton",
+      "source": "parkervcp",
+      "summary": "Fight, farm, build and work alongside mysterious creatures called \"Pals\" in this completely new multiplayer, open world survival and crafting game!",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 25575,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/palworld/egg-palworld-proton.json"
+      }
+    },
+    {
+      "id": "paper",
+      "name": "Paper",
+      "source": "parkervcp",
+      "summary": "High performance Spigot fork that aims to fix gameplay and mechanics inconsistencies.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/paper/egg-paper.json"
+      }
+    },
+    {
+      "id": "path-of-titans",
+      "name": "Path Of Titans",
+      "source": "pelican-eggs",
+      "summary": "Path of Titans is a multiplayer dinosaur survival video game. Survive as a dinosaur in a rich ecosystem filled with intelligent AI creatures and up to 200 other players.",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 7778,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+        "path": "path_of_titans/egg-path-of-titans.json"
+      }
+    },
+    {
+      "id": "pavlov-vr",
+      "name": "Pavlov VR",
+      "source": "parkervcp",
+      "summary": "Pavlov VR is a multiplayer shooter in VR with heavy focus on community features. Realistic reloading features and fast paced combat as part of the core experience. Play the #1 most popular VR shooter ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 8188,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/pavlov_vr/egg-pavlov-v-r.json"
+      }
+    },
+    {
+      "id": "pixark",
+      "name": "PixARK",
+      "source": "parkervcp",
+      "summary": "A simple Docker container with Wine to run PixARK using Pterodactyl Panel",
+      "tier": "disabled",
+      "disabledReason": "steam: appid 1007 not yet validated for anonymous-loginnable install",
+      "defaultPort": 12345,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/pixark/egg-pix-a-r-k.json"
+      }
+    },
+    {
+      "id": "pocketminemp",
+      "name": "PocketmineMP",
+      "source": "parkervcp",
+      "summary": "Pocketmine Egg\r\nby onekintaro from swisscrafting.ch\r\nwith the nice help from #eggs Channel on Pterodactyl-Discord :)",
+      "tier": "disabled",
+      "disabledReason": "egg builds from source (BuildTools/gradle/maven/cmake); needs a pre-built binary URL",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/bedrock/pocketmine_mp/egg-pocketmine-m-p.json"
+      }
+    },
+    {
+      "id": "portal-knights",
+      "name": "Portal Knights",
+      "source": "parkervcp",
+      "summary": "The world of Elysia needs YOU! Join this cooperative, 3D sandbox action RPG to level up your character, craft epic weapons, conquer enemies in real-time, and build almost anything! Craft your adventur",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/portal_knights/egg-portal-knights.json"
+      }
+    },
+    {
+      "id": "post-scriptum",
+      "name": "Post Scriptum",
+      "source": "parkervcp",
+      "summary": "Post Scriptum is a WW2-themed first-person tactical shooter that provides an authentic WWII combat experience. Focusing on historical accuracy, large-scale battles, and a challenging battlefield deman",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 10037,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/post_scriptum/egg-post-scriptum.json"
+      }
+    },
+    {
+      "id": "powernukkitx",
+      "name": "PowerNukkitX",
+      "source": "parkervcp",
+      "summary": "PowerNukkitX support for Pterodactyl",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/bedrock/PowerNukkitX/egg-powernukkitx.json"
+      }
+    },
+    {
+      "id": "project-zomboid",
+      "name": "Project Zomboid",
+      "source": "parkervcp",
+      "summary": "Project Zomboid is an open world survival horror video game in alpha stage development by British and Canadian independent developer, The Indie Stone. The game is set in a post apocalyptic, zombie inf",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 16262,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/project_zomboid/egg-project-zomboid.json"
+      }
+    },
+    {
+      "id": "purpur",
+      "name": "Purpur",
+      "source": "parkervcp",
+      "summary": "A drop-in replacement for Paper servers designed for configurability, and new fun and exciting gameplay features.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/purpur/egg-purpur.json"
+      }
+    },
+    {
+      "id": "purpur-geyser-floodgate",
+      "name": "Purpur-Geyser-Floodgate",
+      "source": "parkervcp",
+      "summary": "A drop-in replacement for Paper servers designed for configurability, and new fun and exciting gameplay features, with the addition of GeyserMC and Floodgate",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/crossplay/purpur-geysermc-floodgate/egg-purpur-geysermc-floodgate.json"
+      }
+    },
+    {
+      "id": "quake-live",
+      "name": "Quake Live",
+      "source": "parkervcp",
+      "summary": "Quake Live is a first-person shooter video game by id Software. It is an updated version of Quake III Arena that was originally designed as a free-to-play game launched via a web browser plug-in. On S",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/quake_live/egg-quake-live.json"
+      }
+    },
+    {
+      "id": "quilt",
+      "name": "Quilt",
+      "source": "parkervcp",
+      "summary": "The Quilt project is an open-source, community-driven modding toolchain designed primarily for Minecraft. By focusing on speed, ease of use and modularity, Quilt aims to provide a sleek and modern mod",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/quilt/egg-quilt.json"
+      }
+    },
+    {
+      "id": "rage-mp",
+      "name": "Rage.MP",
+      "source": "parkervcp",
+      "summary": "https://rage.mp/\r\n\r\nModified to work with the latest version of RAGE:MP\r\nWill automatically install linux bridge.\r\n**This server requires 2 ports to be added for the server. the main port and the next",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://cdn.rage.mp/updater/prerelease/server-files/linux_x64.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "gta/ragemp/egg-rage--m-p.json"
+      }
+    },
+    {
+      "id": "ragecoop",
+      "name": "RageCOOP",
+      "source": "parkervcp",
+      "summary": "Drive around the interstate with your buddy, enjoy GTAs environment, make own missions and events or just chill in Grove Street! 🌐",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "gta/ragecoop/egg-rage-c-o-o-p.json"
+      }
+    },
+    {
+      "id": "redm",
+      "name": "RedM",
+      "source": "parkervcp",
+      "summary": "A new RedM egg for the latest builds due to recent changes in RedM",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "rdr/redm/egg-red-m.json"
+      }
+    },
+    {
+      "id": "resonite",
+      "name": "Resonite",
+      "source": "parkervcp",
+      "summary": "Enter a novel digital universe with infinite possibilities. Whether you resonate with people around the world in a casual conversation, playing games and socializing or you riff off each other when cr",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/resonite/egg-resonite.json"
+      }
+    },
+    {
+      "id": "rimworld-open-world",
+      "name": "Rimworld: Open World",
+      "source": "parkervcp",
+      "summary": "The Open World mod allows you to create and join servers to play with people all around the world, it introduces plenty of new features including trading, gifting, bartering, PvP and so much more!\r\n\r\n",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "rimworld/open_world/egg-rimworld-open-world.json"
+      }
+    },
+    {
+      "id": "rimworld-together",
+      "name": "Rimworld Together",
+      "source": "parkervcp",
+      "summary": "A community driven multiplayer mod, for Rimworld.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "rimworld/together/egg-rimworld-together.json"
+      }
+    },
+    {
+      "id": "rising-world-java-legacy",
+      "name": "Rising World Java Legacy",
+      "source": "parkervcp",
+      "summary": "Rising World is a voxel based open-world sandbox game, featuring a procedurally generated world, playable in single and multi-player.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 4253,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/rising_world/legacy/egg-rising-world-legacy.json"
+      }
+    },
+    {
+      "id": "rising-world-unity",
+      "name": "Rising World Unity",
+      "source": "parkervcp",
+      "summary": "Rising World is a voxel based open-world sandbox game, featuring a procedurally generated world, playable in single and multi-player.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 4253,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/rising_world/unity/egg-rising-world-unity.json"
+      }
+    },
+    {
+      "id": "risk-of-rain-2",
+      "name": "Risk of Rain 2",
+      "source": "parkervcp",
+      "summary": "Risk of Rain 2 dedicated server.",
+      "tier": "disabled",
+      "disabledReason": "steam: appid 1007 not yet validated for anonymous-loginnable install",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/risk_of_rain_2/egg-risk-of-rain2.json"
+      }
+    },
+    {
       "id": "rust",
       "name": "Rust",
       "source": "linuxgsm",
@@ -127,6 +2431,502 @@
       "installRecipe": {
         "method": "steam",
         "steamAppId": 258550
+      }
+    },
+    {
+      "id": "rust-autowipe",
+      "name": "Rust Autowipe",
+      "source": "parkervcp",
+      "summary": "The only aim in Rust is to survive. To do this you will need to overcome struggles such as hunger, thirst and cold. Build a fire. Build a shelter. Kill animals for meat. Protect yourself from other pl",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 28016,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/rust/rust_autowipe/egg-rust-autowipe.json"
+      }
+    },
+    {
+      "id": "rust-staging",
+      "name": "Rust Staging",
+      "source": "parkervcp",
+      "summary": "The only aim in Rust is to survive. To do this you will need to overcome struggles such as hunger, thirst and cold. Build a fire. Build a shelter. Kill animals for meat. Protect yourself from other pl",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 28016,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/rust/rust_staging/egg-rust-staging.json"
+      }
+    },
+    {
+      "id": "sa-mp",
+      "name": "SA-MP",
+      "source": "parkervcp",
+      "summary": "SA-MP is a free Massively Multiplayer Online game mod for the PC version of Rockstar Games Grand Theft Auto: San Andreas (tm).",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable ${VERSION}; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "gta/samp/egg-s-a--m-p.json"
+      }
+    },
+    {
+      "id": "satisfactory",
+      "name": "Satisfactory",
+      "source": "parkervcp",
+      "summary": "Satisfactory is a first-person open-world factory building game with a dash of exploration and combat. Play alone or with friends, explore an alien planet, create multi-story factories, and enter conv",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 15777,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/satisfactory/egg-satisfactory.json"
+      }
+    },
+    {
+      "id": "scp-sl",
+      "name": "SCP:SL",
+      "source": "parkervcp",
+      "summary": "Egg for SCP: Secret Laboratory Dedicated Linux Server",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/scpsl/dedicated/egg-scpsl.json"
+      }
+    },
+    {
+      "id": "scp-sl-exiled",
+      "name": "SCP:SL - Exiled",
+      "source": "parkervcp",
+      "summary": "Egg for SCP: Secret Laboratory Dedicated Linux Server with Exiled Plugin Framework",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/scpsl/exiled/egg-s-c-p--s-l--exiled.json"
+      }
+    },
+    {
+      "id": "singleplayer-tarkov",
+      "name": "Singleplayer Tarkov",
+      "source": "parkervcp",
+      "summary": "The Stay in Tarkov project was born due to Battlestate Games' (BSG) reluctance to create the pure PvE version of Escape from Tarkov. The project's aim is simple, create a Cooperation PvE experience th",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "eft/egg-singleplayer-tarkov.json"
+      }
+    },
+    {
+      "id": "smalland-survive-the-wilds",
+      "name": "Smalland: Survive the Wilds",
+      "source": "parkervcp",
+      "summary": "Experience a big adventure on a tiny scale! Enjoy multiplayer survival in a vast, hazardous world. Preparation is key when you're this small \u0026 at the bottom of the food chain. Craft weapons \u0026 armour, ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/smalland_survive_the_wilds/egg-smalland--survive-the-wilds.json"
+      }
+    },
+    {
+      "id": "solace-crafting",
+      "name": "Solace Crafting",
+      "source": "parkervcp",
+      "summary": "Open-world fantasy survival RPG. Borderless distance-based difficulty with player built fast-travel, modular-building, and town management.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/solace_crafting/egg-solace-crafting.json"
+      }
+    },
+    {
+      "id": "soldat",
+      "name": "Soldat",
+      "source": "parkervcp",
+      "summary": "Soldat is a unique 2D (side-view) multiplayer action game. It has been influenced by the best of games such as Liero, Worms, Quake, and Counter-Strike and provides a fast-paced gaming experience with ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/soldat/egg-soldat.json"
+      }
+    },
+    {
+      "id": "sons-of-the-forest",
+      "name": "Sons Of The Forest",
+      "source": "parkervcp",
+      "summary": "Sons of the Forest is a horror survival game and sequel to The Forest by Endnight Games, Ltd.. Sent to find a missing billionaire on a remote island, you find yourself in a cannibal-infested hellscape",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27016,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/sonsoftheforest/egg-sons-of-the-forest.json"
+      }
+    },
+    {
+      "id": "space-engineers",
+      "name": "Space Engineers",
+      "source": "parkervcp",
+      "summary": "Space Engineers is a voxel-based sandbox game set in space and on planets.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 8766,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/space_engineers/default/egg-space-engineers.json"
+      }
+    },
+    {
+      "id": "space-engineers-torch-server",
+      "name": "Space Engineers - Torch Server",
+      "source": "parkervcp",
+      "summary": "Torch is the successor to SE Server Extender and gives server admins the tools they need to keep their Space Engineers servers running smoothly. It features a user interface with live management tools",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 8766,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/space_engineers/torch/egg-space-engineers--torch-server.json"
+      }
+    },
+    {
+      "id": "space-station-14",
+      "name": "Space Station 14",
+      "source": "pelican-eggs",
+      "summary": "Space Station 14 tells the story of an ordinary shift on a space station gone wrong. Immerse yourself into your role, tinker with detailed systems, and survive the chaos in this round-based multiplaye",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+        "path": "spacestation_14/egg-pterodactyl-spacestation14.json"
+      }
+    },
+    {
+      "id": "spacestation-14",
+      "name": "Spacestation 14",
+      "source": "parkervcp",
+      "summary": "Space Station 14 tells the story of an ordinary shift on a space station gone wrong. Immerse yourself into your role, tinker with detailed systems, and survive the chaos in this round-based multiplaye",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable ${V}; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "spacestation_14/egg-spacestation14.json"
+      }
+    },
+    {
+      "id": "spigot",
+      "name": "Spigot",
+      "source": "parkervcp",
+      "summary": "Spigot is the most widely-used modded Minecraft server software in the world. It powers many of the top Minecraft server networks around to ensure they can cope with their huge player base and ensure ",
+      "tier": "disabled",
+      "disabledReason": "egg builds from source (BuildTools/gradle/maven/cmake); needs a pre-built binary URL",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/spigot/egg-spigot.json"
+      }
+    },
+    {
+      "id": "spongeforge",
+      "name": "SpongeForge",
+      "source": "parkervcp",
+      "summary": "A community-driven open source Minecraft: Java Edition modding platform.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/spongeforge/egg-sponge-forge.json"
+      }
+    },
+    {
+      "id": "spongevanilla",
+      "name": "SpongeVanilla",
+      "source": "parkervcp",
+      "summary": "SpongeVanilla is the implementation of the Sponge API on top of Vanilla Minecraft.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/spongevanilla/egg-sponge-vanilla.json"
+      }
+    },
+    {
+      "id": "squad",
+      "name": "Squad",
+      "source": "parkervcp",
+      "summary": "Squad is a 50 vs 50 multiplayer first-person shooter that aims to capture combat realism through communication and teamplay. Major features include vehicle-based combined arms gameplay, large scale en",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27165,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/squad/egg-squad.json"
+      }
+    },
+    {
+      "id": "starbound",
+      "name": "Starbound",
+      "source": "parkervcp",
+      "summary": "Starbound takes place in a two-dimensional, procedurally generated universe which the player is able to explore in order to obtain new weapons, armor, and items, and to visit towns and villages inhabi",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/starbound/egg-starbound.json"
+      }
+    },
+    {
+      "id": "starmade",
+      "name": "starmade",
+      "source": "parkervcp",
+      "summary": "starmade",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "starmade/egg-starmade.json"
+      }
+    },
+    {
+      "id": "stationeers",
+      "name": "Stationeers",
+      "source": "parkervcp",
+      "summary": "Stationeers Server",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27014,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/stationeers/stationeers_vanilla/egg-stationeers.json"
+      }
+    },
+    {
+      "id": "stationeers-bepinex",
+      "name": "Stationeers (BepInEx)",
+      "source": "parkervcp",
+      "summary": "Stationeers Server with very basic BepInEx support",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 27014,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/stationeers/stationeers_bepinex/egg-stationeers--bep-in-ex.json"
+      }
+    },
+    {
+      "id": "stay-in-tarkov",
+      "name": "Stay In Tarkov",
+      "source": "pelican-eggs",
+      "summary": "The Stay in Tarkov project was born due to Battlestate Games' (BSG) reluctance to create the pure PvE version of Escape from Tarkov. The project's aim is simple, create a Cooperation PvE experience th",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+        "path": "eft/egg-pterodactyl-stay-in-tarkov.json"
+      }
+    },
+    {
+      "id": "stormworks-build-and-rescue",
+      "name": "Stormworks: Build and Rescue",
+      "source": "parkervcp",
+      "summary": "Join a world where you design, create and pilot your own air sea rescue service. Release your inner hero as you battle fierce storms out at sea to rescue those in need.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/stormworks/egg-stormworks--build-and-rescue.json"
+      }
+    },
+    {
+      "id": "subnautica",
+      "name": "Subnautica",
+      "source": "parkervcp",
+      "summary": "Subnautica is an open world survival action-adventure video game developed and published by Unknown Worlds Entertainment. In it, players are free to explore the ocean on an alien planet, known as plan",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/subnautica_nitrox_mod/egg-subnautica.json"
+      }
+    },
+    {
+      "id": "supertuxkart",
+      "name": "SuperTuxKart",
+      "source": "parkervcp",
+      "summary": "Egg for hosting a SuperTuxKart Server.",
+      "tier": "disabled",
+      "disabledReason": "egg builds from source (BuildTools/gradle/maven/cmake); needs a pre-built binary URL",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "SuperTuxKart/egg-super-tux-kart.json"
+      }
+    },
+    {
+      "id": "sven-co-op",
+      "name": "Sven Co-op",
+      "source": "parkervcp",
+      "summary": "Sven Co-op is a co-operative game originally based around Valve Software's Half-Life. In this game players must work together against computer controlled enemies and solve puzzles as a team.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/svencoop/egg-sven-co-op.json"
+      }
+    },
+    {
+      "id": "swords-n-magic-and-stuff",
+      "name": "Swords 'n Magic and Stuff",
+      "source": "parkervcp",
+      "summary": "Grab your friends and set out for adventure in a world of swords, magic, and stuff. Discover tons of cool loot, uncover hidden secrets, and meet new friends and foes along the way. Make your mark and ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/swords_'n_Magic_and_Stuff/egg-swords-n-magic-and-stuff.json"
+      }
+    },
+    {
+      "id": "tachyon",
+      "name": "Tachyon",
+      "source": "parkervcp",
+      "summary": "A multiplayer version of FTL.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "ftl/tachyon/egg-tachyon.json"
+      }
+    },
+    {
+      "id": "team-fortress-2-classic",
+      "name": "Team Fortress 2 Classic",
+      "source": "parkervcp",
+      "summary": "Team Fortress 2 Classic is a free mod of the 2007 game Team Fortress 2, developed by Eminoma and utilizing the Source engine.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/team_fortress_2_classic/egg-team-fortress-2-classic.json"
       }
     },
     {
@@ -150,6 +2950,102 @@
       "start": {
         "binary": "teeworlds_srv",
         "args": "\"sv_port {{port}}\""
+      }
+    },
+    {
+      "id": "tekkit",
+      "name": "Tekkit",
+      "source": "parkervcp",
+      "summary": "Tekkit is set to reignite the same sort of wonder and awe that we all received from booting up Minecraft for the first time. With the skies open, the moon ready to be colonized (by force if need be) a",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/technic/Tekkit/egg-tekkit.json"
+      }
+    },
+    {
+      "id": "tekkit-2",
+      "name": "Tekkit 2",
+      "source": "parkervcp",
+      "summary": "Those of you who are nostalgic for the early days of Tekkit (now known as Tekkit Classic), will love what awaits you in Tekkit 2!\r\n\r\nWith a collection of nostalgic mods and plenty of new improvements,",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/technic/Tekkit-2/egg-tekkit-2.json"
+      }
+    },
+    {
+      "id": "tekkit-classic",
+      "name": "Tekkit Classic",
+      "source": "parkervcp",
+      "summary": "Created by the Technic team, Tekkit Classic is a modpack for the record breaking sandbox construction game Minecraft. \r\nIt brings together some of the best mods from the Minecraft community for automa",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/technic/tekkit-classic/egg-tekkit-classic.json"
+      }
+    },
+    {
+      "id": "tekkit-legends",
+      "name": "Tekkit Legends",
+      "source": "parkervcp",
+      "summary": "The ancient power of Tekkits past return in this legendary pack! Wield the philosopher's stone, ride the rails, breed the bees, and much, much more! This pack will remind you of what you've always lov",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/technic/tekkit-legends/egg-tekkit-legends.json"
+      }
+    },
+    {
+      "id": "terraria-vanilla",
+      "name": "Terraria Vanilla",
+      "source": "parkervcp",
+      "summary": "Dig, fight, explore, build! Nothing is impossible in this action-packed adventure game.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "terraria/vanilla/egg-terraria-vanilla.json"
+      }
+    },
+    {
+      "id": "terratech-worlds",
+      "name": "TerraTech Worlds",
+      "source": "parkervcp",
+      "summary": "TerraTech Worlds",
+      "tier": "disabled",
+      "disabledReason": "steam: appid 1007 not yet validated for anonymous-loginnable install",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/terratech_worlds/egg-terra-tech-worlds.json"
       }
     },
     {
@@ -177,6 +3073,262 @@
       }
     },
     {
+      "id": "the-1-12-2-pack",
+      "name": "The 1.12.2 Pack",
+      "source": "parkervcp",
+      "summary": "The 1.12.2 Pack",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/technic/the-1-12-2-pack/egg-the1-12-2-pack.json"
+      }
+    },
+    {
+      "id": "the-1-7-10-pack",
+      "name": "The 1.7.10 Pack",
+      "source": "parkervcp",
+      "summary": "The 1.7.10 Pack",
+      "tier": "disabled",
+      "disabledReason": "egg install URL contains unsubstituted shell variable $MODPACK_VERSION; needs a static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/technic/the-1-7-10-pack/egg-the1-7-10-pack.json"
+      }
+    },
+    {
+      "id": "the-battle-for-wesnoth",
+      "name": "The Battle for Wesnoth",
+      "source": "pelican-eggs",
+      "summary": "Egg for hosting a Battle for Wesnoth Server.",
+      "tier": "disabled",
+      "disabledReason": "egg builds from source (BuildTools/gradle/maven/cmake); needs a pre-built binary URL",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+        "path": "thebattleforwesnoth/egg-pterodactyl-the-battle-for-wesnoth.json"
+      }
+    },
+    {
+      "id": "the-forest",
+      "name": "The Forest",
+      "source": "parkervcp",
+      "summary": "As the lone survivor of a passenger jet crash, you find yourself in a mysterious forest battling to stay alive against a society of cannibalistic mutants. Build, explore, survive in this terrifying fi",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 8766,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/the_forest/egg-the-forest.json"
+      }
+    },
+    {
+      "id": "the-front",
+      "name": "The Front",
+      "source": "parkervcp",
+      "summary": "The Front is a survival open-world crafting shooter. You play the role of a resistance fighter sent back in time to stop the rise of a tyrannical empire.",
+      "tier": "disabled",
+      "disabledReason": "steam: appid 1007 not yet validated for anonymous-loginnable install",
+      "defaultPort": 27016,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/thefront/egg-the-front.json"
+      }
+    },
+    {
+      "id": "the-isle",
+      "name": "The Isle",
+      "source": "parkervcp",
+      "summary": "The Isle is an open beta with an open-world survival game where players choose from three factions in an attempt to survive a fierce island. Hunt. Prey. Survive.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 44000,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/the_isle/evrima/egg-the-isle.json"
+      }
+    },
+    {
+      "id": "tmodloader",
+      "name": "tModloader",
+      "source": "parkervcp",
+      "summary": "tModLoader is essentially a mod that provides a way to load your own mods without having to work directly with Terraria's source code itself. This means you can easily make mods that are compatible wi",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "terraria/tmodloader/egg-t-modloader.json"
+      }
+    },
+    {
+      "id": "tower-unite",
+      "name": "Tower Unite",
+      "source": "parkervcp",
+      "summary": "Tower Unite\r\n\r\nDefault Port: 7778\r\nDefault Query Port: 27016\r\n\r\nConfig Path: Tower/Saved/Config/TowerServer.ini",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/tower_unite/egg-tower-unite.json"
+      }
+    },
+    {
+      "id": "trackmania-2020",
+      "name": "Trackmania (2020)",
+      "source": "pelican-eggs",
+      "summary": "Trackmania is a free-to-play game that combines racing and creation. Compete on over 1000 community-made tracks, create your own with the editor, and join clubs and events online.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL http://files.v04.maniaplanet.com/server/TrackmaniaServer_Latest.zip; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+        "path": "trackmania2020/egg-trackmania2020.json"
+      }
+    },
+    {
+      "id": "travertine",
+      "name": "Travertine",
+      "source": "parkervcp",
+      "summary": "Travertine is a fork of Waterfall with 1.7 protocol support. Waterfall is a fork of the well-known BungeeCord server teleportation suite.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/proxy/java/travertine/egg-travertine.json"
+      }
+    },
+    {
+      "id": "tshock",
+      "name": "tshock",
+      "source": "parkervcp",
+      "summary": "The t-shock modded terraria server.\r\n\r\nhttps://tshock.co/",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "terraria/tshock/egg-tshock.json"
+      }
+    },
+    {
+      "id": "tshock-legacy",
+      "name": "tshock legacy",
+      "source": "parkervcp",
+      "summary": "The t-shock modded terraria server.\r\n\r\nhttps://tshock.co/",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "terraria/tshock/egg-tshock-legacy.json"
+      }
+    },
+    {
+      "id": "unturned",
+      "name": "Unturned",
+      "source": "parkervcp",
+      "summary": "Vanilla Unturned with the included RockerMod.",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/unturned/egg-unturned.json"
+      }
+    },
+    {
+      "id": "urban-terror",
+      "name": "Urban Terror",
+      "source": "parkervcp",
+      "summary": "Urban Terror started as a realism based \"total conversion\" mod for Quake III Arena. Nowadays, Urban Terror is played using the free, stand-alone, ioquake3 engine modified, which doesn't require Quake ",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "urbanterror/egg-urban-terror.json"
+      }
+    },
+    {
+      "id": "v-rising",
+      "name": "V Rising",
+      "source": "parkervcp",
+      "summary": "Awaken as a vampire. Hunt for blood in nearby settlements to regain your strength and evade the scorching sun to survive. Raise your castle and thrive in an ever-changing open world full of mystery. G",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 9877,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/v_rising/v_rising_vanilla/egg-v-rising.json"
+      }
+    },
+    {
+      "id": "v-rising-bepinex",
+      "name": "V Rising BepInEx",
+      "source": "parkervcp",
+      "summary": "Awaken as a vampire. Hunt for blood in nearby settlements to regain your strength and evade the scorching sun to survive. Raise your castle and thrive in an ever-changing open world full of mystery. G",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 9877,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/v_rising/v_rising_bepinex/egg-v-rising-bep-in-ex.json"
+      }
+    },
+    {
       "id": "valheim",
       "name": "Valheim",
       "source": "linuxgsm",
@@ -200,6 +3352,38 @@
       }
     },
     {
+      "id": "valheim-bepinex",
+      "name": "Valheim  BepINex",
+      "source": "parkervcp",
+      "summary": "A brutal exploration and survival game for 1-10 players, set in a procedurally-generated purgatory inspired by viking culture incl the Plugin Framework BepInEx",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/valheim/valheim_bepinex/egg-valheim-bep-i-nex.json"
+      }
+    },
+    {
+      "id": "valheim-plus-mod",
+      "name": "Valheim Plus Mod",
+      "source": "parkervcp",
+      "summary": "A brutal exploration and survival game for 1-10 players, set in a procedurally-generated purgatory inspired by viking culture.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/valheim/valheim_plus/egg-valheim-plus-mod.json"
+      }
+    },
+    {
       "id": "vanilla-bedrock",
       "name": "Vanilla Bedrock",
       "source": "parkervcp",
@@ -213,6 +3397,246 @@
       "upstream": {
         "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
         "path": "game_eggs/minecraft/bedrock/bedrock/egg-vanilla-bedrock.json"
+      }
+    },
+    {
+      "id": "vanilla-bedrock-arm64",
+      "name": "Vanilla Bedrock ARM64",
+      "source": "parkervcp",
+      "summary": "Bedrock Edition (also known as the Bedrock Version, Bedrock Codebase, Bedrock Engine or just Bedrock) refers to the multi-platform family of editions of Minecraft developed by Mojang AB, Microsoft Stu",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/bedrock/bedrock/egg-vanilla-bedrock-ARM64.json"
+      }
+    },
+    {
+      "id": "vanillacord",
+      "name": "VanillaCord",
+      "source": "parkervcp",
+      "summary": "Minecraft is a game about placing blocks and going on adventures. Explore randomly generated worlds and build amazing things from the simplest of homes to the grandest of castles. Play in Creative Mod",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/java/vanillacord/egg-vanilla-cord.json"
+      }
+    },
+    {
+      "id": "vein",
+      "name": "VEIN",
+      "source": "parkervcp",
+      "summary": "VEIN is a post-apocalyptic survival multiplayer sandbox game. Gather supplies to survive, explore abandoned buildings, combat bandits, defend your home, assist friendly NPCs, and rebuild society with ",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/vein/egg-v-e-i-n.json"
+      }
+    },
+    {
+      "id": "velocity",
+      "name": "Velocity",
+      "source": "parkervcp",
+      "summary": "Velocity is a Minecraft server proxy with unparalleled server support, scalability, and flexibility.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/proxy/java/velocity/egg-velocity.json"
+      }
+    },
+    {
+      "id": "veloren",
+      "name": "Veloren",
+      "source": "parkervcp",
+      "summary": "Veloren is a multiplayer voxel RPG written in Rust. It is inspired by games such as Cube World, Legend of Zelda: Breath of the Wild, Dwarf Fortress and Minecraft.",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 14005,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "veloren/egg-veloren.json"
+      }
+    },
+    {
+      "id": "venice-unleashed",
+      "name": "Venice Unleashed",
+      "source": "pelican-eggs",
+      "summary": "Venice Unleashed (VU) is a community-oriented Battlefield 3 custom server \u0026 modding platform that gives you back control of your gaming experience. This Egg requires a valid VU `server.key` file, and ",
+      "tier": "disabled",
+      "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+        "path": "venice_unleashed/egg-pterodactyl-venice-unleashed.json"
+      }
+    },
+    {
+      "id": "viaaas",
+      "name": "VIAaaS",
+      "source": "parkervcp",
+      "summary": "VIAaaS - ViaVersion as a Service - Standalone ViaVersion proxy",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 25543,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/proxy/java/viaaas/egg-v-i-aaa-s.json"
+      }
+    },
+    {
+      "id": "vintage-story",
+      "name": "Vintage Story",
+      "source": "parkervcp",
+      "summary": "Vintage Story is an uncompromising wilderness survival sandbox game inspired by lovecraftian horror themes. Find yourself in a ruined world reclaimed by nature and permeated by unnerving temporal dist",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "vintage_story/egg-vintage-story.json"
+      }
+    },
+    {
+      "id": "waterdog",
+      "name": "Waterdog",
+      "source": "parkervcp",
+      "summary": "Waterdog is fork of the well-known Waterfall, which is a fork of the well-known BungeeCord, server teleportation suite.",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/proxy/cross_platform/waterdog/egg-waterdog.json"
+      }
+    },
+    {
+      "id": "waterdog-pe",
+      "name": "Waterdog PE",
+      "source": "parkervcp",
+      "summary": "Brand new proxy server for Minecraft: Bedrock Edition",
+      "tier": "disabled",
+      "disabledReason": "no extractable install URL; manual recipe required",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/proxy/bedrock/waterdog_pe/egg-waterdog-p-e.json"
+      }
+    },
+    {
+      "id": "waterfall",
+      "name": "Waterfall",
+      "source": "parkervcp",
+      "summary": "Waterfall is a fork of the well-known BungeeCord server teleportation suite.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "minecraft/proxy/java/waterfall/egg-waterfall.json"
+      }
+    },
+    {
+      "id": "wine-generic",
+      "name": "Wine Generic",
+      "source": "parkervcp",
+      "summary": "a generic egg to run servers with wine",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "wine/generic/egg-wine-generic.json"
+      }
+    },
+    {
+      "id": "wurm-unlimited",
+      "name": "Wurm Unlimited",
+      "source": "parkervcp",
+      "summary": "Wurm Unlimited is the standalone version of the fantasy sandbox world Wurm Online, the MMORPG where the players are in charge! A pioneer in the ideas of player influence, crafting and adventure, it is",
+      "tier": "disabled",
+      "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "steamcmd_servers/wurm_unlimited/egg-wurm-unlimited.json"
+      }
+    },
+    {
+      "id": "xonotic",
+      "name": "Xonotic",
+      "source": "parkervcp",
+      "summary": "This is for the default xonotic setup.",
+      "tier": "disabled",
+      "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "xonotic/xonotic/egg-xonotic.json"
+      }
+    },
+    {
+      "id": "zandronum",
+      "name": "Zandronum",
+      "source": "parkervcp",
+      "summary": "Zandronum is a multiplayer oriented port, based off Skulltag, for Doom and Doom II by id Software.\r\n\r\nThis egg uses the Freedoom WAD by default.",
+      "tier": "disabled",
+      "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+      "defaultPort": 0,
+      "protocols": [
+        "udp"
+      ],
+      "upstream": {
+        "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+        "path": "doom/zandronum/egg-zandronum.json"
       }
     },
     {

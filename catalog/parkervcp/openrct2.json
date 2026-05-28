@@ -1,0 +1,15 @@
+{
+  "id": "openrct2",
+  "name": "OpenRCT2",
+  "summary": "OpenRCT2 is an open-source re-implementation of RollerCoaster Tycoon 2 (RCT2), expanding the game with new features, fixing bugs and raising game limits.",
+  "tier": "disabled",
+  "disabledReason": "install entrypoint is '/bin/bash', not a POSIX shell our installer can ignore",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "tycoon_games/openrct2/egg-openrct2.json"
+  }
+}

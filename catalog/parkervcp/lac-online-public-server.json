@@ -1,0 +1,15 @@
+{
+  "id": "lac-online-public-server",
+  "name": "LAC-Online Public Server",
+  "summary": "To make the Los Angeles Crimes public server. Los Angeles Crimes lets you play, create, and discover a variety of immersive worlds created by a global community!",
+  "tier": "disabled",
+  "disabledReason": "egg install URL contains unsubstituted shell variable ${VER}; needs a static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "losangelescrimes/egg-l-a-c--online-public-server.json"
+  }
+}

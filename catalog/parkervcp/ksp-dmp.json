@@ -1,0 +1,15 @@
+{
+  "id": "ksp-dmp",
+  "name": "KSP DMP",
+  "summary": "Dark Multiplayer mod server for Kerbal Space Program",
+  "tier": "disabled",
+  "disabledReason": "no extractable install URL; manual recipe required",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "ksp/egg-k-s-p-d-m-p.json"
+  }
+}

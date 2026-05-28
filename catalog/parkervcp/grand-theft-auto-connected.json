@@ -1,0 +1,15 @@
+{
+  "id": "grand-theft-auto-connected",
+  "name": "Grand Theft Auto Connected",
+  "summary": "Grand Theft Auto Connected is a custom scriptable multiplayer modification for multiple Grand Theft Auto games.",
+  "tier": "disabled",
+  "disabledReason": "egg install URL contains unsubstituted shell variable ${DL_VERSION}; needs a static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "gta/gtac/egg-grand-theft-auto-connected.json"
+  }
+}

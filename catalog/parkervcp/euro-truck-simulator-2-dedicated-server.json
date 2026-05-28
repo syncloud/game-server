@@ -1,0 +1,15 @@
+{
+  "id": "euro-truck-simulator-2-dedicated-server",
+  "name": "Euro Truck Simulator 2 Dedicated server",
+  "summary": "Travel across Europe as king of the road, a trucker who delivers important cargo across impressive distances! With dozens of cities to explore, your endurance, skill and speed will all be pushed to th",
+  "tier": "disabled",
+  "disabledReason": "candidate downloadExtract: static URL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz; promote after testing on device",
+  "defaultPort": 27016,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/truck-simulator/euro-truck-simulator2/egg-euro-truck-simulator2-dedicated-server.json"
+  }
+}

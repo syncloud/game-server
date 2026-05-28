@@ -1,0 +1,15 @@
+{
+  "id": "path-of-titans",
+  "name": "Path Of Titans",
+  "summary": "Path of Titans is a multiplayer dinosaur survival video game. Survive as a dinosaur in a rich ecosystem filled with intelligent AI creatures and up to 200 other players.",
+  "tier": "disabled",
+  "disabledReason": "egg installs build tools via apt/apk/yum; not supported in our snap install context",
+  "defaultPort": 7778,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "34331fce33c83df752d94e2a90b1e43ca6280f82",
+    "path": "path_of_titans/egg-path-of-titans.json"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "dead-matter",
+  "name": "Dead Matter",
+  "summary": "After a rampant viral outbreak causes global society to collapse, you must survive the harsh wilderness of the Canadian Rockies amidst vast hordes of Infected and rival survivors.",
+  "tier": "disabled",
+  "disabledReason": "steam: appid 1007 not yet validated for anonymous-loginnable install",
+  "defaultPort": 7002,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "steamcmd_servers/dead_matter/egg-dead-matter.json"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "openra-tiberian-dawn",
+  "name": "OpenRA - Tiberian Dawn",
+  "summary": "OpenRA is a project that recreates and modernizes the classic Command & Conquer real time strategy games. We have developed a flexible open source game engine (the OpenRA engine) that provides a commo",
+  "tier": "disabled",
+  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin",
+  "defaultPort": 0,
+  "protocols": [
+    "udp"
+  ],
+  "upstream": {
+    "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
+    "path": "openra/openra_tiberian_dawn/egg-open-r-a--tiberian-dawn.json"
+  }
+}
