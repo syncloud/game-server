@@ -35,14 +35,55 @@ func (r *RecipeInstaller) Install(ctx context.Context, g Game, installDir, steam
 	if g.Recipe == nil {
 		return nil, fmt.Errorf("no install recipe for %s", g.ID)
 	}
+	var result *Result
+	var err error
 	switch g.Recipe.Method {
 	case "steam":
-		return r.installSteam(ctx, g, installDir, steamUser, steamPass)
+		result, err = r.installSteam(ctx, g, installDir, steamUser, steamPass)
 	case "downloadExtract":
-		return r.installDownloadExtract(ctx, g, installDir)
+		result, err = r.installDownloadExtract(ctx, g, installDir)
+	case "downloadFile":
+		result, err = r.installDownloadFile(ctx, g, installDir)
 	default:
 		return nil, fmt.Errorf("unknown install method %q", g.Recipe.Method)
 	}
+	if err != nil {
+		return nil, err
+	}
+	for _, f := range g.Recipe.AdditionalURLs {
+		dest := filepath.Join(installDir, f.Dest)
+		if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
+			return nil, fmt.Errorf("additionalUrl mkdir: %w", err)
+		}
+		if err := r.download(ctx, f.URL, dest); err != nil {
+			return nil, fmt.Errorf("additionalUrl %s: %w", f.URL, err)
+		}
+	}
+	for _, f := range g.Recipe.PostInstallFiles {
+		dest := filepath.Join(installDir, f.Path)
+		if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
+			return nil, fmt.Errorf("postInstallFiles mkdir: %w", err)
+		}
+		if err := os.WriteFile(dest, []byte(f.Content), 0644); err != nil {
+			return nil, fmt.Errorf("postInstallFiles write %s: %w", f.Path, err)
+		}
+	}
+	return result, nil
+}
+
+func (r *RecipeInstaller) installDownloadFile(ctx context.Context, g Game, installDir string) (*Result, error) {
+	if g.Recipe.URL == "" {
+		return nil, fmt.Errorf("recipe url empty")
+	}
+	dest := filepath.Join(installDir, filepath.Base(g.Recipe.URL))
+	if err := r.download(ctx, g.Recipe.URL, dest); err != nil {
+		return nil, fmt.Errorf("download: %w", err)
+	}
+	if g.Start != nil && g.Start.Binary != "" {
+		binPath := filepath.Join(installDir, g.Start.Binary)
+		_ = os.Chmod(binPath, 0755)
+	}
+	return &Result{InstallDir: installDir, StartCmd: r.renderStart(g, installDir)}, nil
 }
 
 func (r *RecipeInstaller) installSteam(ctx context.Context, g Game, installDir, user, pass string) (*Result, error) {
@@ -105,6 +146,10 @@ func (r *RecipeInstaller) installDownloadExtract(ctx context.Context, g Game, in
 func (r *RecipeInstaller) renderStart(g Game, installDir string) string {
 	if g.Start == nil {
 		return fmt.Sprintf("echo 'no start recipe for %s; configure manually'", g.ID)
+	}
+	if g.Start.Command != "" {
+		cmd := strings.ReplaceAll(g.Start.Command, "{{port}}", strconv.Itoa(g.DefaultPort))
+		return fmt.Sprintf("cd %s && %s", installDir, cmd)
 	}
 	args := strings.ReplaceAll(g.Start.Args, "{{port}}", strconv.Itoa(g.DefaultPort))
 	bin := filepath.Join(installDir, g.Start.Binary)

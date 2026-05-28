@@ -472,10 +472,19 @@ func toInstallerGame(g Game) installer.Game {
 			SteamAppID: g.InstallRecipe.SteamAppID,
 			SteamArgs:  g.InstallRecipe.SteamArgs,
 		}
+		for _, f := range g.InstallRecipe.AdditionalURLs {
+			ig.Recipe.AdditionalURLs = append(ig.Recipe.AdditionalURLs,
+				installer.FileFetch{URL: f.URL, Dest: f.Dest})
+		}
+		for _, f := range g.InstallRecipe.PostInstallFiles {
+			ig.Recipe.PostInstallFiles = append(ig.Recipe.PostInstallFiles,
+				installer.FileWrite{Path: f.Path, Content: f.Content})
+		}
 	}
 	if g.Start != nil {
 		ig.Start = &installer.Start{
 			Binary:    g.Start.Binary,
+			Command:   g.Start.Command,
 			Wrap:      g.Start.Wrap,
 			ExtraLibs: g.Start.ExtraLibs,
 			Args:      g.Start.Args,

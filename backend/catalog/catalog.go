@@ -34,14 +34,27 @@ type Game struct {
 }
 
 type InstallRecipe struct {
-	Method     string   `json:"method"`
-	URL        string   `json:"url,omitempty"`
-	SteamAppID int      `json:"steamAppId,omitempty"`
-	SteamArgs  []string `json:"steamArgs,omitempty"`
+	Method           string         `json:"method"`
+	URL              string         `json:"url,omitempty"`
+	SteamAppID       int            `json:"steamAppId,omitempty"`
+	SteamArgs        []string       `json:"steamArgs,omitempty"`
+	AdditionalURLs   []FileFetch    `json:"additionalUrls,omitempty"`
+	PostInstallFiles []FileWrite    `json:"postInstallFiles,omitempty"`
+}
+
+type FileFetch struct {
+	URL  string `json:"url"`
+	Dest string `json:"dest"`
+}
+
+type FileWrite struct {
+	Path    string `json:"path"`
+	Content string `json:"content"`
 }
 
 type StartRecipe struct {
-	Binary    string   `json:"binary"`
+	Binary    string   `json:"binary,omitempty"`
+	Command   string   `json:"command,omitempty"`
 	Wrap      string   `json:"wrap,omitempty"`
 	ExtraLibs []string `json:"extraLibs,omitempty"`
 	Args      string   `json:"args,omitempty"`

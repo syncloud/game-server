@@ -24,14 +24,27 @@ type Game struct {
 }
 
 type Recipe struct {
-	Method     string
-	URL        string
-	SteamAppID int
-	SteamArgs  []string
+	Method           string
+	URL              string
+	SteamAppID       int
+	SteamArgs        []string
+	AdditionalURLs   []FileFetch
+	PostInstallFiles []FileWrite
+}
+
+type FileFetch struct {
+	URL  string
+	Dest string
+}
+
+type FileWrite struct {
+	Path    string
+	Content string
 }
 
 type Start struct {
 	Binary    string
+	Command   string
 	Wrap      string
 	ExtraLibs []string
 	Args      string
