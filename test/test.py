@@ -112,6 +112,28 @@ def test_logs_endpoint(device):
     cli_run(device, 'server', 'stop', 'log-stub')
     cli_run(device, 'server', 'delete', 'log-stub')
 
+def test_vanilla_bedrock_real_install(device):
+    """Repro for the converter's inability to handle dynamic install URLs.
+
+    The bedrock egg's install script scrapes minecraft.net to discover
+    the latest tarball URL at runtime (Akamai-served, version not in
+    URL). The only literal archive URL in the script is
+      https://minecraft.azureedge.net/bin-linux/bedrock-server-$BEDROCK_VERSION.zip
+    which deriveRecipe() captures verbatim — $BEDROCK_VERSION is never
+    expanded, so install hits http 404. Different shape from the
+    cuberite ${ARCH} bug: even with variable substitution, the version
+    has no static value — must be resolved against minecraft.net. The
+    right fix is a hand-curated overrides.json recipe."""
+    cli_run(device, 'server', 'create', 'bedrock-real', 'vanilla-bedrock', '--port', '19132')
+    cli_run(device, 'server', 'install', 'bedrock-real')
+    wait_status(device, 'bedrock-real', 'stopped', timeout=300)
+
+    install_dir = '/data/games/servers/bedrock-real'
+    out = device.run_ssh('ls {0} 2>&1'.format(install_dir))
+    assert 'bedrock_server' in out, 'bedrock_server binary missing post-install: ' + out
+
+    cli_run(device, 'server', 'delete', 'bedrock-real')
+
 def test_cuberite_real_install(device):
     """Repro for the converter ${ARCH} substitution bug.
 
