@@ -1,15 +1,21 @@
 {
   "id": "terraria-vanilla",
   "name": "Terraria Vanilla",
-  "summary": "Dig, fight, explore, build! Nothing is impossible in this action-packed adventure game.",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Re-Logic's official Terraria dedicated server. Pinned to 1.4.5.6 (build 1456).",
+  "tier": "experimental",
+  "defaultPort": 7777,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "terraria/vanilla/egg-terraria-vanilla.json"
+    "path": "game_eggs/terraria/vanilla/egg-terraria-vanilla.json"
   },
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
+  "installRecipe": {
+    "method": "downloadExtract",
+    "url": "https://terraria.org/api/download/pc-dedicated-server/terraria-server-1456.zip"
+  },
+  "start": {
+    "binary": "TerrariaServer.bin.x86_64",
+    "wrap": "amd64",
+    "extraLibs": ["."]
+  }
 }

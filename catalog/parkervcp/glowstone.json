@@ -1,15 +1,19 @@
 {
   "id": "glowstone",
   "name": "Glowstone",
-  "summary": "Glowstone is an open-source server implementation for Minecraft: Java Edition 1.12.2 and up.",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Open-source Minecraft Java 1.12.2 server. Pinned to 2021.8.0 (last release).",
+  "tier": "experimental",
+  "defaultPort": 25565,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "minecraft/java/glowstone/egg-glowstone.json"
+    "path": "game_eggs/minecraft/java/glowstone/egg-glowstone.json"
   },
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
+  "installRecipe": {
+    "method": "downloadFile",
+    "url": "https://github.com/GlowstoneMC/Glowstone/releases/download/2021.8.0/glowstone.jar"
+  },
+  "start": {
+    "command": "/snap/games/current/jre/bin/java -Xms128M -Xmx2048M -XX:+UseG1GC -jar glowstone.jar"
+  }
 }

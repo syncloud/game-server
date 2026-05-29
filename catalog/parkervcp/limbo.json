@@ -1,15 +1,19 @@
 {
   "id": "limbo",
   "name": "Limbo",
-  "summary": "Standalone server program Limbo.",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Standalone Minecraft Java server with no world (idle limbo). Pinned to 2026.0.1-ALPHA-26.1.2.",
+  "tier": "experimental",
+  "defaultPort": 25565,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "minecraft/java/limbo/egg-limbo.json"
+    "path": "game_eggs/minecraft/java/limbo/egg-limbo.json"
   },
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
+  "installRecipe": {
+    "method": "downloadFile",
+    "url": "https://ci.loohpjames.com/job/Limbo/lastSuccessfulBuild/artifact/target/Limbo-2026.0.1-ALPHA-26.1.2.jar"
+  },
+  "start": {
+    "command": "/snap/games/current/jre/bin/java -Xms128M -Xmx512M -jar Limbo-2026.0.1-ALPHA-26.1.2.jar"
+  }
 }
