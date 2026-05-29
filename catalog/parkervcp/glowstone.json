@@ -1,10 +1,12 @@
 {
   "id": "glowstone",
-  "name": "Glowstone",
+  "name": "Minecraft Glowstone",
   "summary": "Open-source Minecraft Java 1.12.2 server. Pinned to 2021.8.0 (last release).",
   "tier": "experimental",
   "defaultPort": 25565,
-  "protocols": ["tcp"],
+  "protocols": [
+    "tcp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/minecraft/java/glowstone/egg-glowstone.json"

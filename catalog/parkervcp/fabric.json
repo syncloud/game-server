@@ -1,6 +1,6 @@
 {
   "id": "fabric",
-  "name": "Fabric",
+  "name": "Minecraft Fabric",
   "summary": "Fabric is a modular modding toolchain targeting Minecraft 1.14 and above, including snapshots.",
   "tier": "disabled",
   "defaultPort": 0,

@@ -1,6 +1,6 @@
 {
   "id": "mohist",
-  "name": "Mohist",
+  "name": "Minecraft Mohist",
   "summary": "Spigot fork with performance optimizations.",
   "tier": "disabled",
   "defaultPort": 0,

@@ -1,6 +1,6 @@
 {
   "id": "liteloader-bedrock-dedicated-server",
-  "name": "Liteloader Bedrock Dedicated Server",
+  "name": "Minecraft Liteloader Bedrock Dedicated Server",
   "summary": "LiteLoaderBDS - Epoch-making & Cross-language Bedrock Dedicated Servers Plugin Loader\r\n\r\nLiteLoaderBDS is an unofficial plugin loader that provides basic API support for Bedrock Dedicated Server, with",
   "tier": "disabled",
   "defaultPort": 0,

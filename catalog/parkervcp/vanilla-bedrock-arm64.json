@@ -1,6 +1,6 @@
 {
   "id": "vanilla-bedrock-arm64",
-  "name": "Vanilla Bedrock ARM64",
+  "name": "Minecraft Vanilla Bedrock ARM64",
   "summary": "Bedrock Edition (also known as the Bedrock Version, Bedrock Codebase, Bedrock Engine or just Bedrock) refers to the multi-platform family of editions of Minecraft developed by Mojang AB, Microsoft Stu",
   "tier": "disabled",
   "defaultPort": 0,

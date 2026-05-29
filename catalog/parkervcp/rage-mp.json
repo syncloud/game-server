@@ -1,11 +1,13 @@
 {
   "id": "rage-mp",
-  "name": "Rage.MP",
+  "name": "GTA Rage.MP",
   "summary": "GTA V multiplayer mod server. Needs 2 ports + paid GTA V client to play.",
   "tier": "disabled",
   "disabledReason": "binary URL works but needs 2 ports + a paid GTA V client to play; not a casual smoke-test fixture",
   "defaultPort": 0,
-  "protocols": ["udp"],
+  "protocols": [
+    "udp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "gta/ragemp/egg-rage--m-p.json"

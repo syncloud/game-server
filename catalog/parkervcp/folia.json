@@ -1,10 +1,12 @@
 {
   "id": "folia",
-  "name": "Folia",
+  "name": "Minecraft Folia",
   "summary": "Paper fork with regionised multithreading. Pinned to 1.21.11 build 6.",
   "tier": "experimental",
   "defaultPort": 25565,
-  "protocols": ["tcp"],
+  "protocols": [
+    "tcp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/minecraft/java/folia/egg-folia.json"
@@ -13,7 +15,10 @@
     "method": "downloadFile",
     "url": "https://api.papermc.io/v2/projects/folia/versions/1.21.11/builds/6/downloads/folia-1.21.11-6.jar",
     "postInstallFiles": [
-      {"path": "eula.txt", "content": "eula=true\n"}
+      {
+        "path": "eula.txt",
+        "content": "eula=true\n"
+      }
     ]
   },
   "start": {

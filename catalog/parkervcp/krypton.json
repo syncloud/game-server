@@ -1,6 +1,6 @@
 {
   "id": "krypton",
-  "name": "Krypton",
+  "name": "Minecraft Krypton",
   "summary": "A fast, lightweight Minecraft server written in Kotlin",
   "tier": "disabled",
   "defaultPort": 0,

@@ -1,6 +1,6 @@
 {
   "id": "waterdog",
-  "name": "Waterdog",
+  "name": "Minecraft Waterdog",
   "summary": "Waterdog is fork of the well-known Waterfall, which is a fork of the well-known BungeeCord, server teleportation suite.",
   "tier": "disabled",
   "defaultPort": 0,

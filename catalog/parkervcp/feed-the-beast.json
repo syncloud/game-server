@@ -1,6 +1,6 @@
 {
   "id": "feed-the-beast",
-  "name": "Feed the Beast",
+  "name": "Minecraft Feed the Beast",
   "summary": "Egg to handle all official FTB Modpacks",
   "tier": "disabled",
   "defaultPort": 0,

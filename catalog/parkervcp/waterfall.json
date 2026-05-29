@@ -1,10 +1,12 @@
 {
   "id": "waterfall",
-  "name": "Waterfall",
+  "name": "Minecraft Waterfall",
   "summary": "BungeeCord-style Minecraft proxy. Pinned to 1.21 build 600.",
   "tier": "experimental",
   "defaultPort": 25577,
-  "protocols": ["tcp"],
+  "protocols": [
+    "tcp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/minecraft/proxy/java/waterfall/egg-waterfall.json"

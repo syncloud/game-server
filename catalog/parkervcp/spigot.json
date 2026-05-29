@@ -1,6 +1,6 @@
 {
   "id": "spigot",
-  "name": "Spigot",
+  "name": "Minecraft Spigot",
   "summary": "Spigot is the most widely-used modded Minecraft server software in the world. It powers many of the top Minecraft server networks around to ensure they can cope with their huge player base and ensure ",
   "tier": "disabled",
   "defaultPort": 0,

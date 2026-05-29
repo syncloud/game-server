@@ -1,10 +1,12 @@
 {
   "id": "attack-of-the-b-team",
-  "name": "Attack of the B-Team",
+  "name": "Minecraft Attack of the B-Team",
   "summary": "Crazy-science modpack from Technic. Pinned to 1.0.12c.",
   "tier": "experimental",
   "defaultPort": 25565,
-  "protocols": ["tcp"],
+  "protocols": [
+    "tcp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/minecraft/java/technic/attack-of-the-bteam/egg-attack-of-the-b--team.json"
@@ -19,7 +21,10 @@
       }
     ],
     "postInstallFiles": [
-      {"path": "eula.txt", "content": "eula=true\n"}
+      {
+        "path": "eula.txt",
+        "content": "eula=true\n"
+      }
     ]
   },
   "start": {

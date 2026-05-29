@@ -1,6 +1,6 @@
 {
   "id": "viaaas",
-  "name": "VIAaaS",
+  "name": "Minecraft VIAaaS",
   "summary": "VIAaaS - ViaVersion as a Service - Standalone ViaVersion proxy",
   "tier": "disabled",
   "defaultPort": 25543,

@@ -1,10 +1,12 @@
 {
   "id": "tekkit-2",
-  "name": "Tekkit 2",
+  "name": "Minecraft Tekkit 2",
   "summary": "Tekkit 2 modpack from Technic. Pinned to v1.0.5.",
   "tier": "experimental",
   "defaultPort": 25565,
-  "protocols": ["tcp"],
+  "protocols": [
+    "tcp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/minecraft/java/technic/Tekkit-2/egg-tekkit-2.json"
@@ -19,7 +21,10 @@
       }
     ],
     "postInstallFiles": [
-      {"path": "eula.txt", "content": "eula=true\n"}
+      {
+        "path": "eula.txt",
+        "content": "eula=true\n"
+      }
     ]
   },
   "start": {

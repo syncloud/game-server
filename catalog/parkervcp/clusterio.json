@@ -1,6 +1,6 @@
 {
   "id": "clusterio",
-  "name": "Clusterio",
+  "name": "Factorio Clusterio",
   "summary": "Clusterio is a clustered Factorio server manager that provides the tooling for implementing cross server interactions in Factorio. It was previously best known for implementing cross server transfer a",
   "tier": "disabled",
   "defaultPort": 0,

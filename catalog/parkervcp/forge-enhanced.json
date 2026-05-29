@@ -1,6 +1,6 @@
 {
   "id": "forge-enhanced",
-  "name": "Forge Enhanced",
+  "name": "Minecraft Forge Enhanced",
   "summary": "Minecraft Forge Server. Minecraft Forge is a modding API (Application Programming Interface), which makes it easier to create mods, and also make sure mods are compatible with each other.",
   "tier": "disabled",
   "defaultPort": 0,

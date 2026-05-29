@@ -1,6 +1,6 @@
 {
   "id": "modrinth-generic",
-  "name": "Modrinth Generic",
+  "name": "Minecraft Modrinth Generic",
   "summary": "A generic egg for a Modrinth modpack.",
   "tier": "disabled",
   "defaultPort": 0,

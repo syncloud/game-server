@@ -1,10 +1,12 @@
 {
   "id": "nanolimbo",
-  "name": "NanoLimbo",
+  "name": "Minecraft NanoLimbo",
   "summary": "Lightweight Minecraft Java limbo server (Netty). Pinned to v1.12.0.",
   "tier": "experimental",
   "defaultPort": 25565,
-  "protocols": ["tcp"],
+  "protocols": [
+    "tcp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/minecraft/java/nanolimbo/egg-nano-limbo.json"

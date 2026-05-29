@@ -1,6 +1,6 @@
 {
   "id": "spongeforge",
-  "name": "SpongeForge",
+  "name": "Minecraft SpongeForge",
   "summary": "A community-driven open source Minecraft: Java Edition modding platform.",
   "tier": "disabled",
   "defaultPort": 0,

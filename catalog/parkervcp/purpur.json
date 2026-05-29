@@ -1,10 +1,12 @@
 {
   "id": "purpur",
-  "name": "Purpur",
+  "name": "Minecraft Purpur",
   "summary": "Drop-in Paper replacement with extra config + fun gameplay tweaks. Pinned to 26.1.2 build 2587.",
   "tier": "experimental",
   "defaultPort": 25565,
-  "protocols": ["tcp"],
+  "protocols": [
+    "tcp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/minecraft/java/purpur/egg-purpur.json"
@@ -13,7 +15,10 @@
     "method": "downloadFile",
     "url": "https://api.purpurmc.org/v2/purpur/26.1.2/2587/download",
     "postInstallFiles": [
-      {"path": "eula.txt", "content": "eula=true\n"}
+      {
+        "path": "eula.txt",
+        "content": "eula=true\n"
+      }
     ]
   },
   "start": {

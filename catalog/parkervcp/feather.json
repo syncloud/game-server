@@ -1,10 +1,12 @@
 {
   "id": "feather",
-  "name": "Feather",
+  "name": "Minecraft Feather",
   "summary": "Rust-implementation of Minecraft Java server. Pinned to v0.6.0 (last release).",
   "tier": "experimental",
   "defaultPort": 25565,
-  "protocols": ["tcp"],
+  "protocols": [
+    "tcp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/minecraft/java/feather/egg-feather.json"
@@ -16,6 +18,8 @@
   "start": {
     "binary": "feather-server",
     "wrap": "amd64",
-    "extraLibs": ["."]
+    "extraLibs": [
+      "."
+    ]
   }
 }

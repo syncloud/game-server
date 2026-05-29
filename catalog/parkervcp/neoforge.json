@@ -1,6 +1,6 @@
 {
   "id": "neoforge",
-  "name": "NeoForge",
+  "name": "Minecraft NeoForge",
   "summary": "NeoForge Server. NeoForge is a modding API (Application Programming Interface), which makes it easier to create mods, and also make sure mods are compatible with each other. NeoForge is a fork of Mine",
   "tier": "disabled",
   "defaultPort": 0,

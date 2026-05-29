@@ -1,6 +1,6 @@
 {
   "id": "curseforge-generic",
-  "name": "CurseForge Generic",
+  "name": "Minecraft CurseForge Generic",
   "summary": "A generic egg for a CurseForge modpack.",
   "tier": "disabled",
   "defaultPort": 0,

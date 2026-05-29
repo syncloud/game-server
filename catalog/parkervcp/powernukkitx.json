@@ -1,10 +1,12 @@
 {
   "id": "powernukkitx",
-  "name": "PowerNukkitX",
+  "name": "Minecraft PowerNukkitX",
   "summary": "JVM-based alternative Bedrock-protocol server. Pinned to 2.0.0.",
   "tier": "experimental",
   "defaultPort": 19132,
-  "protocols": ["udp"],
+  "protocols": [
+    "udp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/minecraft/bedrock/PowerNukkitX/egg-powernukkitx.json"

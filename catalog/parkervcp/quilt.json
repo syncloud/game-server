@@ -1,6 +1,6 @@
 {
   "id": "quilt",
-  "name": "Quilt",
+  "name": "Minecraft Quilt",
   "summary": "The Quilt project is an open-source, community-driven modding toolchain designed primarily for Minecraft. By focusing on speed, ease of use and modularity, Quilt aims to provide a sleek and modern mod",
   "tier": "disabled",
   "defaultPort": 0,

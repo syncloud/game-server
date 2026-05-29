@@ -1,10 +1,12 @@
 {
   "id": "velocity",
-  "name": "Velocity",
+  "name": "Minecraft Velocity",
   "summary": "Minecraft server proxy. Pinned to 3.4.0-SNAPSHOT build 559.",
   "tier": "experimental",
   "defaultPort": 25577,
-  "protocols": ["tcp"],
+  "protocols": [
+    "tcp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/minecraft/proxy/java/velocity/egg-velocity.json"

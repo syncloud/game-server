@@ -1,6 +1,6 @@
 {
   "id": "zandronum",
-  "name": "Zandronum",
+  "name": "Doom Zandronum",
   "summary": "Zandronum is a multiplayer oriented port, based off Skulltag, for Doom and Doom II by id Software.\r\n\r\nThis egg uses the Freedoom WAD by default.",
   "tier": "disabled",
   "defaultPort": 0,

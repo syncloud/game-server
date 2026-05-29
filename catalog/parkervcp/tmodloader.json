@@ -1,10 +1,12 @@
 {
   "id": "tmodloader",
-  "name": "tModLoader",
+  "name": "Terraria tModLoader",
   "summary": "Modloader for Terraria. Pinned to v2026.03.3.0.",
   "tier": "experimental",
   "defaultPort": 7777,
-  "protocols": ["tcp"],
+  "protocols": [
+    "tcp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/terraria/tmodloader/egg-t-modloader.json"
@@ -16,7 +18,9 @@
   "start": {
     "binary": "tModLoaderServer",
     "wrap": "amd64",
-    "extraLibs": ["."],
+    "extraLibs": [
+      "."
+    ],
     "args": "-server -port {{port}}"
   }
 }

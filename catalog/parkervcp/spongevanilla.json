@@ -1,6 +1,6 @@
 {
   "id": "spongevanilla",
-  "name": "SpongeVanilla",
+  "name": "Minecraft SpongeVanilla",
   "summary": "SpongeVanilla is the implementation of the Sponge API on top of Vanilla Minecraft.",
   "tier": "disabled",
   "defaultPort": 0,

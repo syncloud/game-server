@@ -1,6 +1,6 @@
 {
   "id": "openmp",
-  "name": "OpenMP",
+  "name": "GTA OpenMP",
   "summary": "A multiplayer mod for Grand Theft Auto: San Andreas that is fully backwards compatible with San Andreas Multiplayer.",
   "tier": "disabled",
   "defaultPort": 0,

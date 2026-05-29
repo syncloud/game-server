@@ -1,10 +1,12 @@
 {
   "id": "tekkit-classic",
-  "name": "Tekkit Classic",
+  "name": "Minecraft Tekkit Classic",
   "summary": "Original Tekkit modpack from Technic. Pinned to 3.1.2.",
   "tier": "experimental",
   "defaultPort": 25565,
-  "protocols": ["tcp"],
+  "protocols": [
+    "tcp"
+  ],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
     "path": "game_eggs/minecraft/java/technic/tekkit-classic/egg-tekkit-classic.json"
@@ -19,7 +21,10 @@
       }
     ],
     "postInstallFiles": [
-      {"path": "eula.txt", "content": "eula=true\n"}
+      {
+        "path": "eula.txt",
+        "content": "eula=true\n"
+      }
     ]
   },
   "start": {

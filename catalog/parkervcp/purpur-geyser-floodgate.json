@@ -1,6 +1,6 @@
 {
   "id": "purpur-geyser-floodgate",
-  "name": "Purpur-Geyser-Floodgate",
+  "name": "Minecraft Purpur-Geyser-Floodgate",
   "summary": "A drop-in replacement for Paper servers designed for configurability, and new fun and exciting gameplay features, with the addition of GeyserMC and Floodgate",
   "tier": "disabled",
   "defaultPort": 0,
