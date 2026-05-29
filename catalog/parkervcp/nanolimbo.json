@@ -1,15 +1,19 @@
 {
   "id": "nanolimbo",
   "name": "NanoLimbo",
-  "summary": "This is lightweight minecraft limbo server, written on Java with Netty. The main goal of the project is maximum simplicity with a minimum number of sent and processed packets. This limbo is empty, the",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Lightweight Minecraft Java limbo server (Netty). Pinned to v1.12.0.",
+  "tier": "experimental",
+  "defaultPort": 25565,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "minecraft/java/nanolimbo/egg-nano-limbo.json"
+    "path": "game_eggs/minecraft/java/nanolimbo/egg-nano-limbo.json"
   },
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
+  "installRecipe": {
+    "method": "downloadFile",
+    "url": "https://github.com/Nan1t/NanoLimbo/releases/download/v1.12.0/NanoLimbo.jar"
+  },
+  "start": {
+    "command": "/snap/games/current/jre/bin/java -Xms128M -Xmx256M -jar NanoLimbo.jar"
+  }
 }

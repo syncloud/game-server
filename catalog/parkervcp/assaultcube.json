@@ -1,15 +1,21 @@
 {
   "id": "assaultcube",
   "name": "AssaultCube",
-  "summary": "AssaultCube is a FREE, multiplayer, first-person shooter game, based on the CUBE engine.\r\n\r\nTaking place in realistic environments, with fast, arcade gameplay, it's addictive and fun!",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Free multiplayer FPS on the Cube engine. Pinned to v1.3.0.2 LockdownEdition RC1.",
+  "tier": "experimental",
+  "defaultPort": 28763,
+  "protocols": ["udp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "cubeengine/assaultcube/egg-assault-cube.json"
+    "path": "game_eggs/cubeengine/assaultcube/egg-assault-cube.json"
   },
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
+  "installRecipe": {
+    "method": "downloadExtract",
+    "url": "https://github.com/assaultcube/AC/releases/download/v1.3.0.2/AssaultCube_v1.3.0.2_LockdownEdition_RC1.tar.bz2"
+  },
+  "start": {
+    "binary": "bin_unix/linux_64_server",
+    "wrap": "amd64",
+    "extraLibs": ["."]
+  }
 }
