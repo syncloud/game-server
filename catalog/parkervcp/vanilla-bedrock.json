@@ -1,6 +1,6 @@
 {
   "id": "vanilla-bedrock",
-  "name": "Vanilla Bedrock",
+  "name": "Minecraft Bedrock",
   "summary": "Mojang's official Bedrock dedicated server. Speaks UDP 19132 to the Play Store Minecraft app.",
   "tier": "experimental",
   "defaultPort": 19132,
