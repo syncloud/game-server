@@ -1,15 +1,22 @@
 {
   "id": "tmodloader",
-  "name": "tModloader",
-  "summary": "tModLoader is essentially a mod that provides a way to load your own mods without having to work directly with Terraria's source code itself. This means you can easily make mods that are compatible wi",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "name": "tModLoader",
+  "summary": "Modloader for Terraria. Pinned to v2026.03.3.0.",
+  "tier": "experimental",
+  "defaultPort": 7777,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "terraria/tmodloader/egg-t-modloader.json"
+    "path": "game_eggs/terraria/tmodloader/egg-t-modloader.json"
   },
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
+  "installRecipe": {
+    "method": "downloadExtract",
+    "url": "https://github.com/tModLoader/tModLoader/releases/download/v2026.03.3.0/tModLoader.zip"
+  },
+  "start": {
+    "binary": "tModLoaderServer",
+    "wrap": "amd64",
+    "extraLibs": ["."],
+    "args": "-server -port {{port}}"
+  }
 }
