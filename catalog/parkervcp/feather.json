@@ -1,15 +1,21 @@
 {
   "id": "feather",
   "name": "Feather",
-  "summary": "An experimental Minecraft server implementation written in Rust.",
-  "tier": "disabled",
-  "defaultPort": 0,
-  "protocols": [
-    "udp"
-  ],
+  "summary": "Rust-implementation of Minecraft Java server. Pinned to v0.6.0 (last release).",
+  "tier": "experimental",
+  "defaultPort": 25565,
+  "protocols": ["tcp"],
   "upstream": {
     "commit": "fcfd5a3549769ade15127a7577d6d3c397e83b05",
-    "path": "minecraft/java/feather/egg-feather.json"
+    "path": "game_eggs/minecraft/java/feather/egg-feather.json"
   },
-  "disabledReason": "egg resolves install URL dynamically (jq/zgrep/curl pipe); needs a hand-curated static URL pin"
+  "installRecipe": {
+    "method": "downloadExtract",
+    "url": "https://github.com/feather-rs/feather/releases/download/v0.6.0/feather-v0.6.0-linux.zip"
+  },
+  "start": {
+    "binary": "feather-server",
+    "wrap": "amd64",
+    "extraLibs": ["."]
+  }
 }
