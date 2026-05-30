@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"bytes"
@@ -8,12 +8,14 @@ import (
 	"strings"
 	"testing"
 
+	"go.uber.org/zap"
+
 	"github.com/syncloud/games/backend/catalog"
 	"github.com/syncloud/games/backend/db"
 	"github.com/syncloud/games/backend/server"
 )
 
-func testStore(t *testing.T) *db.DB {
+func testApi(t *testing.T) *Api {
 	t.Helper()
 	if err := catalog.Start(); err != nil {
 		t.Fatalf("catalog: %v", err)
@@ -23,22 +25,22 @@ func testStore(t *testing.T) *db.DB {
 		t.Fatalf("db start: %v", err)
 	}
 	t.Cleanup(func() { _ = d.Close() })
-	return d
+	return New(zap.NewNop(), d, nil, nil, nil)
 }
 
-func postServer(t *testing.T, store *db.DB, body map[string]any) *httptest.ResponseRecorder {
+func postServer(t *testing.T, a *Api, body map[string]any) *httptest.ResponseRecorder {
 	t.Helper()
 	raw, _ := json.Marshal(body)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/servers", bytes.NewReader(raw))
-	handleServers(rec, req, store)
+	a.handleServers(rec, req)
 	return rec
 }
 
 func TestCreateDerivesNameAndEnrichesGameName(t *testing.T) {
-	store := testStore(t)
+	a := testApi(t)
 
-	rec := postServer(t, store, map[string]any{"gameId": "teeworlds", "port": 8303})
+	rec := postServer(t, a, map[string]any{"gameId": "teeworlds", "port": 8303})
 	if rec.Code != http.StatusCreated {
 		t.Fatalf("create: want 201, got %d (%s)", rec.Code, rec.Body.String())
 	}
@@ -55,9 +57,9 @@ func TestCreateDerivesNameAndEnrichesGameName(t *testing.T) {
 }
 
 func TestCreateKeepsExplicitName(t *testing.T) {
-	store := testStore(t)
+	a := testApi(t)
 
-	rec := postServer(t, store, map[string]any{"name": "my-tw", "gameId": "teeworlds"})
+	rec := postServer(t, a, map[string]any{"name": "my-tw", "gameId": "teeworlds"})
 	if rec.Code != http.StatusCreated {
 		t.Fatalf("want 201, got %d (%s)", rec.Code, rec.Body.String())
 	}
@@ -69,12 +71,12 @@ func TestCreateKeepsExplicitName(t *testing.T) {
 }
 
 func TestCreateOnePerGameRejectsDuplicate(t *testing.T) {
-	store := testStore(t)
+	a := testApi(t)
 
-	if rec := postServer(t, store, map[string]any{"gameId": "teeworlds"}); rec.Code != http.StatusCreated {
+	if rec := postServer(t, a, map[string]any{"gameId": "teeworlds"}); rec.Code != http.StatusCreated {
 		t.Fatalf("first create: want 201, got %d (%s)", rec.Code, rec.Body.String())
 	}
-	rec := postServer(t, store, map[string]any{"gameId": "teeworlds"})
+	rec := postServer(t, a, map[string]any{"gameId": "teeworlds"})
 	if rec.Code != http.StatusConflict {
 		t.Fatalf("duplicate game: want 409, got %d (%s)", rec.Code, rec.Body.String())
 	}
@@ -84,9 +86,9 @@ func TestCreateOnePerGameRejectsDuplicate(t *testing.T) {
 }
 
 func TestCreateUnknownGameRejected(t *testing.T) {
-	store := testStore(t)
+	a := testApi(t)
 
-	rec := postServer(t, store, map[string]any{"gameId": "not-a-game"})
+	rec := postServer(t, a, map[string]any{"gameId": "not-a-game"})
 	if rec.Code != http.StatusBadRequest {
 		t.Fatalf("want 400, got %d (%s)", rec.Code, rec.Body.String())
 	}
@@ -96,14 +98,14 @@ func TestCreateUnknownGameRejected(t *testing.T) {
 }
 
 func TestListEnrichesGameName(t *testing.T) {
-	store := testStore(t)
-	if rec := postServer(t, store, map[string]any{"gameId": "teeworlds"}); rec.Code != http.StatusCreated {
+	a := testApi(t)
+	if rec := postServer(t, a, map[string]any{"gameId": "teeworlds"}); rec.Code != http.StatusCreated {
 		t.Fatalf("create: %d (%s)", rec.Code, rec.Body.String())
 	}
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/servers", nil)
-	handleServers(rec, req, store)
+	a.handleServers(rec, req)
 	if rec.Code != http.StatusOK {
 		t.Fatalf("list: want 200, got %d", rec.Code)
 	}

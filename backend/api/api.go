@@ -1,16 +1,17 @@
-package main
+package api
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/syncloud/games/backend/auth"
 	"github.com/syncloud/games/backend/catalog"
@@ -22,15 +23,100 @@ import (
 	"github.com/syncloud/games/backend/steam"
 )
 
-const oidcConfigPath = "/var/snap/games/current/oidc.json"
-
-type Game = catalog.Game
-
 const (
 	socketPath    = "/var/snap/games/current/backend.sock"
 	cliSocketPath = "/var/snap/games/current/cli.sock"
-	dbPath        = "/var/snap/games/current/database.db"
 )
+
+type Game = catalog.Game
+
+type Api struct {
+	logger *zap.Logger
+	store  *db.DB
+	run    *runner.Runner
+	inst   *installer.Installer
+	auth   *auth.Service
+}
+
+func New(logger *zap.Logger, store *db.DB, run *runner.Runner, inst *installer.Installer, authService *auth.Service) *Api {
+	return &Api{logger: logger, store: store, run: run, inst: inst, auth: authService}
+}
+
+func (a *Api) routes() http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/v1/health", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+	})
+	mux.HandleFunc("/api/v1/me", func(w http.ResponseWriter, r *http.Request) {
+		if a.auth != nil {
+			a.auth.HandleMe(w, r)
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]string{"sub": "unknown"})
+	})
+	mux.HandleFunc("/api/v1/games", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, catalog.All())
+	})
+	mux.HandleFunc("/api/v1/catalog/sources", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, catalog.Sources())
+	})
+	mux.HandleFunc("/api/v1/steam/login", a.handleSteamLogin)
+	mux.HandleFunc("/api/v1/steam/status", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, map[string]any{
+			"linked":   steam.StoredUsername() != "",
+			"username": steam.StoredUsername(),
+		})
+	})
+	mux.HandleFunc("/api/v1/servers", a.handleServers)
+	mux.HandleFunc("/api/v1/servers/", a.handleServerByID)
+	return mux
+}
+
+func (a *Api) Start() error {
+	apiHandler := a.routes()
+
+	_ = os.Remove(socketPath)
+	listener, err := net.Listen("unix", socketPath)
+	if err != nil {
+		return fmt.Errorf("listen: %w", err)
+	}
+	if err := os.Chmod(socketPath, 0666); err != nil {
+		return fmt.Errorf("chmod: %w", err)
+	}
+
+	_ = os.Remove(cliSocketPath)
+	cliListener, err := net.Listen("unix", cliSocketPath)
+	if err != nil {
+		return fmt.Errorf("listen cli: %w", err)
+	}
+	if err := os.Chmod(cliSocketPath, 0660); err != nil {
+		return fmt.Errorf("chmod cli: %w", err)
+	}
+
+	mux := http.NewServeMux()
+	if a.auth != nil {
+		mux.HandleFunc("/auth/login", a.auth.HandleLogin)
+		mux.HandleFunc("/auth/callback", a.auth.HandleCallback)
+		mux.HandleFunc("/auth/logout", a.auth.HandleLogout)
+		mux.Handle("/api/", a.auth.Middleware(apiHandler))
+	} else {
+		a.logger.Info("auth disabled — OIDC config not loaded; /api/ unprotected (dev mode)")
+		mux.Handle("/api/", apiHandler)
+	}
+
+	cliMux := http.NewServeMux()
+	cliMux.Handle("/api/", apiHandler)
+
+	go func() {
+		a.logger.Info("listening (cli)", zap.String("socket", cliSocketPath))
+		if err := http.Serve(cliListener, cliMux); err != nil {
+			a.logger.Fatal("serve cli", zap.Error(err))
+		}
+	}()
+
+	a.logger.Info("listening", zap.String("socket", socketPath))
+	return http.Serve(listener, mux)
+}
 
 func writeJSON(w http.ResponseWriter, code int, v any) {
 	w.Header().Set("Content-Type", "application/json")
@@ -77,154 +163,6 @@ func enrichServer(s *server.Server, ip string) {
 	s.LocalIp = ip
 }
 
-func main() {
-	logger := log.New(os.Stdout, "backend: ", log.LstdFlags)
-
-	if err := catalog.Start(); err != nil {
-		logger.Fatalf("catalog: %v", err)
-	}
-
-	store, err := openDB(logger)
-	if err != nil {
-		logger.Fatalf("db: %v", err)
-	}
-	defer store.Close()
-	run := runner.New(logger)
-	inst := installer.New(
-		installer.ServersBaseDir,
-		installer.NewRecipeInstaller(installer.SteamCMDPath, installer.SteamLib32, installer.SteamLib64),
-	)
-
-	_ = os.Remove(socketPath)
-	listener, err := net.Listen("unix", socketPath)
-	if err != nil {
-		logger.Fatalf("listen: %v", err)
-	}
-	if err := os.Chmod(socketPath, 0666); err != nil {
-		logger.Fatalf("chmod: %v", err)
-	}
-
-	_ = os.Remove(cliSocketPath)
-	cliListener, err := net.Listen("unix", cliSocketPath)
-	if err != nil {
-		logger.Fatalf("listen cli: %v", err)
-	}
-	if err := os.Chmod(cliSocketPath, 0660); err != nil {
-		logger.Fatalf("chmod cli: %v", err)
-	}
-
-	authSvc := loadAuth(logger)
-
-	api := http.NewServeMux()
-	api.HandleFunc("/api/v1/health", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
-	})
-	api.HandleFunc("/api/v1/me", func(w http.ResponseWriter, r *http.Request) {
-		if authSvc != nil {
-			authSvc.HandleMe(w, r)
-			return
-		}
-		writeJSON(w, http.StatusOK, map[string]string{"sub": "unknown"})
-	})
-	api.HandleFunc("/api/v1/games", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, http.StatusOK, catalog.All())
-	})
-	api.HandleFunc("/api/v1/catalog/sources", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, http.StatusOK, catalog.Sources())
-	})
-	api.HandleFunc("/api/v1/steam/login", func(w http.ResponseWriter, r *http.Request) {
-		handleSteamLogin(w, r)
-	})
-	api.HandleFunc("/api/v1/steam/status", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, http.StatusOK, map[string]any{
-			"linked":   steam.StoredUsername() != "",
-			"username": steam.StoredUsername(),
-		})
-	})
-	api.HandleFunc("/api/v1/servers", func(w http.ResponseWriter, r *http.Request) {
-		handleServers(w, r, store)
-	})
-	api.HandleFunc("/api/v1/servers/", func(w http.ResponseWriter, r *http.Request) {
-		handleServerByID(w, r, store, run, inst)
-	})
-
-	mux := http.NewServeMux()
-	if authSvc != nil {
-		mux.HandleFunc("/auth/login", authSvc.HandleLogin)
-		mux.HandleFunc("/auth/callback", authSvc.HandleCallback)
-		mux.HandleFunc("/auth/logout", authSvc.HandleLogout)
-		mux.Handle("/api/", authSvc.Middleware(api))
-	} else {
-		logger.Printf("auth disabled — OIDC config not loaded; /api/ unprotected (dev mode)")
-		mux.Handle("/api/", api)
-	}
-
-	cliMux := http.NewServeMux()
-	cliMux.Handle("/api/", api)
-
-	go func() {
-		logger.Printf("listening on %s (cli)", cliSocketPath)
-		if err := http.Serve(cliListener, cliMux); err != nil {
-			logger.Fatalf("serve cli: %v", err)
-		}
-	}()
-
-	logger.Printf("listening on %s", socketPath)
-	if err := http.Serve(listener, mux); err != nil {
-		logger.Fatalf("serve: %v", err)
-	}
-}
-
-type oidcFileConfig struct {
-	AuthUrl      string `json:"authUrl"`
-	AuthSocket   string `json:"authSocket"`
-	ClientID     string `json:"clientId"`
-	ClientSecret string `json:"clientSecret"`
-	RedirectUrl  string `json:"redirectUrl"`
-}
-
-func loadAuth(logger *log.Logger) *auth.Service {
-	data, err := os.ReadFile(oidcConfigPath)
-	if err != nil {
-		logger.Printf("auth: oidc.json missing (%v); /api/ will be unprotected", err)
-		return nil
-	}
-	var c oidcFileConfig
-	if err := json.Unmarshal(data, &c); err != nil {
-		logger.Printf("auth: oidc.json parse: %v", err)
-		return nil
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-	if c.AuthSocket == "" {
-		logger.Printf("auth: oidc.json missing authSocket; /api/ will be unprotected")
-		return nil
-	}
-	svc, err := auth.NewService(ctx, logger, c.AuthUrl, c.AuthSocket, c.ClientID, c.ClientSecret, c.ClientSecret, c.RedirectUrl)
-	if err != nil {
-		logger.Printf("auth: init: %v", err)
-		return nil
-	}
-	logger.Printf("auth: OIDC ready (provider=%s socket=%s client=%s redirect=%s)", c.AuthUrl, c.AuthSocket, c.ClientID, c.RedirectUrl)
-	return svc
-}
-
-func openDB(logger *log.Logger) (*db.DB, error) {
-	d := db.New(dbPath)
-	if err := d.Start(); err != nil {
-		if _, statErr := os.Stat("/var/snap/games/current"); statErr != nil {
-			logger.Printf("data dir missing, falling back to in-memory db: %v", statErr)
-			d = db.New(":memory:")
-			if err := d.Start(); err != nil {
-				return nil, err
-			}
-			return d, nil
-		}
-		return nil, err
-	}
-	return d, nil
-}
-
 type createRequest struct {
 	Name     string `json:"name"`
 	GameID   string `json:"gameId"`
@@ -232,10 +170,10 @@ type createRequest struct {
 	StartCmd string `json:"startCmd"`
 }
 
-func handleServers(w http.ResponseWriter, r *http.Request, store *db.DB) {
+func (a *Api) handleServers(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		list, err := store.ListServers()
+		list, err := a.store.ListServers()
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -256,7 +194,7 @@ func handleServers(w http.ResponseWriter, r *http.Request, store *db.DB) {
 			writeError(w, http.StatusBadRequest, "unknown gameId")
 			return
 		}
-		existing, err := store.ListServers()
+		existing, err := a.store.ListServers()
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -274,7 +212,7 @@ func handleServers(w http.ResponseWriter, r *http.Request, store *db.DB) {
 		if req.Port == 0 {
 			req.Port = game.DefaultPort
 		}
-		s, err := store.CreateServer(server.Server{
+		s, err := a.store.CreateServer(server.Server{
 			Name:     name,
 			GameID:   req.GameID,
 			Port:     req.Port,
@@ -292,7 +230,7 @@ func handleServers(w http.ResponseWriter, r *http.Request, store *db.DB) {
 	}
 }
 
-func handleServerByID(w http.ResponseWriter, r *http.Request, store *db.DB, run *runner.Runner, inst *installer.Installer) {
+func (a *Api) handleServerByID(w http.ResponseWriter, r *http.Request) {
 	rest := strings.TrimPrefix(r.URL.Path, "/api/v1/servers/")
 	parts := strings.SplitN(rest, "/", 2)
 	id, err := strconv.ParseInt(parts[0], 10, 64)
@@ -303,19 +241,19 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *db.DB, run 
 	if len(parts) == 2 && parts[1] != "" {
 		switch parts[1] {
 		case "logs":
-			handleLogs(w, r, run, id)
+			a.handleLogs(w, r, id)
 			return
 		case "query":
-			handleQuery(w, r, store, id)
+			a.handleQuery(w, r, id)
 			return
 		default:
-			handleServerAction(w, r, store, run, inst, id, parts[1])
+			a.handleServerAction(w, r, id, parts[1])
 			return
 		}
 	}
 	switch r.Method {
 	case http.MethodGet:
-		s, err := store.GetServer(id)
+		s, err := a.store.GetServer(id)
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -324,12 +262,12 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *db.DB, run 
 			writeError(w, http.StatusNotFound, "not found")
 			return
 		}
-		s.Status = currentStatus(s, run)
+		s.Status = a.currentStatus(s)
 		enrichServer(s, hostIP())
 		writeJSON(w, http.StatusOK, s)
 	case http.MethodDelete:
-		_ = run.Stop(id)
-		if err := store.DeleteServer(id); err != nil {
+		_ = a.run.Stop(id)
+		if err := a.store.DeleteServer(id); err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -340,13 +278,13 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *db.DB, run 
 	}
 }
 
-func handleServerAction(w http.ResponseWriter, r *http.Request, store *db.DB, run *runner.Runner, inst *installer.Installer, id int64, action string) {
+func (a *Api) handleServerAction(w http.ResponseWriter, r *http.Request, id int64, action string) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", "POST")
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
-	s, err := store.GetServer(id)
+	s, err := a.store.GetServer(id)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -370,53 +308,53 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, store *db.DB, ru
 			writeError(w, http.StatusConflict, fmt.Sprintf("game %s is disabled: %s", game.ID, reason))
 			return
 		}
-		_ = store.UpdateServerStatus(id, "installing")
-		go runInstall(log.Default(), store, inst, id, *game)
+		_ = a.store.UpdateServerStatus(id, "installing")
+		go a.runInstall(id, *game)
 		s.Status = "installing"
 	case "start":
-		if err := run.Start(id, s.StartCmd, s.InstallDir); err != nil {
+		if err := a.run.Start(id, s.StartCmd, s.InstallDir); err != nil {
 			writeError(w, http.StatusConflict, err.Error())
 			return
 		}
-		_ = store.UpdateServerStatus(id, "running")
+		_ = a.store.UpdateServerStatus(id, "running")
 	case "stop":
-		if err := run.Stop(id); err != nil {
+		if err := a.run.Stop(id); err != nil {
 			writeError(w, http.StatusConflict, err.Error())
 			return
 		}
-		_ = store.UpdateServerStatus(id, "stopped")
+		_ = a.store.UpdateServerStatus(id, "stopped")
 	case "restart":
-		if err := run.Restart(id, s.StartCmd, s.InstallDir); err != nil {
+		if err := a.run.Restart(id, s.StartCmd, s.InstallDir); err != nil {
 			writeError(w, http.StatusConflict, err.Error())
 			return
 		}
-		_ = store.UpdateServerStatus(id, "running")
+		_ = a.store.UpdateServerStatus(id, "running")
 	default:
 		writeError(w, http.StatusNotFound, "unknown action")
 		return
 	}
-	s, _ = store.GetServer(id)
-	s.Status = currentStatus(s, run)
+	s, _ = a.store.GetServer(id)
+	s.Status = a.currentStatus(s)
 	enrichServer(s, hostIP())
 	writeJSON(w, http.StatusOK, s)
 }
 
-func handleLogs(w http.ResponseWriter, r *http.Request, run *runner.Runner, id int64) {
+func (a *Api) handleLogs(w http.ResponseWriter, r *http.Request, id int64) {
 	if r.Method != http.MethodGet {
 		w.Header().Set("Allow", "GET")
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
-	writeJSON(w, http.StatusOK, map[string]any{"lines": run.Logs(id)})
+	writeJSON(w, http.StatusOK, map[string]any{"lines": a.run.Logs(id)})
 }
 
-func handleQuery(w http.ResponseWriter, r *http.Request, store *db.DB, id int64) {
+func (a *Api) handleQuery(w http.ResponseWriter, r *http.Request, id int64) {
 	if r.Method != http.MethodGet {
 		w.Header().Set("Allow", "GET")
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
-	s, err := store.GetServer(id)
+	s, err := a.store.GetServer(id)
 	if err != nil || s == nil {
 		writeError(w, http.StatusNotFound, "not found")
 		return
@@ -436,7 +374,7 @@ type steamLoginRequest struct {
 	GuardCode string `json:"guardCode"`
 }
 
-func handleSteamLogin(w http.ResponseWriter, r *http.Request) {
+func (a *Api) handleSteamLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", "POST")
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
@@ -467,20 +405,20 @@ func handleSteamLogin(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func currentStatus(s *server.Server, run *runner.Runner) string {
+func (a *Api) currentStatus(s *server.Server) string {
 	if s.Status == "installing" || s.Status == "install-error" {
 		return s.Status
 	}
-	if run.Running(s.ID) {
+	if a.run.Running(s.ID) {
 		return "running"
 	}
 	return "stopped"
 }
 
-func runInstall(logger *log.Logger, store *db.DB, inst *installer.Installer, id int64, g Game) {
+func (a *Api) runInstall(id int64, g Game) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
-	s, err := store.GetServer(id)
+	s, err := a.store.GetServer(id)
 	if err != nil || s == nil {
 		return
 	}
@@ -489,17 +427,20 @@ func runInstall(logger *log.Logger, store *db.DB, inst *installer.Installer, id 
 	if g.InstallRecipe != nil {
 		appid = g.InstallRecipe.SteamAppID
 	}
-	logger.Printf("install[%d] starting: game=%s source=%s appid=%d steamUser=%q", id, g.ID, g.Source, appid, steamUser)
-	result, err := inst.Install(ctx, toInstallerGame(g), s.Name, s.Port, steamUser, "")
+	a.logger.Info("install starting",
+		zap.Int64("id", id), zap.String("game", g.ID), zap.String("source", g.Source),
+		zap.Int("appid", appid), zap.String("steamUser", steamUser))
+	result, err := a.inst.Install(ctx, toInstallerGame(g), s.Name, s.Port, steamUser, "")
 	if err != nil {
-		logger.Printf("install[%d] FAILED: %v", id, err)
-		_ = store.UpdateServerLastError(id, err.Error())
-		_ = store.UpdateServerStatus(id, "install-error")
+		a.logger.Error("install failed", zap.Int64("id", id), zap.Error(err))
+		_ = a.store.UpdateServerLastError(id, err.Error())
+		_ = a.store.UpdateServerStatus(id, "install-error")
 		return
 	}
-	logger.Printf("install[%d] OK: dir=%s start=%q", id, result.InstallDir, result.StartCmd)
-	_ = store.UpdateServerInstall(id, result.InstallDir, result.StartCmd)
-	_ = store.UpdateServerStatus(id, "stopped")
+	a.logger.Info("install ok", zap.Int64("id", id),
+		zap.String("dir", result.InstallDir), zap.String("start", result.StartCmd))
+	_ = a.store.UpdateServerInstall(id, result.InstallDir, result.StartCmd)
+	_ = a.store.UpdateServerStatus(id, "stopped")
 }
 
 func toInstallerGame(g Game) installer.Game {
