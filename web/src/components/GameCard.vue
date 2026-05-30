@@ -1,12 +1,14 @@
 <script setup>
-defineProps({ game: { type: Object, required: true } })
-defineEmits(['install'])
+defineProps({
+  game: { type: Object, required: true },
+  installedId: { type: Number, default: null }
+})
+defineEmits(['install', 'open'])
 </script>
 
 <template>
   <article class="card" :data-testid="`game-${game.id}`">
     <div class="card-head">
-      <div class="card-icon">{{ game.name.charAt(0) }}</div>
       <div>
         <h3 class="card-title">{{ game.name }}</h3>
         <span :class="['badge', game.installRecipe?.method === 'steam' ? '' : 'egg']">{{ game.source }}</span>
@@ -17,7 +19,13 @@ defineEmits(['install'])
     <p class="card-summary">{{ game.summary }}</p>
     <div class="card-foot">
       <span class="port">{{ (game.protocols || []).join('/').toUpperCase() }} {{ game.defaultPort }}</span>
-      <button class="btn" data-testid="install-btn" @click="$emit('install', game)">Install</button>
+      <button
+        v-if="installedId"
+        class="btn ghost"
+        data-testid="open-btn"
+        @click="$emit('open', installedId)"
+      >Installed</button>
+      <button v-else class="btn" data-testid="install-btn" @click="$emit('install', game)">Install</button>
     </div>
   </article>
 </template>

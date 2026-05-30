@@ -4,17 +4,15 @@ import { ref, computed } from 'vue'
 const props = defineProps({ game: { type: Object, required: true } })
 const emit = defineEmits(['close', 'submit'])
 
-const name = ref(props.game.id)
 const port = ref(props.game.defaultPort)
 const error = ref(null)
 
-const valid = computed(() => name.value.trim().length > 0 && port.value > 0)
+const valid = computed(() => port.value > 0)
 
 async function submit () {
   error.value = null
   try {
     await emit('submit', {
-      name: name.value.trim(),
       gameId: props.game.id,
       port: Number(port.value)
     })
@@ -32,10 +30,6 @@ async function submit () {
         <button class="modal-close" data-testid="dialog-close" @click="emit('close')">✕</button>
       </header>
       <div class="modal-body">
-        <label>
-          Name
-          <input v-model="name" data-testid="dialog-name" />
-        </label>
         <label>
           Port
           <input v-model.number="port" type="number" data-testid="dialog-port" />

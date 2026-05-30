@@ -50,6 +50,33 @@ func gameByID(id string) *Game {
 	return &g
 }
 
+func hostIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ""
+	}
+	for _, a := range addrs {
+		ipnet, ok := a.(*net.IPNet)
+		if !ok || ipnet.IP.IsLoopback() {
+			continue
+		}
+		if ip4 := ipnet.IP.To4(); ip4 != nil {
+			return ip4.String()
+		}
+	}
+	return ""
+}
+
+func enrichServer(s *server.Server, ip string) {
+	if s == nil {
+		return
+	}
+	if g, ok := catalog.Get(s.GameID); ok {
+		s.GameName = g.Name
+	}
+	s.LocalIp = ip
+}
+
 func main() {
 	logger := log.New(os.Stdout, "backend: ", log.LstdFlags)
 
@@ -213,6 +240,10 @@ func handleServers(w http.ResponseWriter, r *http.Request, store *db.DB) {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+		ip := hostIP()
+		for i := range list {
+			enrichServer(&list[i], ip)
+		}
 		writeJSON(w, http.StatusOK, list)
 	case http.MethodPost:
 		var req createRequest
@@ -220,21 +251,31 @@ func handleServers(w http.ResponseWriter, r *http.Request, store *db.DB) {
 			writeError(w, http.StatusBadRequest, "invalid body")
 			return
 		}
-		req.Name = strings.TrimSpace(req.Name)
-		if req.Name == "" {
-			writeError(w, http.StatusBadRequest, "name required")
-			return
-		}
 		game := gameByID(req.GameID)
 		if game == nil {
 			writeError(w, http.StatusBadRequest, "unknown gameId")
 			return
 		}
+		existing, err := store.ListServers()
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		for _, e := range existing {
+			if e.GameID == req.GameID {
+				writeError(w, http.StatusConflict, fmt.Sprintf("%s is already installed", game.Name))
+				return
+			}
+		}
+		name := strings.TrimSpace(req.Name)
+		if name == "" {
+			name = req.GameID
+		}
 		if req.Port == 0 {
 			req.Port = game.DefaultPort
 		}
 		s, err := store.CreateServer(server.Server{
-			Name:     req.Name,
+			Name:     name,
 			GameID:   req.GameID,
 			Port:     req.Port,
 			StartCmd: req.StartCmd,
@@ -243,6 +284,7 @@ func handleServers(w http.ResponseWriter, r *http.Request, store *db.DB) {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+		enrichServer(s, hostIP())
 		writeJSON(w, http.StatusCreated, s)
 	default:
 		w.Header().Set("Allow", "GET, POST")
@@ -283,6 +325,7 @@ func handleServerByID(w http.ResponseWriter, r *http.Request, store *db.DB, run 
 			return
 		}
 		s.Status = currentStatus(s, run)
+		enrichServer(s, hostIP())
 		writeJSON(w, http.StatusOK, s)
 	case http.MethodDelete:
 		_ = run.Stop(id)
@@ -354,6 +397,7 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, store *db.DB, ru
 	}
 	s, _ = store.GetServer(id)
 	s.Status = currentStatus(s, run)
+	enrichServer(s, hostIP())
 	writeJSON(w, http.StatusOK, s)
 }
 

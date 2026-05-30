@@ -21,6 +21,8 @@ async function load () {
   } catch (e) { error.value = e.message }
 }
 
+const title = computed(() => server.value?.gameName || server.value?.gameId || '')
+
 async function loadLogs () {
   try {
     const r = await api.logs(props.id)
@@ -46,6 +48,10 @@ async function confirmDelete () {
 }
 
 const status = computed(() => server.value?.status || 'unknown')
+const connect = computed(() => {
+  if (!server.value) return ''
+  return `${server.value.localIp || '<server-ip>'}:${server.value.port}`
+})
 const installed = computed(() => server.value?.installDir && server.value.installDir.length > 0)
 
 onMounted(() => {
@@ -63,15 +69,11 @@ onUnmounted(() => { clearInterval(pollServer); clearInterval(pollLogs) })
   <div v-if="error" class="error">{{ error }}</div>
 
   <div v-if="server" class="detail-head">
-    <div class="card-icon big">{{ server.name.charAt(0) }}</div>
     <div class="detail-meta">
-      <h1 data-testid="detail-name">{{ server.name }}</h1>
-      <p class="muted">
-        {{ server.gameId.toUpperCase() }} ·
+      <h1 data-testid="detail-name">
+        {{ title }}
         <span :class="['badge', `status-${status}`]" data-testid="detail-status">{{ status }}</span>
-        ·
-        PORT {{ server.port }}
-      </p>
+      </h1>
     </div>
     <div class="detail-actions">
       <button v-if="!installed" class="btn" data-testid="action-install" @click="action('install')">Install</button>
@@ -93,10 +95,12 @@ onUnmounted(() => { clearInterval(pollServer); clearInterval(pollLogs) })
 
   <section v-if="tab === 'overview' && server" class="detail-card" data-testid="detail-overview">
     <dl>
+      <dt>Connect</dt><dd class="mono" data-testid="detail-connect">{{ connect }}</dd>
       <dt>Install dir</dt><dd>{{ server.installDir || '—' }}</dd>
       <dt>Start command</dt><dd class="mono">{{ server.startCmd || '—' }}</dd>
       <dt>Status</dt><dd>{{ status }}</dd>
     </dl>
+    <p class="muted">Enter this address in the game client to join from another device on your network.</p>
   </section>
 
   <section v-if="tab === 'logs'" class="detail-card log-viewer" data-testid="detail-logs">
@@ -113,7 +117,7 @@ onUnmounted(() => { clearInterval(pollServer); clearInterval(pollLogs) })
   <ConfirmDialog
     v-if="confirmingDelete && server"
     title="Delete server?"
-    :message="`Remove '${server.name}' from the catalog. Installed game files under /data/games/servers/${server.name} will stay on disk — delete them manually if you no longer want them.`"
+    :message="`Remove '${title}' from the catalog. Installed game files under /data/games/servers/${server.name} will stay on disk — delete them manually if you no longer want them.`"
     confirm-label="Delete"
     danger
     @cancel="confirmingDelete = false"
@@ -133,15 +137,19 @@ onUnmounted(() => { clearInterval(pollServer); clearInterval(pollLogs) })
 .link-back:hover { color: var(--text); }
 .detail-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  gap: 12px 16px;
   margin-bottom: 16px;
 }
-.card-icon.big { width: 56px; height: 56px; font-size: 22px; }
-.detail-meta { flex: 1; }
-.detail-meta h1 { margin: 0; font-size: 22px; }
+.detail-meta { flex: 1 1 100%; }
+.detail-meta h1 { margin: 0; font-size: 22px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .muted { color: var(--text-muted); font-size: 14px; margin: 4px 0 0; }
 .detail-actions { display: flex; gap: 8px; }
+@media (max-width: 640px) {
+  .detail-actions { width: 100%; }
+  .detail-actions .btn { flex: 1; }
+}
 .subtabs {
   display: flex;
   gap: 4px;
