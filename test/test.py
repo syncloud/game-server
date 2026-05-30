@@ -87,15 +87,27 @@ def test_create_server(device):
     assert s['name'] == 'test-tw'
     assert s['gameId'] == 'teeworlds'
     assert s['status'] == 'stopped'
+    assert s['gameName'], 'gameName should be enriched from the catalog: ' + str(s)
+    assert 'localIp' in s, 'server should carry the host localIp: ' + str(s)
 
 def test_list_after_create(device):
     servers = cli_run(device, 'server', 'list')
     assert len(servers) == 1
     assert servers[0]['name'] == 'test-tw'
+    assert servers[0]['gameName'], 'list entries should be enriched with gameName: ' + str(servers[0])
 
 def test_delete_server(device):
     cli_run(device, 'server', 'delete', 'test-tw')
     assert cli_run(device, 'server', 'list') == []
+
+def test_one_server_per_game(device):
+    cli_run(device, 'server', 'create', 'dup-a', 'teeworlds', '--port', '8401')
+    out = device.run_ssh(
+        '/snap/bin/games.cli server create dup-b teeworlds --port 8402 2>&1; echo EXIT=\$?',
+        throw=False)
+    assert 'already installed' in out.lower(), out
+    assert 'EXIT=1' in out, out
+    cli_run(device, 'server', 'delete', 'dup-a')
 
 def test_create_unknown_game_rejected(device):
     out = device.run_ssh(

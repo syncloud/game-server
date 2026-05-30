@@ -97,23 +97,40 @@ const sources = {
 const initialServers = [
   {
     id: 1,
-    name: 'my-tw',
+    name: 'teeworlds',
     gameId: 'teeworlds',
     port: 8303,
     status: 'running',
-    installDir: '/data/games/servers/my-tw',
-    startCmd: 'cd /data/games/servers/my-tw && ./teeworlds_srv "sv_port 8303"'
+    installDir: '/data/games/servers/teeworlds',
+    startCmd: 'cd /data/games/servers/teeworlds && ./teeworlds_srv "sv_port 8303"'
   },
   {
     id: 2,
-    name: 'mc-paper',
+    name: 'paper',
     gameId: 'paper',
     port: 25565,
     status: 'stopped',
-    installDir: '/data/games/servers/mc-paper',
-    startCmd: 'cd /data/games/servers/mc-paper && java -jar paper.jar nogui'
+    installDir: '/data/games/servers/paper',
+    startCmd: 'cd /data/games/servers/paper && java -jar paper.jar nogui'
+  },
+  {
+    id: 3,
+    name: 'hlds-cs',
+    gameId: 'hlds-cs',
+    port: 27015,
+    status: 'stopped',
+    installDir: '/data/games/servers/hlds-cs',
+    startCmd: 'cd /data/games/servers/hlds-cs && ./hlds_run -game cstrike +port 27015'
   }
 ]
+
+const localIp = '192.168.1.10'
+
+function withGameName (s) {
+  if (!s) return s
+  const g = games.find(x => x.id === s.gameId)
+  return { ...s, gameName: g ? g.name : s.gameId, localIp }
+}
 
 function buildLog (server) {
   return [
@@ -146,28 +163,31 @@ export function mock () {
         return { linked: true, username: body.username }
       })
 
-      this.get('/api/v1/servers', () => servers)
+      this.get('/api/v1/servers', () => servers.map(withGameName))
 
       this.get('/api/v1/servers/:id', (_, request) => {
         const s = servers.find(x => x.id === Number(request.params.id))
-        return s || new Response(404, {}, { error: 'not found' })
+        return s ? withGameName(s) : new Response(404, {}, { error: 'not found' })
       })
 
       this.post('/api/v1/servers', (_, request) => {
         const body = JSON.parse(request.requestBody || '{}')
         const g = games.find(x => x.id === body.gameId)
         if (!g) return new Response(400, {}, { error: 'unknown game' })
+        if (servers.some(x => x.gameId === body.gameId)) {
+          return new Response(409, {}, { error: `${g.name} is already installed` })
+        }
         const s = {
           id: nextId++,
-          name: body.name,
+          name: body.gameId,
           gameId: body.gameId,
           port: body.port || g.defaultPort,
           status: 'stopped',
-          installDir: `/data/games/servers/${body.name}`,
+          installDir: `/data/games/servers/${body.gameId}`,
           startCmd: '(stub) not started yet'
         }
         servers.push(s)
-        return new Response(201, {}, s)
+        return new Response(201, {}, withGameName(s))
       })
 
       this.delete('/api/v1/servers/:id', (_, request) => {
@@ -181,7 +201,7 @@ export function mock () {
         const s = servers.find(x => x.id === Number(request.params.id))
         if (!s) return new Response(404, {}, { error: 'not found' })
         s.status = next
-        return s
+        return withGameName(s)
       }
       this.post('/api/v1/servers/:id/install', action('stopped'))
       this.post('/api/v1/servers/:id/start', action('running'))

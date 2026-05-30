@@ -62,7 +62,7 @@ onUnmounted(() => clearInterval(poll))
   <ConfirmDialog
     v-if="pendingDelete"
     title="Delete server?"
-    :message="`Remove '${pendingDelete.name}' from the catalog. Installed game files under /data/games/servers/${pendingDelete.name} will stay on disk — delete them manually if you no longer want them.`"
+    :message="`Remove '${pendingDelete.gameName || pendingDelete.gameId}' from the catalog. Installed game files under /data/games/servers/${pendingDelete.name} will stay on disk — delete them manually if you no longer want them.`"
     confirm-label="Delete"
     danger
     @cancel="pendingDelete = null"

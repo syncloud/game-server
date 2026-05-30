@@ -7,6 +7,7 @@ import InstallDialog from '../components/InstallDialog.vue'
 
 const router = useRouter()
 const games = ref([])
+const installedByGame = ref({})
 const loading = ref(true)
 const error = ref(null)
 const query = ref('')
@@ -27,6 +28,10 @@ async function load () {
   loading.value = true; error.value = null
   try {
     games.value = await api.games()
+    try {
+      const servers = await api.servers()
+      installedByGame.value = Object.fromEntries(servers.map(s => [s.gameId, s.id]))
+    } catch (_) { installedByGame.value = {} }
     try {
       const s = await fetch('/api/v1/steam/status').then(r => r.json())
       steamLinked.value = !!s.linked
@@ -118,7 +123,9 @@ onMounted(load)
       v-for="g in filtered"
       :key="g.id"
       :game="g"
+      :installed-id="installedByGame[g.id] || null"
       @install="startInstall"
+      @open="router.push(`/servers/${$event}`)"
     />
   </div>
 
