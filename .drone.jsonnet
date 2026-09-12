@@ -169,7 +169,7 @@ local platform_image(distro, arch) =
       },
       command: ['snap', '-c', '${DRONE_BRANCH}'],
       when: {
-        branch: ['master', 'stable'],
+        branch: ['stable'],
         event: ['push'],
       },
     },
